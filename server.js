@@ -10,6 +10,7 @@ const { Pool } = pkg;
 
 dotenv.config({ path: "./.env.local" });
 const app = express();
+app.set("trust proxy", 1);
 const pool = new Pool({
     user: process.env.PGUSER,
     host: process.env.PGHOST,

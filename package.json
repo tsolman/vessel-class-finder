@@ -5,6 +5,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
+    "start": "node server.js",
+    "scrape": "node app.js",
     "test": "NODE_ENV=test vitest run"
   },
   "author": "WeAreFabbrik",

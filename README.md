@@ -112,7 +112,23 @@ Content-Type: application/json
 { "imos": [9200079, 9300123] }
 ```
 
-Response: Array of vessel records with IMO, name, class, survey dates, and status.
+Response:
+
+```json
+[
+  {
+    "imo": 9200079,
+    "vessel_name": "EXAMPLE VESSEL",
+    "update_date": "01/03/26",
+    "class": "LR",
+    "date_of_survey": "15/06/2025",
+    "date_of_next_survey": "15/06/2028",
+    "date_of_latest_status": "01/01/2024",
+    "status": "In Class",
+    "reason_for_status": ""
+  }
+]
+```
 
 ### Subscriptions (requires `x-api-key` header)
 
@@ -156,6 +172,23 @@ x-api-key: your-api-key
 ```
 
 Response: `{ "message": "API key revoked" }`
+
+### Error Responses
+
+All errors return JSON with an `error` field:
+
+```json
+{ "error": "Invalid credentials" }
+```
+
+| Status | Meaning |
+|--------|---------|
+| 400 | Bad request (missing/invalid fields) |
+| 401 | Invalid credentials |
+| 403 | Missing or invalid API key |
+| 404 | Resource not found |
+| 429 | Rate limit exceeded |
+| 500 | Internal server error |
 
 ## Rate Limiting
 

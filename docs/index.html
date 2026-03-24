@@ -336,7 +336,7 @@
         <span>terminal</span>
       </div>
 <pre><span class="cm"># Fetch vessel classification by IMO</span>
-<span class="kw">curl</span> -X POST https://api.vesselclassfinder.com/vessels \
+<span class="kw">curl</span> -X POST https://vessel-class-finder-production.up.railway.app/vessels \
   -H <span class="str">"x-api-key: YOUR_API_KEY"</span> \
   -H <span class="str">"Content-Type: application/json"</span> \
   -d <span class="str">'{"imos": [9200079]}'</span>

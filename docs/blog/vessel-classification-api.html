@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IACS Vessel Classification Data API — How to Query Class Status by IMO Number</title>
+  <meta name="description" content="How to access IACS vessel classification data via REST API. Query class status, survey dates, and compliance info by IMO number. Free tier available.">
+  <meta name="keywords" content="IACS vessel classification data API, vessel class API, IMO lookup API, maritime classification data, ship class status API">
+  <link rel="canonical" href="https://tsolman.github.io/vessel-class-finder/blog/vessel-classification-api.html">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0e17;
+      --surface: #111827;
+      --border: #1e293b;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --green: #22c55e;
+      --code-bg: #0d1117;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+
+    /* Nav */
+    nav {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(10, 14, 23, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+    nav .nav-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+    .logo span { color: var(--accent); }
+    nav ul { list-style: none; display: flex; gap: 28px; }
+    nav ul a { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+    nav ul a:hover { color: var(--text); }
+
+    /* Article */
+    article {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .breadcrumb {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+    .breadcrumb a { color: var(--text-muted); }
+    .breadcrumb a:hover { color: var(--text); }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 36px);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .meta {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 40px 0 12px;
+      letter-spacing: -0.3px;
+    }
+
+    p { margin-bottom: 16px; color: var(--text); font-size: 16px; }
+
+    ul, ol { margin: 0 0 16px 20px; color: var(--text); }
+    li { margin-bottom: 6px; font-size: 16px; }
+
+    /* Code */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      overflow-x: auto;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 16px 0 24px;
+    }
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      font-size: 14px;
+      background: var(--surface);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    pre code { background: none; padding: 0; }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* CTA box */
+    .cta-box {
+      background: var(--surface);
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 28px;
+      margin: 40px 0;
+      text-align: center;
+    }
+    .cta-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .cta-box p { color: var(--text-muted); font-size: 15px; margin-bottom: 16px; }
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      background: var(--accent);
+      color: #fff;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); color: #fff; }
+
+    /* Footer */
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/vessel-class-finder/" class="logo">vessel<span>class</span>finder</a>
+    <ul>
+      <li><a href="/vessel-class-finder/">Home</a></li>
+      <li><a href="/vessel-class-finder/#api">API</a></li>
+      <li><a href="/vessel-class-finder/#pricing">Pricing</a></li>
+      <li><a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article>
+  <div class="breadcrumb">
+    <a href="/vessel-class-finder/">Home</a> / Blog
+  </div>
+
+  <h1>IACS Vessel Classification Data API: How to Query Class Status by IMO Number</h1>
+  <div class="meta">March 2026 &middot; 5 min read</div>
+
+  <p>If you're building maritime software, you've probably needed vessel classification data at some point &mdash; the class society, survey dates, class status, reason for withdrawal. The kind of data you need to assess compliance, flag risk, or populate a fleet dashboard.</p>
+
+  <p>That data exists. IACS (the International Association of Classification Societies) publishes it. But getting it into your application programmatically is a different story.</p>
+
+  <h2>What is IACS vessel classification data?</h2>
+
+  <p>IACS member societies &mdash; DNV, Lloyd's Register, Bureau Veritas, ClassNK, ABS, and others &mdash; collectively classify over 90% of the world's cargo-carrying tonnage. When a vessel is "in class," it means the hull and machinery meet the society's rules and have been surveyed on schedule.</p>
+
+  <p>The data IACS publishes includes:</p>
+
+  <table>
+    <thead>
+      <tr><th>Field</th><th>Description</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>imo</code></td><td>IMO number (unique vessel identifier)</td></tr>
+      <tr><td><code>vessel_name</code></td><td>Current registered name</td></tr>
+      <tr><td><code>class</code></td><td>Classification society (DNV, LR, BV, etc.)</td></tr>
+      <tr><td><code>status</code></td><td>Class status (In Class, Suspended, Withdrawn)</td></tr>
+      <tr><td><code>date_of_survey</code></td><td>Last survey date</td></tr>
+      <tr><td><code>date_of_next_survey</code></td><td>Next survey due date</td></tr>
+      <tr><td><code>date_of_latest_status</code></td><td>When the status last changed</td></tr>
+      <tr><td><code>reason_for_status</code></td><td>Reason for withdrawal or suspension</td></tr>
+    </tbody>
+  </table>
+
+  <p>This data matters for insurers underwriting marine risk, port state control systems checking compliance, ship operators tracking their fleet, and any maritime SaaS product that displays vessel information.</p>
+
+  <h2>The problem: getting this data into your application</h2>
+
+  <p>IACS publishes vessel-in-class data on their website as a downloadable ZIP file containing a semicolon-delimited CSV. There is no API. No webhook. No structured feed.</p>
+
+  <p>To use this data programmatically, you typically have to:</p>
+
+  <ol>
+    <li>Scrape the IACS website to find the latest download link</li>
+    <li>Download and extract the ZIP file (~50MB+)</li>
+    <li>Parse the CSV with its non-standard formatting (semicolon separator, dates embedded in ship names)</li>
+    <li>Deduplicate records and handle data quality issues</li>
+    <li>Load it into a database</li>
+    <li>Build and maintain this pipeline to run on a schedule</li>
+  </ol>
+
+  <p>That's 2-4 weeks of engineering work to build, plus ongoing maintenance every time the source format changes. If you're a small team building a maritime product, that's time you don't have.</p>
+
+  <h2>A simpler approach: query by IMO via REST API</h2>
+
+  <p>Vessel Class Finder handles the entire pipeline &mdash; scraping, parsing, deduplication, storage, and weekly refresh &mdash; and exposes the result as a clean REST API. You send IMO numbers, you get structured JSON back.</p>
+
+  <p>Register for an API key:</p>
+
+<pre><code>curl -X POST https://vessel-class-finder-production.up.railway.app/register \
+  -H "Content-Type: application/json" \
+  -d '{"email": "you@company.com", "password": "your-password"}'</code></pre>
+
+  <p>Log in to receive your API key:</p>
+
+<pre><code>curl -X POST https://vessel-class-finder-production.up.railway.app/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "you@company.com", "password": "your-password"}'
+
+# Response:
+# {"message": "Login successful", "token": "jwt...", "apiKey": "your-api-key"}</code></pre>
+
+  <p>Query vessels by IMO number:</p>
+
+<pre><code>curl -X POST https://vessel-class-finder-production.up.railway.app/vessels \
+  -H "x-api-key: your-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"imos": [9200079]}'</code></pre>
+
+  <p>Response:</p>
+
+<pre><code>[
+  {
+    "imo": 9200079,
+    "vessel_name": "NORDIC AURORA",
+    "class": "DNV",
+    "status": "In Class",
+    "date_of_survey": "15/06/2025",
+    "date_of_next_survey": "15/06/2028",
+    "date_of_latest_status": "01/01/2024",
+    "reason_for_status": ""
+  }
+]</code></pre>
+
+  <p>You can query multiple IMOs in a single request by passing an array. The response returns all matching vessels.</p>
+
+  <h2>How the data stays fresh</h2>
+
+  <p>The pipeline runs on a weekly schedule, pulling the latest data from IACS every Sunday. It uses a staging table approach &mdash; new data is loaded into a temporary table first, then swapped atomically &mdash; so the API never returns stale or partial results during a refresh.</p>
+
+  <h2>What you can build with this</h2>
+
+  <ul>
+    <li><strong>Fleet monitoring dashboards</strong> &mdash; show class status and upcoming survey dates for a managed fleet</li>
+    <li><strong>Risk scoring for marine insurance</strong> &mdash; flag vessels with suspended or withdrawn class during quoting</li>
+    <li><strong>Port state compliance checks</strong> &mdash; verify a vessel's classification before port entry</li>
+    <li><strong>Vessel due diligence tools</strong> &mdash; include class history in sale and purchase workflows</li>
+    <li><strong>Maritime data enrichment</strong> &mdash; add classification data to existing vessel records in your product</li>
+  </ul>
+
+  <h2>Pricing</h2>
+
+  <p>The API has a free tier (100 lookups/month) so you can test the integration before committing. Paid plans start at $49/month for 5,000 lookups.</p>
+
+  <table>
+    <thead>
+      <tr><th>Plan</th><th>Lookups/month</th><th>Price</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Free</td><td>100</td><td>$0</td></tr>
+      <tr><td>Starter</td><td>5,000</td><td>$49/mo</td></tr>
+      <tr><td>Pro</td><td>50,000</td><td>$199/mo</td></tr>
+      <tr><td>Enterprise</td><td>Unlimited</td><td>Custom</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cta-box">
+    <h3>Get started in 2 minutes</h3>
+    <p>Register for a free API key and start querying vessel classification data.</p>
+    <a href="/vessel-class-finder/#pricing" class="btn">Get Free API Key</a>
+  </div>
+
+  <p>The full API reference and source code are available on <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a>.</p>
+
+</article>
+
+<footer>
+  <div>
+    <p>Built by <a href="https://fabbrik.dev" target="_blank">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

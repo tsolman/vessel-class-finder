@@ -48,7 +48,15 @@ CREATE TABLE subscriptions (
   id SERIAL PRIMARY KEY,
   user_id INTEGER UNIQUE REFERENCES users(id),
   status TEXT NOT NULL,
-  expires_at TIMESTAMP
+  expires_at TIMESTAMP,
+  plan TEXT DEFAULT 'starter'
+);
+
+CREATE TABLE api_usage (
+  user_id INTEGER REFERENCES users(id),
+  month TEXT NOT NULL,
+  request_count INTEGER DEFAULT 0,
+  PRIMARY KEY (user_id, month)
 );
 ```
 
@@ -152,6 +160,28 @@ Content-Type: application/json
 ```
 
 Response: `{ "message": "Subscription activated" }`
+
+### Usage (requires `x-api-key` header)
+
+#### Check Current Usage
+
+```
+GET /usage
+x-api-key: your-api-key
+```
+
+Response: `{ "month": "2026-03", "used": 47, "limit": 100, "plan": "free" }`
+
+### Usage Limits
+
+| Plan | Lookups/month | How to get |
+|------|--------------|------------|
+| Free | 100 | Register an account |
+| Starter | 5,000 | Contact info@wearefabbrik.com |
+| Pro | 50,000 | Contact info@wearefabbrik.com |
+| Enterprise | Unlimited | Contact info@wearefabbrik.com |
+
+When you exceed your monthly limit, `/vessels` returns `429` with your current usage and limit.
 
 ### API Key Management (requires `x-api-key` header)
 

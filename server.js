@@ -105,8 +105,61 @@ const authenticateAPIKey = async (req, res, next) => {
     }
 };
 
+// 📌 Middleware: Check Usage Limits
+const PLAN_LIMITS = { free: 100, starter: 5000, pro: 50000, enterprise: Infinity };
+
+const checkUsageLimit = async (req, res, next) => {
+    try {
+        const month = new Date().toISOString().slice(0, 7);
+
+        const subResult = await pool.query(
+            "SELECT plan, status, expires_at FROM subscriptions WHERE user_id = $1",
+            [req.userId]
+        );
+
+        let plan = "free";
+        if (subResult.rows.length > 0) {
+            const sub = subResult.rows[0];
+            if (sub.status === "active" && new Date(sub.expires_at) > new Date()) {
+                plan = sub.plan || "starter";
+            }
+        }
+
+        const limit = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+
+        const usageResult = await pool.query(
+            "SELECT request_count FROM api_usage WHERE user_id = $1 AND month = $2",
+            [req.userId, month]
+        );
+
+        const currentUsage = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
+
+        if (limit !== Infinity && currentUsage >= limit) {
+            return res.status(429).json({
+                error: "Monthly lookup limit reached. Upgrade your plan at info@wearefabbrik.com",
+                usage: currentUsage,
+                limit,
+                plan
+            });
+        }
+
+        await pool.query(
+            "INSERT INTO api_usage (user_id, month, request_count) VALUES ($1, $2, 1) ON CONFLICT (user_id, month) DO UPDATE SET request_count = api_usage.request_count + 1",
+            [req.userId, month]
+        );
+
+        req.plan = plan;
+        req.usageCount = currentUsage + 1;
+        req.usageLimit = limit;
+        next();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 // 📌 API: Fetch Vessel Data by IMO
-app.post("/vessels", authenticateAPIKey, async (req, res) => {
+app.post("/vessels", authenticateAPIKey, checkUsageLimit, async (req, res) => {
     try {
         const { imos } = req.body;
         if (!imos || !Array.isArray(imos)) return res.status(400).json({ error: "Provide an array of IMOs" });
@@ -152,6 +205,40 @@ app.post("/subscribe", authenticateAPIKey, async (req, res) => {
         );
 
         res.json({ message: "Subscription activated" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// 📌 API: Get Current Usage
+app.get("/usage", authenticateAPIKey, async (req, res) => {
+    try {
+        const month = new Date().toISOString().slice(0, 7);
+
+        const subResult = await pool.query(
+            "SELECT plan, status, expires_at FROM subscriptions WHERE user_id = $1",
+            [req.userId]
+        );
+
+        let plan = "free";
+        if (subResult.rows.length > 0) {
+            const sub = subResult.rows[0];
+            if (sub.status === "active" && new Date(sub.expires_at) > new Date()) {
+                plan = sub.plan || "starter";
+            }
+        }
+
+        const limit = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+
+        const usageResult = await pool.query(
+            "SELECT request_count FROM api_usage WHERE user_id = $1 AND month = $2",
+            [req.userId, month]
+        );
+
+        const used = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
+
+        res.json({ month, used, limit: limit === Infinity ? "unlimited" : limit, plan });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });

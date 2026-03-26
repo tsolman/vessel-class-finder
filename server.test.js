@@ -132,6 +132,16 @@ describe("POST /login", () => {
   });
 });
 
+// Helper: mock checkUsageLimit to pass (free user, under limit)
+function mockUsageUnderLimit() {
+  // subscription lookup — no subscription (free)
+  mockQuery.mockResolvedValueOnce({ rows: [] });
+  // usage lookup — 10 requests so far
+  mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 10 }] });
+  // usage UPSERT
+  mockQuery.mockResolvedValueOnce({ rows: [] });
+}
+
 describe("POST /vessels", () => {
   it("should return vessel data for valid IMOs", async () => {
     const vesselData = [
@@ -139,6 +149,7 @@ describe("POST /vessels", () => {
     ];
 
     mockAuthMiddleware();
+    mockUsageUnderLimit();
     mockQuery.mockResolvedValueOnce({ rows: vesselData });
 
     const res = await request(app)
@@ -152,6 +163,7 @@ describe("POST /vessels", () => {
 
   it("should return 400 when imos field is missing", async () => {
     mockAuthMiddleware();
+    mockUsageUnderLimit();
 
     const res = await request(app)
       .post("/vessels")
@@ -169,6 +181,88 @@ describe("POST /vessels", () => {
 
     expect(res.status).toBe(403);
     expect(res.body).toEqual({ error: "API key required" });
+  });
+
+  it("should return 429 when free tier limit is exceeded", async () => {
+    mockAuthMiddleware();
+    // subscription lookup — no subscription (free, limit 100)
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    // usage lookup — at limit
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 100 }] });
+
+    const res = await request(app)
+      .post("/vessels")
+      .set("x-api-key", VALID_API_KEY)
+      .send({ imos: ["1234567"] });
+
+    expect(res.status).toBe(429);
+    expect(res.body.error).toMatch(/Monthly lookup limit reached/);
+    expect(res.body.usage).toBe(100);
+    expect(res.body.limit).toBe(100);
+    expect(res.body.plan).toBe("free");
+  });
+
+  it("should allow paid user with higher limit", async () => {
+    const vesselData = [{ imo: "1234567", name: "Test Vessel" }];
+
+    mockAuthMiddleware();
+    // subscription lookup — active starter plan
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ plan: "starter", status: "active", expires_at: new Date(Date.now() + 86400000).toISOString() }],
+    });
+    // usage lookup — 200 requests (over free limit but under starter)
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 200 }] });
+    // usage UPSERT
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    // vessel query
+    mockQuery.mockResolvedValueOnce({ rows: vesselData });
+
+    const res = await request(app)
+      .post("/vessels")
+      .set("x-api-key", VALID_API_KEY)
+      .send({ imos: ["1234567"] });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual(vesselData);
+  });
+});
+
+describe("GET /usage", () => {
+  it("should return usage for free user", async () => {
+    mockAuthMiddleware();
+    // subscription lookup — none
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    // usage lookup
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 42 }] });
+
+    const res = await request(app)
+      .get("/usage")
+      .set("x-api-key", VALID_API_KEY);
+
+    expect(res.status).toBe(200);
+    expect(res.body.used).toBe(42);
+    expect(res.body.limit).toBe(100);
+    expect(res.body.plan).toBe("free");
+    expect(res.body.month).toMatch(/^\d{4}-\d{2}$/);
+  });
+
+  it("should return usage for paid user", async () => {
+    mockAuthMiddleware();
+    // subscription lookup — active pro plan
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ plan: "pro", status: "active", expires_at: new Date(Date.now() + 86400000).toISOString() }],
+    });
+    // usage lookup
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 1500 }] });
+
+    const res = await request(app)
+      .get("/usage")
+      .set("x-api-key", VALID_API_KEY);
+
+    expect(res.status).toBe(200);
+    expect(res.body.used).toBe(1500);
+    expect(res.body.limit).toBe(50000);
+    expect(res.body.plan).toBe("pro");
   });
 });
 

@@ -21,6 +21,13 @@ const pool = new Pool({
 });
 
 app.use(express.json());
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Content-Type, x-api-key");
+    res.header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+    if (req.method === "OPTIONS") return res.sendStatus(204);
+    next();
+});
 
 const globalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -41,6 +48,21 @@ const authLimiter = rateLimit({
 
 const SECRET_KEY = process.env.JWT_SECRET; // JWT secret for authentication
 
+async function notifyTelegram(message) {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    if (!token || !chatId) return;
+    try {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: "HTML" })
+        });
+    } catch (e) {
+        console.error("Telegram notification failed:", e.message);
+    }
+}
+
 // 📌 Register a New User
 app.post("/register", authLimiter, async (req, res) => {
     const { email, password } = req.body;
@@ -55,6 +77,7 @@ app.post("/register", authLimiter, async (req, res) => {
             [email, hashedPassword]
         );
         res.json({ message: "User registered", userId: result.rows[0].id });
+        notifyTelegram(`New signup: ${email}`);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "User already exists or database error" });

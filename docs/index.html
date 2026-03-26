@@ -285,6 +285,56 @@
     }
     .field .type { color: var(--text-muted); font-size: 11px; display: block; margin-top: 2px; }
 
+    /* Signup form */
+    .signup-form {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .signup-form input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 15px;
+      margin-bottom: 10px;
+      outline: none;
+    }
+    .signup-form input:focus { border-color: var(--accent); }
+    .signup-form .btn { width: 100%; border: none; cursor: pointer; padding: 14px; font-size: 16px; }
+    .form-message {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 14px;
+      display: none;
+    }
+    .form-message.success {
+      display: block;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: var(--green);
+    }
+    .form-message.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+    .api-key-display {
+      margin-top: 12px;
+      padding: 12px 16px;
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: 'SF Mono', monospace;
+      font-size: 13px;
+      word-break: break-all;
+      user-select: all;
+      color: var(--green);
+    }
+
     /* Footer */
     footer {
       padding: 32px 0;
@@ -325,7 +375,7 @@
     <h1>Vessel classification data<br>as a clean REST API</h1>
     <p>Query IACS class status, survey dates, and compliance info by IMO number. Stop maintaining scrapers &mdash; start shipping.</p>
     <div class="cta-group">
-      <a href="#pricing" class="btn btn-primary">Get Free API Key</a>
+      <a href="#signup" class="btn btn-primary">Get Free API Key</a>
       <a href="#api" class="btn btn-secondary">View Docs</a>
     </div>
 
@@ -464,7 +514,7 @@
           <li>All data fields</li>
           <li>Weekly data refresh</li>
         </ul>
-        <a href="mailto:info@wearefabbrik.com?subject=Vessel%20Class%20Finder%20-%20Free%20Tier" class="btn btn-secondary" style="text-align:center;">Get Started</a>
+        <a href="#signup" class="btn btn-secondary" style="text-align:center;">Get Started</a>
       </div>
       <div class="price-card featured">
         <h3>Starter</h3>
@@ -475,7 +525,7 @@
           <li>Priority support</li>
           <li>Multiple API keys</li>
         </ul>
-        <a href="mailto:info@wearefabbrik.com?subject=Vessel%20Class%20Finder%20-%20Starter" class="btn btn-primary" style="text-align:center;">Get Started</a>
+        <a href="mailto:info@wearefabbrik.com?subject=Vessel%20Class%20Finder%20-%20Starter%20Plan" class="btn btn-primary" style="text-align:center;">Contact Us</a>
       </div>
       <div class="price-card">
         <h3>Pro</h3>
@@ -502,6 +552,93 @@
     </div>
   </div>
 </section>
+
+<section id="signup">
+  <div class="container" style="text-align:center;">
+    <div class="section-label">Get Started</div>
+    <h2>Get your free API key</h2>
+    <p class="section-desc" style="margin:0 auto 32px;">100 lookups per month. No credit card required.</p>
+
+    <div class="signup-form">
+      <input type="email" id="signup-email" placeholder="Email address" autocomplete="email">
+      <input type="password" id="signup-password" placeholder="Password (min 6 characters)" autocomplete="new-password">
+      <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create Account & Get API Key</button>
+
+      <div id="form-message" class="form-message"></div>
+    </div>
+  </div>
+</section>
+
+<script>
+const API = "https://vessel-class-finder-production.up.railway.app";
+
+async function handleSignup() {
+  const email = document.getElementById("signup-email").value.trim();
+  const password = document.getElementById("signup-password").value;
+  const msg = document.getElementById("form-message");
+  const btn = document.getElementById("signup-btn");
+
+  msg.className = "form-message";
+  msg.style.display = "none";
+
+  if (!email || !password) {
+    msg.className = "form-message error";
+    msg.textContent = "Please enter both email and password.";
+    return;
+  }
+  if (password.length < 6) {
+    msg.className = "form-message error";
+    msg.textContent = "Password must be at least 6 characters.";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Creating account...";
+
+  try {
+    const regRes = await fetch(API + "/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+    const regData = await regRes.json();
+
+    if (!regRes.ok) {
+      msg.className = "form-message error";
+      msg.textContent = regData.error || "Registration failed.";
+      btn.disabled = false;
+      btn.textContent = "Create Account & Get API Key";
+      return;
+    }
+
+    const loginRes = await fetch(API + "/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+    const loginData = await loginRes.json();
+
+    if (!loginRes.ok) {
+      msg.className = "form-message error";
+      msg.textContent = "Account created but login failed. Try logging in via the API.";
+      btn.disabled = false;
+      btn.textContent = "Create Account & Get API Key";
+      return;
+    }
+
+    msg.className = "form-message success";
+    msg.innerHTML = "Account created! Here is your API key (save it now):" +
+      '<div class="api-key-display">' + loginData.apiKey + '</div>' +
+      '<p style="margin-top:10px;color:#94a3b8;font-size:13px;">Use this as the <code>x-api-key</code> header in your API requests.</p>';
+    btn.textContent = "Done!";
+  } catch (e) {
+    msg.className = "form-message error";
+    msg.textContent = "Network error. Please try again.";
+    btn.disabled = false;
+    btn.textContent = "Create Account & Get API Key";
+  }
+}
+</script>
 
 <footer>
   <div class="container">

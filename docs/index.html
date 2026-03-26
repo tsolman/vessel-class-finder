@@ -579,7 +579,7 @@ async function handleSignup() {
   const btn = document.getElementById("signup-btn");
 
   msg.className = "form-message";
-  msg.style.display = "none";
+  msg.removeAttribute("style");
 
   if (!email || !password) {
     msg.className = "form-message error";

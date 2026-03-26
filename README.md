@@ -31,14 +31,14 @@ JWT_SECRET=your_jwt_secret
 
 ```sql
 CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL
 );
 
 CREATE TABLE api_keys (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id),
+  user_id UUID REFERENCES users(id),
   api_key TEXT UNIQUE NOT NULL,
   active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP DEFAULT NOW()
@@ -46,14 +46,14 @@ CREATE TABLE api_keys (
 
 CREATE TABLE subscriptions (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER UNIQUE REFERENCES users(id),
+  user_id UUID UNIQUE REFERENCES users(id),
   status TEXT NOT NULL,
   expires_at TIMESTAMP,
   plan TEXT DEFAULT 'starter'
 );
 
 CREATE TABLE api_usage (
-  user_id INTEGER REFERENCES users(id),
+  user_id UUID REFERENCES users(id),
   month TEXT NOT NULL,
   request_count INTEGER DEFAULT 0,
   PRIMARY KEY (user_id, month)

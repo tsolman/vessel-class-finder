@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="500" height="500">
+  <rect width="500" height="500" rx="60" fill="#0a0e17"/>
+  <rect x="20" y="20" width="460" height="460" rx="48" fill="#111827" stroke="#1e293b" stroke-width="2"/>
+  <text x="250" y="210" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="800" fill="#3b82f6" text-anchor="middle" letter-spacing="-2">vessel</text>
+  <text x="250" y="290" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="800" fill="#e2e8f0" text-anchor="middle" letter-spacing="-2">class</text>
+  <text x="250" y="370" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="72" font-weight="800" fill="#3b82f6" text-anchor="middle" letter-spacing="-2">finder</text>
+  <rect x="80" y="400" width="340" height="3" rx="1.5" fill="#1e293b"/>
+  <text x="250" y="440" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="500" fill="#94a3b8" text-anchor="middle" letter-spacing="4">IACS CLASSIFICATION API</text>
+</svg>

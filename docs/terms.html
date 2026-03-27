@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service & Privacy Policy — Vessel Class Finder</title>
+  <meta name="description" content="Terms of Service and Privacy Policy for the Vessel Class Finder API.">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0e17;
+      --surface: #111827;
+      --border: #1e293b;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-hover); }
+
+    nav {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(10, 14, 23, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+    nav .nav-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+    .logo span { color: var(--accent); }
+    nav ul { list-style: none; display: flex; gap: 28px; }
+    nav ul a { color: var(--text-muted); font-size: 14px; font-weight: 500; }
+    nav ul a:hover { color: var(--text); }
+
+    article {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .breadcrumb {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+    .breadcrumb a { color: var(--text-muted); }
+    .breadcrumb a:hover { color: var(--text); }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 36px);
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .meta {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 40px 0 12px;
+      letter-spacing: -0.3px;
+    }
+
+    h3 {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 28px 0 8px;
+    }
+
+    p { margin-bottom: 14px; font-size: 15px; color: var(--text-muted); }
+
+    ul { margin: 0 0 14px 20px; }
+    li { margin-bottom: 6px; font-size: 15px; color: var(--text-muted); }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 48px 0;
+    }
+
+    footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    footer a { color: var(--text-muted); }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/vessel-class-finder/" class="logo">vessel<span>class</span>finder</a>
+    <ul>
+      <li><a href="/vessel-class-finder/">Home</a></li>
+      <li><a href="/vessel-class-finder/#api">API</a></li>
+      <li><a href="/vessel-class-finder/#pricing">Pricing</a></li>
+      <li><a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article>
+  <div class="breadcrumb">
+    <a href="/vessel-class-finder/">Home</a> / Legal
+  </div>
+
+  <h1>Terms of Service</h1>
+  <div class="meta">Last updated: March 2026</div>
+
+  <p>These terms govern your use of the Vessel Class Finder API ("the Service"), operated by WeAreFabbrik. By creating an account or using the API, you agree to these terms.</p>
+
+  <h2>1. What the Service Does</h2>
+  <p>Vessel Class Finder provides a REST API that serves vessel classification data sourced from publicly available IACS (International Association of Classification Societies) publications. We aggregate, structure, and refresh this data weekly.</p>
+
+  <h2>2. Data Accuracy</h2>
+  <p>The data served by this API is derived from publicly available sources. We make reasonable efforts to keep it accurate and up to date, but we do not guarantee the accuracy, completeness, or timeliness of any data returned by the API.</p>
+  <p>This API is not a substitute for official records from classification societies (DNV, Lloyd's Register, Bureau Veritas, etc.). For decisions involving safety, compliance, or financial risk, always verify against the authoritative source.</p>
+
+  <h2>3. Your Account</h2>
+  <ul>
+    <li>You must provide a valid email address and password to register.</li>
+    <li>You are responsible for keeping your API keys secure. Do not share them publicly or embed them in client-side code.</li>
+    <li>You are responsible for all activity under your account and API keys.</li>
+    <li>One account per person or organization. Do not create multiple accounts to bypass usage limits.</li>
+  </ul>
+
+  <h2>4. Usage Limits</h2>
+  <p>API usage is metered and limited based on your plan:</p>
+  <ul>
+    <li><strong>Free:</strong> 100 lookups per month</li>
+    <li><strong>Starter ($49/mo):</strong> 5,000 lookups per month</li>
+    <li><strong>Pro ($199/mo):</strong> 50,000 lookups per month</li>
+    <li><strong>Enterprise:</strong> Unlimited (custom agreement)</li>
+  </ul>
+  <p>When you exceed your monthly limit, the API returns a 429 status code. Usage resets on the first of each calendar month.</p>
+
+  <h2>5. Acceptable Use</h2>
+  <p>You may use the API to build applications, enrich your data, and serve your customers. You may not:</p>
+  <ul>
+    <li>Resell raw data dumps from the API as a standalone data product.</li>
+    <li>Scrape, crawl, or systematically download the entire dataset.</li>
+    <li>Attempt to circumvent rate limits or usage restrictions.</li>
+    <li>Use the API for any unlawful purpose.</li>
+    <li>Interfere with or disrupt the Service.</li>
+  </ul>
+
+  <h2>6. No Warranty</h2>
+  <p>The Service is provided "as is" and "as available" without warranties of any kind, whether express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, or non-infringement.</p>
+  <p>We do not guarantee that the API will be uninterrupted, error-free, or available at all times.</p>
+
+  <h2>7. Limitation of Liability</h2>
+  <p>To the maximum extent permitted by applicable law, WeAreFabbrik shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues, whether incurred directly or indirectly, arising from your use of the Service.</p>
+  <p>Our total liability for any claim related to the Service shall not exceed the amount you paid us in the 12 months preceding the claim, or 100 EUR, whichever is greater.</p>
+
+  <h2>8. Termination</h2>
+  <p>We may suspend or terminate your account and API access at any time if:</p>
+  <ul>
+    <li>You violate these terms.</li>
+    <li>Your usage is abusive or places unreasonable load on the Service.</li>
+    <li>We are required to do so by law.</li>
+  </ul>
+  <p>You may delete your account at any time by contacting <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a>.</p>
+
+  <h2>9. Changes to These Terms</h2>
+  <p>We may update these terms from time to time. If we make significant changes, we will notify you via the email associated with your account. Continued use of the API after changes take effect constitutes acceptance of the new terms.</p>
+
+  <h2>10. Governing Law</h2>
+  <p>These terms are governed by the laws of Greece and the European Union. Any disputes shall be resolved in the courts of Athens, Greece.</p>
+
+  <h2>11. Contact</h2>
+  <p>Questions about these terms? Email <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a>.</p>
+
+  <hr class="divider">
+
+  <h1>Privacy Policy</h1>
+  <div class="meta">Last updated: March 2026</div>
+
+  <h2>What We Collect</h2>
+
+  <h3>Account data</h3>
+  <p>When you register, we collect your email address and store a bcrypt-hashed version of your password. We never store your password in plain text.</p>
+
+  <h3>API usage data</h3>
+  <p>We track the number of API requests you make per calendar month, associated with your user ID. This is used to enforce plan limits and display your usage.</p>
+
+  <h3>Server logs</h3>
+  <p>Our hosting provider (Railway) collects standard server logs including IP addresses, request timestamps, and HTTP metadata. These are used for debugging and abuse prevention.</p>
+
+  <h2>What We Do Not Collect</h2>
+  <ul>
+    <li>We do not use cookies or tracking scripts.</li>
+    <li>We do not use analytics services on the landing page.</li>
+    <li>We do not collect payment information directly (paid plans are handled via external payment links).</li>
+  </ul>
+
+  <h2>How We Use Your Data</h2>
+  <ul>
+    <li>To provide and maintain the API service.</li>
+    <li>To enforce usage limits and prevent abuse.</li>
+    <li>To contact you about service changes or issues with your account.</li>
+  </ul>
+
+  <h2>We Do Not Sell Your Data</h2>
+  <p>We will never sell, rent, or share your personal information with third parties for marketing purposes.</p>
+
+  <h2>Data Retention</h2>
+  <p>Your account data is retained for as long as your account is active. If you request account deletion, we will remove your data within 30 days. API usage logs are retained for 12 months for billing and abuse prevention.</p>
+
+  <h2>Your Rights (GDPR)</h2>
+  <p>If you are in the EU, you have the right to:</p>
+  <ul>
+    <li>Access the personal data we hold about you.</li>
+    <li>Request correction or deletion of your data.</li>
+    <li>Export your data in a portable format.</li>
+    <li>Object to processing of your data.</li>
+  </ul>
+  <p>To exercise these rights, email <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a>.</p>
+
+  <h2>Contact</h2>
+  <p>For privacy-related questions, email <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a>.</p>
+
+</article>
+
+<footer>
+  <div>
+    <p>Built by <a href="https://fabbrik.dev" target="_blank">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

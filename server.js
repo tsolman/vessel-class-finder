@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
 import rateLimit from "express-rate-limit";
 import pkg from 'pg';
+import { Resend } from "resend";
 
 const { Pool } = pkg;
 
@@ -46,7 +47,73 @@ const authLimiter = rateLimit({
     message: { error: "Too many authentication attempts, please try again later" }
 });
 
-const SECRET_KEY = process.env.JWT_SECRET; // JWT secret for authentication
+const SECRET_KEY = process.env.JWT_SECRET;
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+async function sendConfirmationEmail(email) {
+    if (!process.env.RESEND_API_KEY) return;
+    try {
+        await resend.emails.send({
+            from: "VesselClassFinder <konstantinos@wearefabbrik.com>",
+            to: email,
+            subject: "Welcome to VesselClassFinder — your API key is ready",
+            html: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background:#f4f6f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f9;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+        <tr>
+          <td style="background:#0f172a;padding:28px 40px;">
+            <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">vessel<span style="color:#3b82f6;">class</span>finder</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:40px 40px 32px;">
+            <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#0f172a;">Welcome aboard!</h1>
+            <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">
+              Thanks for signing up. Your account is active and your API key has been generated — you're ready to start querying IACS vessel classification data.
+            </p>
+            <table cellpadding="0" cellspacing="0" style="margin:0 0 28px;">
+              <tr>
+                <td style="background:#f1f5f9;border-radius:6px;padding:16px 20px;">
+                  <p style="margin:0 0 6px;font-size:12px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Free tier includes</p>
+                  <p style="margin:0;font-size:14px;color:#0f172a;line-height:1.7;">
+                    ✓ 100 vessel lookups / month<br>
+                    ✓ Class status &amp; survey dates<br>
+                    ✓ IMO number search<br>
+                    ✓ JSON responses
+                  </p>
+                </td>
+              </tr>
+            </table>
+            <p style="margin:0 0 28px;font-size:15px;line-height:1.6;color:#475569;">
+              Log in to your account to retrieve your API key and explore the full API reference.
+            </p>
+            <a href="https://vessel-class-finder-production.up.railway.app" style="display:inline-block;background:#3b82f6;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:600;">Get your API key →</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 40px;border-top:1px solid #e2e8f0;">
+            <p style="margin:0;font-size:12px;color:#94a3b8;">
+              Questions? Reply to this email or check our <a href="https://vessel-class-finder-production.up.railway.app/#api" style="color:#3b82f6;text-decoration:none;">API docs</a>.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+        });
+    } catch (e) {
+        console.error("Confirmation email failed:", e.message);
+    }
+}
 
 async function notifyTelegram(message) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -78,6 +145,7 @@ app.post("/register", authLimiter, async (req, res) => {
         );
         res.json({ message: "User registered", userId: result.rows[0].id });
         notifyTelegram(`New signup: ${email}`);
+        sendConfirmationEmail(email);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "User already exists or database error" });

@@ -48,10 +48,10 @@ const authLimiter = rateLimit({
 });
 
 const SECRET_KEY = process.env.JWT_SECRET;
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 async function sendConfirmationEmail(email) {
-    if (!process.env.RESEND_API_KEY) return;
+    if (!resend) return;
     try {
         await resend.emails.send({
             from: "VesselClassFinder <konstantinos@wearefabbrik.com>",
@@ -94,13 +94,13 @@ async function sendConfirmationEmail(email) {
             <p style="margin:0 0 28px;font-size:15px;line-height:1.6;color:#475569;">
               Log in to your account to retrieve your API key and explore the full API reference.
             </p>
-            <a href="https://vessel-class-finder-production.up.railway.app" style="display:inline-block;background:#3b82f6;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:600;">Get your API key →</a>
+            <a href="https://tsolman.github.io/vessel-class-finder/#api" style="display:inline-block;background:#3b82f6;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:600;">Get your API key →</a>
           </td>
         </tr>
         <tr>
           <td style="padding:20px 40px;border-top:1px solid #e2e8f0;">
             <p style="margin:0;font-size:12px;color:#94a3b8;">
-              Questions? Reply to this email or check our <a href="https://vessel-class-finder-production.up.railway.app/#api" style="color:#3b82f6;text-decoration:none;">API docs</a>.
+              Questions? Reply to this email or check our <a href="https://tsolman.github.io/vessel-class-finder/#api" style="color:#3b82f6;text-decoration:none;">API docs</a>.
             </p>
           </td>
         </tr>

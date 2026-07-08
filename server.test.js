@@ -62,7 +62,12 @@ describe("POST /register", () => {
       .send({ email: "captain@vesselmail.io", password: "password123" });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ message: "User registered", userId: 42 });
+    expect(res.body.userId).toBe(42);
+    expect(res.body.message).toMatch(/verify/i);
+    // User must be inserted as unverified with a token.
+    const insertSql = mockQuery.mock.calls[0][0];
+    expect(insertSql).toMatch(/verification_token/);
+    expect(insertSql).toMatch(/FALSE/);
   });
 
   it("should return 400 when fields are missing", async () => {
@@ -120,7 +125,7 @@ describe("POST /login", () => {
   it("should login successfully and return token and apiKey", async () => {
     mockQuery
       .mockResolvedValueOnce({
-        rows: [{ id: 1, email: "test@example.com", password_hash: "hashed" }],
+        rows: [{ id: 1, email: "test@example.com", password_hash: "hashed", verified: true }],
       })
       .mockResolvedValueOnce({ rows: [] });
 
@@ -134,6 +139,21 @@ describe("POST /login", () => {
       token: "mock_token",
       apiKey: "mock-uuid-key",
     });
+  });
+
+  it("should block login for an unverified account", async () => {
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ id: 1, email: "test@example.com", password_hash: "hashed", verified: false }],
+    });
+
+    const res = await request(app)
+      .post("/login")
+      .send({ email: "test@example.com", password: "password123" });
+
+    expect(res.status).toBe(403);
+    expect(res.body.unverified).toBe(true);
+    // No API key should be issued.
+    expect(mockQuery).toHaveBeenCalledTimes(1);
   });
 
   it("should return 401 for invalid email", async () => {
@@ -159,6 +179,72 @@ describe("POST /login", () => {
 
     expect(res.status).toBe(401);
     expect(res.body).toEqual({ error: "Invalid credentials" });
+  });
+});
+
+describe("GET /verify", () => {
+  it("should verify a valid, unexpired token and mark the user verified", async () => {
+    mockQuery
+      .mockResolvedValueOnce({
+        rows: [{ id: 7, verified: false, verification_sent_at: new Date().toISOString() }],
+      })
+      .mockResolvedValueOnce({ rows: [] }); // UPDATE
+
+    const res = await request(app).get("/verify").query({ token: "good-token" });
+
+    expect(res.status).toBe(200);
+    expect(res.text).toMatch(/verified/i);
+    const updateSql = mockQuery.mock.calls[1][0];
+    expect(updateSql).toMatch(/verified = TRUE/);
+  });
+
+  it("should reject a missing token", async () => {
+    const res = await request(app).get("/verify");
+    expect(res.status).toBe(400);
+    expect(mockQuery).not.toHaveBeenCalled();
+  });
+
+  it("should reject an unknown token", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    const res = await request(app).get("/verify").query({ token: "nope" });
+    expect(res.status).toBe(400);
+    expect(res.text).toMatch(/invalid/i);
+  });
+
+  it("should reject an expired token without verifying", async () => {
+    const eightDaysAgo = new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString();
+    mockQuery.mockResolvedValueOnce({
+      rows: [{ id: 7, verified: false, verification_sent_at: eightDaysAgo }],
+    });
+
+    const res = await request(app).get("/verify").query({ token: "old-token" });
+
+    expect(res.status).toBe(400);
+    expect(res.text).toMatch(/expired/i);
+    // Only the SELECT ran — no UPDATE.
+    expect(mockQuery).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("POST /resend-verification", () => {
+  it("should return a generic response and not leak account existence", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // no such user
+    const res = await request(app)
+      .post("/resend-verification")
+      .send({ email: "unknown@vesselmail.io" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toMatch(/if that account exists/i);
+  });
+
+  it("should reject invalid/reserved emails with the same generic response", async () => {
+    const res = await request(app)
+      .post("/resend-verification")
+      .send({ email: "bot@example.com" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toMatch(/if that account exists/i);
+    expect(mockQuery).not.toHaveBeenCalled();
   });
 });
 

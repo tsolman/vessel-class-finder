@@ -561,9 +561,11 @@
 
     <div class="signup-form">
       <input type="email" id="signup-email" placeholder="Email address" autocomplete="email">
-      <input type="password" id="signup-password" placeholder="Password (min 6 characters)" autocomplete="new-password">
-      <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create Account & Get API Key</button>
-      <p style="font-size:12px;color:#64748b;margin-top:8px;">By signing up you agree to our <a href="/vessel-class-finder/terms.html">Terms of Service & Privacy Policy</a>.</p>
+      <input type="password" id="signup-password" placeholder="Password (min 6 characters)" autocomplete="current-password">
+      <input type="text" id="signup-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" placeholder="Leave this field empty">
+      <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create Account</button>
+      <button class="btn btn-secondary" id="login-btn" onclick="handleLogin()" style="display:none;width:100%;margin-top:8px;">I've verified — Log in &amp; get API key</button>
+      <p style="font-size:12px;color:#64748b;margin-top:8px;">Already have an account? <a href="#" id="show-login" onclick="showLogin(event)">Log in</a> · By signing up you agree to our <a href="/vessel-class-finder/terms.html">Terms of Service & Privacy Policy</a>.</p>
 
       <div id="form-message" class="form-message"></div>
     </div>
@@ -573,45 +575,77 @@
 <script>
 const API = "https://vessel-class-finder-production.up.railway.app";
 
-async function handleSignup() {
-  const email = document.getElementById("signup-email").value.trim();
-  const password = document.getElementById("signup-password").value;
-  const msg = document.getElementById("form-message");
-  const btn = document.getElementById("signup-btn");
+function getInputs() {
+  return {
+    email: document.getElementById("signup-email").value.trim(),
+    password: document.getElementById("signup-password").value,
+    website: document.getElementById("signup-website").value,
+    msg: document.getElementById("form-message"),
+    signupBtn: document.getElementById("signup-btn"),
+    loginBtn: document.getElementById("login-btn")
+  };
+}
 
-  msg.className = "form-message";
+function setMsg(msg, type, html) {
+  msg.className = "form-message " + type;
   msg.removeAttribute("style");
+  msg.innerHTML = html;
+}
 
-  if (!email || !password) {
-    msg.className = "form-message error";
-    msg.textContent = "Please enter both email and password.";
-    return;
-  }
-  if (password.length < 6) {
-    msg.className = "form-message error";
-    msg.textContent = "Password must be at least 6 characters.";
-    return;
-  }
+// Reveal the login button (e.g. returning user who just verified their email).
+function showLogin(e) {
+  if (e) e.preventDefault();
+  document.getElementById("login-btn").style.display = "block";
+  document.getElementById("signup-email").focus();
+}
 
-  btn.disabled = true;
-  btn.textContent = "Creating account...";
+async function handleSignup() {
+  const { email, password, website, msg, signupBtn, loginBtn } = getInputs();
+
+  if (!email || !password) { setMsg(msg, "error", "Please enter both email and password."); return; }
+  if (password.length < 6) { setMsg(msg, "error", "Password must be at least 6 characters."); return; }
+
+  signupBtn.disabled = true;
+  signupBtn.textContent = "Creating account...";
 
   try {
     const regRes = await fetch(API + "/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, website })
     });
     const regData = await regRes.json();
 
     if (!regRes.ok) {
-      msg.className = "form-message error";
-      msg.textContent = regData.error || "Registration failed.";
-      btn.disabled = false;
-      btn.textContent = "Create Account & Get API Key";
+      setMsg(msg, "error", regData.error || "Registration failed.");
+      signupBtn.disabled = false;
+      signupBtn.textContent = "Create Account";
       return;
     }
 
+    setMsg(msg, "success",
+      "<strong>Almost there!</strong> We've sent a verification link to <strong>" + email + "</strong>. " +
+      "Click it to activate your account, then log in below to get your API key." +
+      '<p style="margin-top:10px;font-size:13px;">Didn\'t get it? <a href="#" onclick="handleResend(event)">Resend email</a></p>');
+    signupBtn.textContent = "Account created";
+    signupBtn.disabled = true;
+    loginBtn.style.display = "block";
+  } catch (e) {
+    setMsg(msg, "error", "Network error. Please try again.");
+    signupBtn.disabled = false;
+    signupBtn.textContent = "Create Account";
+  }
+}
+
+async function handleLogin() {
+  const { email, password, msg, loginBtn } = getInputs();
+
+  if (!email || !password) { setMsg(msg, "error", "Enter the email and password you signed up with."); return; }
+
+  loginBtn.disabled = true;
+  loginBtn.textContent = "Logging in...";
+
+  try {
     const loginRes = await fetch(API + "/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -620,23 +654,42 @@ async function handleSignup() {
     const loginData = await loginRes.json();
 
     if (!loginRes.ok) {
-      msg.className = "form-message error";
-      msg.textContent = "Account created but login failed. Try logging in via the API.";
-      btn.disabled = false;
-      btn.textContent = "Create Account & Get API Key";
+      if (loginData.unverified) {
+        setMsg(msg, "error",
+          "Your email isn't verified yet. Check your inbox for the link. " +
+          '<a href="#" onclick="handleResend(event)">Resend email</a>');
+      } else {
+        setMsg(msg, "error", loginData.error || "Login failed.");
+      }
+      loginBtn.disabled = false;
+      loginBtn.textContent = "I've verified — Log in & get API key";
       return;
     }
 
-    msg.className = "form-message success";
-    msg.innerHTML = "Account created! Here is your API key (save it now):" +
+    setMsg(msg, "success", "You're in! Here is your API key (save it now):" +
       '<div class="api-key-display">' + loginData.apiKey + '</div>' +
-      '<p style="margin-top:10px;color:#94a3b8;font-size:13px;">Use this as the <code>x-api-key</code> header in your API requests.</p>';
-    btn.textContent = "Done!";
+      '<p style="margin-top:10px;color:#94a3b8;font-size:13px;">Use this as the <code>x-api-key</code> header in your API requests.</p>');
+    loginBtn.textContent = "Done!";
   } catch (e) {
-    msg.className = "form-message error";
-    msg.textContent = "Network error. Please try again.";
-    btn.disabled = false;
-    btn.textContent = "Create Account & Get API Key";
+    setMsg(msg, "error", "Network error. Please try again.");
+    loginBtn.disabled = false;
+    loginBtn.textContent = "I've verified — Log in & get API key";
+  }
+}
+
+async function handleResend(e) {
+  if (e) e.preventDefault();
+  const { email, msg } = getInputs();
+  if (!email) { setMsg(msg, "error", "Enter your email address first."); return; }
+  try {
+    await fetch(API + "/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+    setMsg(msg, "success", "If that account exists and is unverified, a new link is on its way to " + email + ".");
+  } catch (e) {
+    setMsg(msg, "error", "Network error. Please try again.");
   }
 }
 </script>

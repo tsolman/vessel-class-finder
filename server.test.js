@@ -59,7 +59,7 @@ describe("POST /register", () => {
 
     const res = await request(app)
       .post("/register")
-      .send({ email: "test@example.com", password: "password123" });
+      .send({ email: "captain@vesselmail.io", password: "password123" });
 
     expect(res.status).toBe(200);
     expect(res.body).toEqual({ message: "User registered", userId: 42 });
@@ -72,12 +72,42 @@ describe("POST /register", () => {
     expect(res.body).toEqual({ error: "Missing fields" });
   });
 
+  it("should reject reserved/disposable email domains", async () => {
+    const res = await request(app)
+      .post("/register")
+      .send({ email: "temp_user_x@example.com", password: "password123" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/non-disposable/);
+    expect(mockQuery).not.toHaveBeenCalled();
+  });
+
+  it("should reject malformed email addresses", async () => {
+    const res = await request(app)
+      .post("/register")
+      .send({ email: "notanemail", password: "password123" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/Invalid email/);
+    expect(mockQuery).not.toHaveBeenCalled();
+  });
+
+  it("should silently reject bot submissions that fill the honeypot", async () => {
+    const res = await request(app)
+      .post("/register")
+      .send({ email: "bot@vesselmail.io", password: "password123", website: "http://spam.example" });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ message: "User registered" });
+    expect(mockQuery).not.toHaveBeenCalled();
+  });
+
   it("should return 500 on database error", async () => {
     mockQuery.mockRejectedValueOnce(new Error("DB error"));
 
     const res = await request(app)
       .post("/register")
-      .send({ email: "test@example.com", password: "password123" });
+      .send({ email: "captain@vesselmail.io", password: "password123" });
 
     expect(res.status).toBe(500);
     expect(res.body).toEqual({

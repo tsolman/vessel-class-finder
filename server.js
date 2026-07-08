@@ -50,6 +50,48 @@ const authLimiter = rateLimit({
 const SECRET_KEY = process.env.JWT_SECRET;
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// 📌 Email validation — blocks bot signups and protects email-sending reputation.
+// RFC 2606 reserved domains can NEVER receive mail, so welcome emails to them
+// always hard-bounce, which damages our Resend sender reputation.
+const RESERVED_DOMAINS = new Set([
+    "example.com", "example.net", "example.org", "example.edu",
+    "test", "test.com", "invalid", "localhost", "local", "domain.com",
+    "email.com", "mail.com", "yourdomain.com", "yourcompany.com",
+]);
+
+const DISPOSABLE_DOMAINS = new Set([
+    "mailinator.com", "guerrillamail.com", "10minutemail.com", "tempmail.com",
+    "temp-mail.org", "throwawaymail.com", "yopmail.com", "trashmail.com",
+    "getnada.com", "sharklasers.com", "maildrop.cc", "dispostable.com",
+    "fakeinbox.com", "mailnesia.com", "mohmal.com", "emailondeck.com",
+    "spam4.me", "grr.la", "guerrillamail.info", "mailcatch.com",
+]);
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Returns an error message string if invalid, or null if the email is acceptable.
+function validateEmail(email) {
+    if (typeof email !== "string") return "Invalid email address";
+    const normalized = email.trim().toLowerCase();
+    if (normalized.length < 6 || normalized.length > 254 || !EMAIL_RE.test(normalized)) {
+        return "Invalid email address";
+    }
+    const domain = normalized.split("@")[1];
+    if (RESERVED_DOMAINS.has(domain) || DISPOSABLE_DOMAINS.has(domain)) {
+        return "Please use a valid, non-disposable email address";
+    }
+    return null;
+}
+
+// Dedicated limiter for account creation: stricter than login, per-IP.
+const registerLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many accounts created from this network. Try again later." }
+});
+
 async function sendConfirmationEmail(email) {
     if (!resend) return;
     try {
@@ -131,21 +173,33 @@ async function notifyTelegram(message) {
 }
 
 // 📌 Register a New User
-app.post("/register", authLimiter, async (req, res) => {
-    const { email, password } = req.body;
+app.post("/register", registerLimiter, authLimiter, async (req, res) => {
+    const { email, password, website } = req.body;
+
+    // Honeypot: `website` is a hidden field real users never see. A bot that
+    // fills it gets a fake success — no account, no email, no Telegram alert.
+    if (website) return res.json({ message: "User registered" });
 
     if (!email || !password) return res.status(400).json({ error: "Missing fields" });
 
+    const emailError = validateEmail(email);
+    if (emailError) return res.status(400).json({ error: emailError });
+
+    if (typeof password !== "string" || password.length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters" });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
     const hashedPassword = await bcrypt.hash(password, 10);
 
     try {
         const result = await pool.query(
             "INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id",
-            [email, hashedPassword]
+            [normalizedEmail, hashedPassword]
         );
         res.json({ message: "User registered", userId: result.rows[0].id });
-        notifyTelegram(`New signup: ${email}`);
-        sendConfirmationEmail(email);
+        notifyTelegram(`New signup: ${normalizedEmail}`);
+        sendConfirmationEmail(normalizedEmail);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "User already exists or database error" });

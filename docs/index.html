@@ -562,6 +562,7 @@
     <div class="signup-form">
       <input type="email" id="signup-email" placeholder="Email address" autocomplete="email">
       <input type="password" id="signup-password" placeholder="Password (min 6 characters)" autocomplete="new-password">
+      <input type="text" id="signup-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" placeholder="Leave this field empty">
       <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create Account & Get API Key</button>
       <p style="font-size:12px;color:#64748b;margin-top:8px;">By signing up you agree to our <a href="/vessel-class-finder/terms.html">Terms of Service & Privacy Policy</a>.</p>
 
@@ -576,6 +577,7 @@ const API = "https://vessel-class-finder-production.up.railway.app";
 async function handleSignup() {
   const email = document.getElementById("signup-email").value.trim();
   const password = document.getElementById("signup-password").value;
+  const website = document.getElementById("signup-website").value;
   const msg = document.getElementById("form-message");
   const btn = document.getElementById("signup-btn");
 
@@ -600,7 +602,7 @@ async function handleSignup() {
     const regRes = await fetch(API + "/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ email, password, website })
     });
     const regData = await regRes.json();
 

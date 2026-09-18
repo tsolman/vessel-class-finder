@@ -1,6 +1,19 @@
-# Vessel Class Finder
+# Vessel Class Finder: IACS Vessel Classification API
 
-Data pipeline and REST API that scrapes IACS vessel classification data, loads it into PostgreSQL, and serves it via authenticated endpoints.
+Look up any ship's **classification society, class status (In Class / Suspended / Withdrawn) and survey dates by IMO number** through a JSON REST API.
+
+IACS publishes its *Vessels in Class* dataset only as a ZIP/CSV download. This project scrapes that file weekly, loads it into PostgreSQL, and serves it through authenticated endpoints.
+
+- **Hosted API & free key:** https://tsolman.github.io/vessel-class-finder/ (100 lookups/month free)
+- **Guide:** [How to query IACS class status by IMO number](https://tsolman.github.io/vessel-class-finder/blog/vessel-classification-api.html)
+- **LLM-readable summary:** [`llms.txt`](https://tsolman.github.io/vessel-class-finder/llms.txt)
+- **Built by** [WeAreFabbrik](https://wearefabbrik.com)
+
+```bash
+curl -X POST https://vessel-class-finder-production.up.railway.app/vessels \
+  -H "x-api-key: YOUR_API_KEY" -H "Content-Type: application/json" \
+  -d '{"imos": [9200079]}'
+```
 
 ## Prerequisites
 
@@ -25,6 +38,14 @@ PGPASSWORD=your_db_password
 DB_PORT=5432
 PGSSLMODE=require
 JWT_SECRET=your_jwt_secret
+
+# Optional
+ADMIN_API_KEY=long_random_secret      # enables POST /subscribe (disabled if unset)
+RESEND_API_KEY=your_resend_key        # verification emails (skipped if unset)
+APP_URL=https://your-api-host         # base URL for /verify links
+SITE_URL=https://your-marketing-site  # links back to the signup page
+TELEGRAM_BOT_TOKEN=...                # signup notifications
+TELEGRAM_CHAT_ID=...
 ```
 
 3. Create the required database tables:
@@ -95,7 +116,28 @@ Content-Type: application/json
 { "email": "user@example.com", "password": "secret" }
 ```
 
-Response: `{ "message": "User registered", "userId": 1 }`
+Response: `{ "message": "Registered. Check your email to verify your account and activate your API key.", "userId": "uuid..." }`
+
+A verification link is emailed to the user. Accounts must be verified before they can log in.
+
+#### Verify Email
+
+```
+GET /verify?token=...
+```
+
+Opened from the link in the verification email. Links expire after 7 days.
+
+#### Resend Verification Email
+
+```
+POST /resend-verification
+Content-Type: application/json
+
+{ "email": "user@example.com" }
+```
+
+Always responds with the same generic message, so it can't be used to check which emails are registered.
 
 #### Login
 
@@ -108,6 +150,10 @@ Content-Type: application/json
 
 Response: `{ "message": "Login successful", "token": "jwt...", "apiKey": "uuid..." }`
 
+Returns your most recent active API key, creating one only if you have none. Email matching is case-insensitive.
+
+Unverified accounts get `403` with `{ "error": "...", "unverified": true }`.
+
 ### Vessel Data (requires `x-api-key` header)
 
 #### Fetch Vessels by IMO
@@ -119,6 +165,10 @@ Content-Type: application/json
 
 { "imos": [9200079, 9300123] }
 ```
+
+- Up to **100 IMO numbers** per request (duplicates are removed first).
+- IMOs must be positive integers of up to 7 digits (numbers or numeric strings). Invalid input returns `400` with an `invalid` list and is not charged.
+- Each unique IMO counts as **one lookup** against your monthly quota. IMOs not in the IACS dataset are omitted from the response.
 
 Response:
 
@@ -149,17 +199,21 @@ x-api-key: your-api-key
 
 Response: `{ "status": "active", "expires_at": "2026-04-23T00:00:00.000Z" }` or `{ "status": "inactive" }`
 
-#### Activate Subscription
+#### Activate Subscription (admin only)
 
 ```
 POST /subscribe
-x-api-key: your-api-key
+x-admin-key: your-ADMIN_API_KEY
 Content-Type: application/json
 
-{ "email": "user@example.com" }
+{ "email": "user@example.com", "plan": "pro" }
 ```
 
-Response: `{ "message": "Subscription activated" }`
+`plan` is one of `starter` (default), `pro`, `enterprise`. Activates or extends the plan for one month from now.
+
+Response: `{ "message": "Subscription activated", "plan": "pro", "expires_at": "..." }`
+
+Requires the `x-admin-key` header to match the `ADMIN_API_KEY` env variable. If `ADMIN_API_KEY` is unset, the endpoint always returns `403`.
 
 ### Usage (requires `x-api-key` header)
 
@@ -181,7 +235,7 @@ Response: `{ "month": "2026-03", "used": 47, "limit": 100, "plan": "free" }`
 | Pro | 50,000 | Contact info@wearefabbrik.com |
 | Enterprise | Unlimited | Contact info@wearefabbrik.com |
 
-When you exceed your monthly limit, `/vessels` returns `429` with your current usage and limit.
+Each unique IMO in a `/vessels` request counts as one lookup. If a request would take you over your monthly limit, `/vessels` returns `429` with `usage`, `requested`, `limit` and `plan`, and nothing is charged.
 
 ### API Key Management (requires `x-api-key` header)
 
@@ -215,7 +269,7 @@ All errors return JSON with an `error` field:
 |--------|---------|
 | 400 | Bad request (missing/invalid fields) |
 | 401 | Invalid credentials |
-| 403 | Missing or invalid API key |
+| 403 | Missing or invalid API key, email not verified, or missing admin key |
 | 404 | Resource not found |
 | 429 | Rate limit exceeded |
 | 500 | Internal server error |
@@ -225,7 +279,8 @@ All errors return JSON with an `error` field:
 | Scope | Limit |
 |-------|-------|
 | Global (all routes) | 100 requests / 15 min per IP |
-| `/register`, `/login` | 10 requests / 15 min per IP |
+| `/register`, `/login`, `/resend-verification` | 10 requests / 15 min per IP |
+| `/register`, `/resend-verification` | 5 requests / hour per IP |
 
 ## Running Tests
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const mockQuery = vi.fn();
 
@@ -37,7 +37,7 @@ vi.mock("express-rate-limit", () => ({
   default: vi.fn(() => (req, res, next) => next()),
 }));
 
-const { app } = await import("./server.js");
+const { app, pruneOldUsage } = await import("./server.js");
 import request from "supertest";
 import bcrypt from "bcryptjs";
 
@@ -122,12 +122,13 @@ describe("POST /register", () => {
 });
 
 describe("POST /login", () => {
-  it("should login successfully and return token and apiKey", async () => {
+  it("should login successfully and create an API key when the user has none", async () => {
     mockQuery
       .mockResolvedValueOnce({
         rows: [{ id: 1, email: "test@example.com", password_hash: "hashed", verified: true }],
       })
-      .mockResolvedValueOnce({ rows: [] });
+      .mockResolvedValueOnce({ rows: [] }) // no active key
+      .mockResolvedValueOnce({ rows: [] }); // insert
 
     const res = await request(app)
       .post("/login")
@@ -139,6 +140,48 @@ describe("POST /login", () => {
       token: "mock_token",
       apiKey: "mock-uuid-key",
     });
+    expect(mockQuery.mock.calls[2][0]).toMatch(/INSERT INTO api_keys/);
+  });
+
+  it("should reuse the existing active API key instead of minting a new one", async () => {
+    mockQuery
+      .mockResolvedValueOnce({
+        rows: [{ id: 1, email: "test@example.com", password_hash: "hashed", verified: true }],
+      })
+      .mockResolvedValueOnce({ rows: [{ api_key: "existing-key" }] });
+
+    const res = await request(app)
+      .post("/login")
+      .send({ email: "test@example.com", password: "password123" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.apiKey).toBe("existing-key");
+    expect(mockQuery).toHaveBeenCalledTimes(2);
+  });
+
+  it("should match emails case-insensitively", async () => {
+    mockQuery
+      .mockResolvedValueOnce({
+        rows: [{ id: 1, email: "test@example.com", password_hash: "hashed", verified: true }],
+      })
+      .mockResolvedValueOnce({ rows: [{ api_key: "existing-key" }] });
+
+    const res = await request(app)
+      .post("/login")
+      .send({ email: "  Test@Example.COM ", password: "password123" });
+
+    expect(res.status).toBe(200);
+    expect(mockQuery.mock.calls[0][0]).toMatch(/lower\(email\)/);
+    expect(mockQuery.mock.calls[0][1]).toEqual(["test@example.com"]);
+  });
+
+  it("should return 401 when email is not a string", async () => {
+    const res = await request(app)
+      .post("/login")
+      .send({ email: { $ne: "" }, password: "password123" });
+
+    expect(res.status).toBe(401);
+    expect(mockQuery).not.toHaveBeenCalled();
   });
 
   it("should block login for an unverified account", async () => {
@@ -252,10 +295,8 @@ describe("POST /resend-verification", () => {
 function mockUsageUnderLimit() {
   // subscription lookup — no subscription (free)
   mockQuery.mockResolvedValueOnce({ rows: [] });
-  // usage lookup — 10 requests so far
-  mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 10 }] });
-  // usage UPSERT
-  mockQuery.mockResolvedValueOnce({ rows: [] });
+  // atomic check-and-charge UPSERT — succeeded, now at 11
+  mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 11 }] });
 }
 
 describe("POST /vessels", () => {
@@ -277,9 +318,8 @@ describe("POST /vessels", () => {
     expect(res.body).toEqual(vesselData);
   });
 
-  it("should return 400 when imos field is missing", async () => {
+  it("should return 400 when imos field is missing, without charging usage", async () => {
     mockAuthMiddleware();
-    mockUsageUnderLimit();
 
     const res = await request(app)
       .post("/vessels")
@@ -288,6 +328,79 @@ describe("POST /vessels", () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toEqual({ error: "Provide an array of IMOs" });
+    expect(mockQuery).toHaveBeenCalledTimes(1); // only the API key lookup
+  });
+
+  it("should return 400 for an empty imos array", async () => {
+    mockAuthMiddleware();
+
+    const res = await request(app)
+      .post("/vessels")
+      .set("x-api-key", VALID_API_KEY)
+      .send({ imos: [] });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("should return 400 for non-numeric IMOs", async () => {
+    mockAuthMiddleware();
+
+    const res = await request(app)
+      .post("/vessels")
+      .set("x-api-key", VALID_API_KEY)
+      .send({ imos: ["1234567", "abc", "12345678"] });
+
+    expect(res.status).toBe(400);
+    expect(res.body.invalid).toEqual(["abc", "12345678"]);
+    expect(mockQuery).toHaveBeenCalledTimes(1);
+  });
+
+  it("should return 400 when more than 100 unique IMOs are requested", async () => {
+    mockAuthMiddleware();
+    const imos = Array.from({ length: 101 }, (_, i) => 1000000 + i);
+
+    const res = await request(app)
+      .post("/vessels")
+      .set("x-api-key", VALID_API_KEY)
+      .send({ imos });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/At most 100 IMOs/);
+    expect(mockQuery).toHaveBeenCalledTimes(1);
+  });
+
+  it("should charge one lookup per unique IMO", async () => {
+    mockAuthMiddleware();
+    mockUsageUnderLimit();
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+
+    const res = await request(app)
+      .post("/vessels")
+      .set("x-api-key", VALID_API_KEY)
+      .send({ imos: ["1234567", 1234567, "7654321", 9999999] });
+
+    expect(res.status).toBe(200);
+    const upsert = mockQuery.mock.calls[2];
+    expect(upsert[0]).toMatch(/INSERT INTO api_usage/);
+    expect(upsert[1][2]).toBe(3); // cost
+    expect(upsert[1][3]).toBe(100); // free-tier limit enforced in SQL
+    expect(mockQuery.mock.calls[3][1]).toEqual([[1234567, 7654321, 9999999]]);
+  });
+
+  it("should return 429 when the request would exceed the remaining quota", async () => {
+    mockAuthMiddleware();
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // free plan
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // UPSERT refused: over limit
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 98 }] }); // current usage for the error
+
+    const res = await request(app)
+      .post("/vessels")
+      .set("x-api-key", VALID_API_KEY)
+      .send({ imos: [1111111, 2222222, 3333333] });
+
+    expect(res.status).toBe(429);
+    expect(res.body.usage).toBe(98);
+    expect(res.body.requested).toBe(3);
   });
 
   it("should return 403 when no API key is provided", async () => {
@@ -303,7 +416,9 @@ describe("POST /vessels", () => {
     mockAuthMiddleware();
     // subscription lookup — no subscription (free, limit 100)
     mockQuery.mockResolvedValueOnce({ rows: [] });
-    // usage lookup — at limit
+    // UPSERT refused: at limit
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    // current usage for the error body
     mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 100 }] });
 
     const res = await request(app)
@@ -326,10 +441,8 @@ describe("POST /vessels", () => {
     mockQuery.mockResolvedValueOnce({
       rows: [{ plan: "starter", status: "active", expires_at: new Date(Date.now() + 86400000).toISOString() }],
     });
-    // usage lookup — 200 requests (over free limit but under starter)
-    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 200 }] });
-    // usage UPSERT
-    mockQuery.mockResolvedValueOnce({ rows: [] });
+    // UPSERT succeeds — 201 lookups (over free limit but under starter)
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 201 }] });
     // vessel query
     mockQuery.mockResolvedValueOnce({ rows: vesselData });
 
@@ -411,28 +524,94 @@ describe("GET /subscription", () => {
 });
 
 describe("POST /subscribe", () => {
-  it("should activate subscription successfully", async () => {
-    mockAuthMiddleware();
+  const ADMIN_KEY = "test-admin-key";
+
+  beforeEach(() => {
+    process.env.ADMIN_API_KEY = ADMIN_KEY;
+  });
+
+  afterEach(() => {
+    delete process.env.ADMIN_API_KEY;
+  });
+
+  it("should activate subscription with the admin key", async () => {
     mockQuery
       .mockResolvedValueOnce({ rows: [{ id: 1 }] })
       .mockResolvedValueOnce({ rows: [] });
 
     const res = await request(app)
       .post("/subscribe")
-      .set("x-api-key", VALID_API_KEY)
+      .set("x-admin-key", ADMIN_KEY)
+      .send({ email: "Test@Example.com", plan: "pro" });
+
+    expect(res.status).toBe(200);
+    expect(res.body.message).toBe("Subscription activated");
+    expect(res.body.plan).toBe("pro");
+    expect(mockQuery.mock.calls[0][1]).toEqual(["test@example.com"]);
+    expect(mockQuery.mock.calls[1][1][2]).toBe("pro");
+  });
+
+  it("should default to the starter plan", async () => {
+    mockQuery
+      .mockResolvedValueOnce({ rows: [{ id: 1 }] })
+      .mockResolvedValueOnce({ rows: [] });
+
+    const res = await request(app)
+      .post("/subscribe")
+      .set("x-admin-key", ADMIN_KEY)
       .send({ email: "test@example.com" });
 
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ message: "Subscription activated" });
+    expect(res.body.plan).toBe("starter");
+  });
+
+  it("should reject a regular user API key", async () => {
+    const res = await request(app)
+      .post("/subscribe")
+      .set("x-api-key", VALID_API_KEY)
+      .send({ email: "test@example.com" });
+
+    expect(res.status).toBe(403);
+    expect(mockQuery).not.toHaveBeenCalled();
+  });
+
+  it("should reject a wrong admin key", async () => {
+    const res = await request(app)
+      .post("/subscribe")
+      .set("x-admin-key", "wrong-key")
+      .send({ email: "test@example.com" });
+
+    expect(res.status).toBe(403);
+    expect(mockQuery).not.toHaveBeenCalled();
+  });
+
+  it("should be disabled when ADMIN_API_KEY is not set", async () => {
+    delete process.env.ADMIN_API_KEY;
+
+    const res = await request(app)
+      .post("/subscribe")
+      .set("x-admin-key", "")
+      .send({ email: "test@example.com" });
+
+    expect(res.status).toBe(403);
+    expect(mockQuery).not.toHaveBeenCalled();
+  });
+
+  it("should reject an unknown plan", async () => {
+    const res = await request(app)
+      .post("/subscribe")
+      .set("x-admin-key", ADMIN_KEY)
+      .send({ email: "test@example.com", plan: "free" });
+
+    expect(res.status).toBe(400);
   });
 
   it("should return 404 when user is not found", async () => {
-    mockAuthMiddleware();
     mockQuery.mockResolvedValueOnce({ rows: [] });
 
     const res = await request(app)
       .post("/subscribe")
-      .set("x-api-key", VALID_API_KEY)
+      .set("x-admin-key", ADMIN_KEY)
       .send({ email: "nonexistent@example.com" });
 
     expect(res.status).toBe(404);
@@ -484,5 +663,21 @@ describe("DELETE /api-keys/:key", () => {
     expect(res.body).toEqual({
       error: "API key not found or already revoked",
     });
+  });
+});
+
+describe("pruneOldUsage", () => {
+  it("deletes usage rows older than the 12-month retention window", async () => {
+    mockQuery.mockResolvedValueOnce({ rowCount: 3 });
+
+    await pruneOldUsage();
+
+    expect(mockQuery.mock.calls[0][0]).toMatch(/DELETE FROM api_usage WHERE month </);
+    expect(mockQuery.mock.calls[0][1]).toEqual([12]);
+  });
+
+  it("never throws when the database errors", async () => {
+    mockQuery.mockRejectedValueOnce(new Error("db down"));
+    await expect(pruneOldUsage()).resolves.toBeUndefined();
   });
 });

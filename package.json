@@ -1,7 +1,24 @@
 {
   "name": "vessel-class-finder",
   "version": "1.0.0",
-  "description": "api for maritime classes",
+  "description": "REST API for IACS vessel classification data: class status, classification society and survey dates by IMO number",
+  "keywords": [
+    "iacs",
+    "vessel-classification",
+    "class-status",
+    "imo",
+    "imo-number",
+    "classification-society",
+    "maritime",
+    "shipping",
+    "vessel-api",
+    "rest-api"
+  ],
+  "homepage": "https://tsolman.github.io/vessel-class-finder/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsolman/vessel-class-finder.git"
+  },
   "main": "app.js",
   "type": "module",
   "scripts": {
@@ -9,30 +26,26 @@
     "scrape": "node app.js",
     "test": "NODE_ENV=test vitest run"
   },
-  "author": "WeAreFabbrik",
+  "author": "WeAreFabbrik <info@wearefabbrik.com> (https://wearefabbrik.com)",
   "license": "ISC",
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "adm-zip": "^0.5.16",
+    "adm-zip": "^0.6.1",
     "axios": "^1.7.9",
     "bcryptjs": "^3.0.0",
     "cheerio": "^1.0.0",
     "csv-parser": "^3.2.0",
     "dotenv": "^16.4.7",
-    "drizzle-orm": "^0.39.3",
     "express": "^4.21.2",
     "express-rate-limit": "^8.3.1",
-    "fs": "^0.0.1-security",
     "fs-extra": "^11.3.0",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^4.2.1",
     "pg": "^8.13.3",
-    "pg-core": "^0.1.15",
     "resend": "^6.12.3",
-    "uuid": "^11.0.5",
-    "xlsx": "^0.18.5"
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "supertest": "^7.2.2",

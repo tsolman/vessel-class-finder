@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terms of Service & Privacy Policy — Vessel Class Finder</title>
   <meta name="description" content="Terms of Service and Privacy Policy for the Vessel Class Finder API.">
+  <link rel="canonical" href="https://tsolman.github.io/vessel-class-finder/terms.html">
+  <link rel="icon" href="/vessel-class-finder/logo.svg" type="image/svg+xml">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -137,7 +139,7 @@
   </div>
 
   <h1>Terms of Service</h1>
-  <div class="meta">Last updated: March 2026</div>
+  <div class="meta">Last updated: September 2026</div>
 
   <p>These terms govern your use of the Vessel Class Finder API ("the Service"), operated by WeAreFabbrik. By creating an account or using the API, you agree to these terms.</p>
 
@@ -157,7 +159,7 @@
   </ul>
 
   <h2>4. Usage Limits</h2>
-  <p>API usage is metered and limited based on your plan:</p>
+  <p>API usage is metered and limited based on your plan. One lookup is one IMO number queried; a single request may contain up to 100 IMO numbers.</p>
   <ul>
     <li><strong>Free:</strong> 100 lookups per month</li>
     <li><strong>Starter ($49/mo):</strong> 5,000 lookups per month</li>
@@ -205,7 +207,7 @@
   <hr class="divider">
 
   <h1>Privacy Policy</h1>
-  <div class="meta">Last updated: March 2026</div>
+  <div class="meta">Last updated: September 2026</div>
 
   <h2>What We Collect</h2>
 
@@ -213,7 +215,16 @@
   <p>When you register, we collect your email address and store a bcrypt-hashed version of your password. We never store your password in plain text.</p>
 
   <h3>API usage data</h3>
-  <p>We track the number of API requests you make per calendar month, associated with your user ID. This is used to enforce plan limits and display your usage.</p>
+  <p>We track the number of lookups (IMO numbers queried) you make per calendar month, associated with your user ID. This is used to enforce plan limits and display your usage.</p>
+
+  <h3>Service providers</h3>
+  <p>We use a small number of providers to run the Service. They process data only on our behalf:</p>
+  <ul>
+    <li><strong>Railway</strong> hosts the API.</li>
+    <li><strong>Neon</strong> hosts the PostgreSQL database that stores your account and usage data, in the EU (Frankfurt, Germany).</li>
+    <li><strong>Resend</strong> sends account emails (such as email verification) to the address you register with.</li>
+    <li><strong>Telegram</strong> delivers internal notifications to our team when a new account is created. These include the email address you registered with.</li>
+  </ul>
 
   <h3>Server logs</h3>
   <p>Our hosting provider (Railway) collects standard server logs including IP addresses, request timestamps, and HTTP metadata. These are used for debugging and abuse prevention.</p>
@@ -255,7 +266,7 @@
 
 <footer>
   <div>
-    <p>Built by <a href="https://fabbrik.dev" target="_blank">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></p>
+    <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></p>
   </div>
 </footer>
 

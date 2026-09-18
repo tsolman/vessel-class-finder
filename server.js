@@ -78,6 +78,22 @@ async function runMigrations() {
     }
 }
 
+// 📌 Usage retention — the privacy policy promises usage records are kept for
+// 12 months. Deletes months older than that; runs at startup and daily.
+const USAGE_RETENTION_MONTHS = 12;
+
+async function pruneOldUsage() {
+    try {
+        const result = await pool.query(
+            "DELETE FROM api_usage WHERE month < to_char(date_trunc('month', now()) - make_interval(months => $1), 'YYYY-MM')",
+            [USAGE_RETENTION_MONTHS]
+        );
+        if (result.rowCount > 0) console.log(`🧹 Pruned ${result.rowCount} usage rows older than ${USAGE_RETENTION_MONTHS} months`);
+    } catch (e) {
+        console.error("⚠️  Usage pruning failed (continuing):", e.message);
+    }
+}
+
 // 📌 Email validation — blocks bot signups and protects email-sending reputation.
 // RFC 2606 reserved domains can NEVER receive mail, so welcome emails to them
 // always hard-bounce, which damages our Resend sender reputation.
@@ -461,16 +477,27 @@ const checkUsageLimit = async (req, res, next) => {
 
         const limit = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
 
-        const usageResult = await pool.query(
-            "SELECT request_count FROM api_usage WHERE user_id = $1 AND month = $2",
-            [req.userId, month]
-        );
-
-        const currentUsage = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
         // Each IMO looked up counts as one lookup.
         const cost = req.imos ? req.imos.length : 1;
 
-        if (limit !== Infinity && currentUsage + cost > limit) {
+        // Check and charge in one statement so concurrent requests can't both pass
+        // the check and overshoot the limit. Returns no row when over the limit.
+        const charged = await pool.query(
+            `INSERT INTO api_usage (user_id, month, request_count)
+                SELECT $1, $2, $3::int WHERE $4::int IS NULL OR $3::int <= $4::int
+             ON CONFLICT (user_id, month) DO UPDATE
+                SET request_count = api_usage.request_count + $3::int
+                WHERE $4::int IS NULL OR api_usage.request_count + $3::int <= $4::int
+             RETURNING request_count`,
+            [req.userId, month, cost, limit === Infinity ? null : limit]
+        );
+
+        if (charged.rows.length === 0) {
+            const usageResult = await pool.query(
+                "SELECT request_count FROM api_usage WHERE user_id = $1 AND month = $2",
+                [req.userId, month]
+            );
+            const currentUsage = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
             return res.status(429).json({
                 error: "Monthly lookup limit reached. Upgrade your plan at info@wearefabbrik.com",
                 usage: currentUsage,
@@ -480,13 +507,8 @@ const checkUsageLimit = async (req, res, next) => {
             });
         }
 
-        await pool.query(
-            "INSERT INTO api_usage (user_id, month, request_count) VALUES ($1, $2, $3) ON CONFLICT (user_id, month) DO UPDATE SET request_count = api_usage.request_count + $3",
-            [req.userId, month, cost]
-        );
-
         req.plan = plan;
-        req.usageCount = currentUsage + cost;
+        req.usageCount = charged.rows[0].request_count;
         req.usageLimit = limit;
         next();
     } catch (error) {
@@ -612,12 +634,14 @@ app.delete("/api-keys/:key", authenticateAPIKey, async (req, res) => {
     }
 });
 
-export { app, pool };
+export { app, pool, pruneOldUsage };
 
 // 📌 Start Server
 const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== "test") {
     runMigrations().finally(() => {
         app.listen(PORT, () => console.log(`🚀 API running on port ${PORT}`));
+        pruneOldUsage();
+        setInterval(pruneOldUsage, 24 * 60 * 60 * 1000).unref();
     });
 }

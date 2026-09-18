@@ -37,7 +37,7 @@ vi.mock("express-rate-limit", () => ({
   default: vi.fn(() => (req, res, next) => next()),
 }));
 
-const { app } = await import("./server.js");
+const { app, pruneOldUsage } = await import("./server.js");
 import request from "supertest";
 import bcrypt from "bcryptjs";
 
@@ -295,10 +295,8 @@ describe("POST /resend-verification", () => {
 function mockUsageUnderLimit() {
   // subscription lookup — no subscription (free)
   mockQuery.mockResolvedValueOnce({ rows: [] });
-  // usage lookup — 10 requests so far
-  mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 10 }] });
-  // usage UPSERT
-  mockQuery.mockResolvedValueOnce({ rows: [] });
+  // atomic check-and-charge UPSERT — succeeded, now at 11
+  mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 11 }] });
 }
 
 describe("POST /vessels", () => {
@@ -382,16 +380,18 @@ describe("POST /vessels", () => {
       .send({ imos: ["1234567", 1234567, "7654321", 9999999] });
 
     expect(res.status).toBe(200);
-    const upsert = mockQuery.mock.calls[3];
+    const upsert = mockQuery.mock.calls[2];
     expect(upsert[0]).toMatch(/INSERT INTO api_usage/);
-    expect(upsert[1][2]).toBe(3);
-    expect(mockQuery.mock.calls[4][1]).toEqual([[1234567, 7654321, 9999999]]);
+    expect(upsert[1][2]).toBe(3); // cost
+    expect(upsert[1][3]).toBe(100); // free-tier limit enforced in SQL
+    expect(mockQuery.mock.calls[3][1]).toEqual([[1234567, 7654321, 9999999]]);
   });
 
   it("should return 429 when the request would exceed the remaining quota", async () => {
     mockAuthMiddleware();
     mockQuery.mockResolvedValueOnce({ rows: [] }); // free plan
-    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 98 }] });
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // UPSERT refused: over limit
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 98 }] }); // current usage for the error
 
     const res = await request(app)
       .post("/vessels")
@@ -416,7 +416,9 @@ describe("POST /vessels", () => {
     mockAuthMiddleware();
     // subscription lookup — no subscription (free, limit 100)
     mockQuery.mockResolvedValueOnce({ rows: [] });
-    // usage lookup — at limit
+    // UPSERT refused: at limit
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    // current usage for the error body
     mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 100 }] });
 
     const res = await request(app)
@@ -439,10 +441,8 @@ describe("POST /vessels", () => {
     mockQuery.mockResolvedValueOnce({
       rows: [{ plan: "starter", status: "active", expires_at: new Date(Date.now() + 86400000).toISOString() }],
     });
-    // usage lookup — 200 requests (over free limit but under starter)
-    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 200 }] });
-    // usage UPSERT
-    mockQuery.mockResolvedValueOnce({ rows: [] });
+    // UPSERT succeeds — 201 lookups (over free limit but under starter)
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 201 }] });
     // vessel query
     mockQuery.mockResolvedValueOnce({ rows: vesselData });
 
@@ -663,5 +663,21 @@ describe("DELETE /api-keys/:key", () => {
     expect(res.body).toEqual({
       error: "API key not found or already revoked",
     });
+  });
+});
+
+describe("pruneOldUsage", () => {
+  it("deletes usage rows older than the 12-month retention window", async () => {
+    mockQuery.mockResolvedValueOnce({ rowCount: 3 });
+
+    await pruneOldUsage();
+
+    expect(mockQuery.mock.calls[0][0]).toMatch(/DELETE FROM api_usage WHERE month </);
+    expect(mockQuery.mock.calls[0][1]).toEqual([12]);
+  });
+
+  it("never throws when the database errors", async () => {
+    mockQuery.mockRejectedValueOnce(new Error("db down"));
+    await expect(pruneOldUsage()).resolves.toBeUndefined();
   });
 });

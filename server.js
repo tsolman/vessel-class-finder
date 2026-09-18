@@ -53,7 +53,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 // Public URL of this API (where the /verify link points) and of the marketing site.
 const APP_URL = (process.env.APP_URL || "https://vessel-class-finder-production.up.railway.app").replace(/\/$/, "");
-const SITE_URL = (process.env.SITE_URL || "https://tsolman.github.io/vessel-class-finder").replace(/\/$/, "");
+const SITE_URL = (process.env.SITE_URL || "https://vesselclassfinder.com").replace(/\/$/, "");
 
 // How long an email-verification link stays valid.
 const VERIFICATION_TTL_MS = 7 * 24 * 60 * 60 * 1000;

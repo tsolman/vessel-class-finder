@@ -5,14 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vessel Class Finder — IACS Vessel Classification API</title>
   <meta name="description" content="REST API for IACS vessel classification data. Get class status, survey dates, and compliance info by IMO number. Free tier available.">
-  <link rel="canonical" href="https://tsolman.github.io/vessel-class-finder/">
-  <link rel="icon" href="/vessel-class-finder/logo.svg" type="image/svg+xml">
-  <link rel="alternate" type="text/plain" title="LLM-readable summary" href="/vessel-class-finder/llms.txt">
+  <link rel="canonical" href="https://vesselclassfinder.com/">
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <link rel="alternate" type="text/plain" title="LLM-readable summary" href="/llms.txt">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Vessel Class Finder">
   <meta property="og:title" content="Vessel Class Finder — IACS Vessel Classification API">
   <meta property="og:description" content="Query IACS class status, classification society, and survey dates for any ship by IMO number. JSON REST API, refreshed weekly. Free tier: 100 lookups/month.">
-  <meta property="og:url" content="https://tsolman.github.io/vessel-class-finder/">
+  <meta property="og:url" content="https://vesselclassfinder.com/">
   <meta name="twitter:card" content="summary">
   <script type="application/ld+json">
   {
@@ -27,13 +27,13 @@
       },
       {
         "@type": "WebAPI",
-        "@id": "https://tsolman.github.io/vessel-class-finder/#api",
+        "@id": "https://vesselclassfinder.com/#api",
         "name": "Vessel Class Finder API",
         "alternateName": ["VesselClassFinder", "IACS vessel classification API"],
         "description": "REST API that returns IACS vessel-in-class data (classification society, class status, last and next survey dates, status reason) for ships by IMO number. Data is scraped from the IACS 'Vessels in Class' dataset and refreshed weekly.",
-        "url": "https://tsolman.github.io/vessel-class-finder/",
+        "url": "https://vesselclassfinder.com/",
         "documentation": "https://github.com/tsolman/vessel-class-finder#api-endpoints",
-        "termsOfService": "https://tsolman.github.io/vessel-class-finder/terms.html",
+        "termsOfService": "https://vesselclassfinder.com/terms.html",
         "provider": { "@id": "https://wearefabbrik.com/#org" },
         "keywords": "IACS, vessel classification, class status, IMO number, classification society, ship survey dates, maritime API",
         "offers": [
@@ -44,7 +44,7 @@
       },
       {
         "@type": "FAQPage",
-        "@id": "https://tsolman.github.io/vessel-class-finder/#faq",
+        "@id": "https://vesselclassfinder.com/#faq",
         "mainEntity": [
           {
             "@type": "Question",
@@ -446,7 +446,7 @@
       <li><a href="#api">API</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#faq">FAQ</a></li>
-      <li><a href="/vessel-class-finder/blog/vessel-classification-api.html">Blog</a></li>
+      <li><a href="/blog/vessel-classification-api.html">Blog</a></li>
       <li><a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></li>
     </ul>
   </div>
@@ -683,7 +683,7 @@
       <input type="text" id="signup-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" placeholder="Leave this field empty">
       <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create Account</button>
       <button class="btn btn-secondary" id="login-btn" onclick="handleLogin()" style="display:none;width:100%;margin-top:8px;">I've verified — Log in &amp; get API key</button>
-      <p style="font-size:12px;color:#64748b;margin-top:8px;">Already have an account? <a href="#" id="show-login" onclick="showLogin(event)">Log in</a> · By signing up you agree to our <a href="/vessel-class-finder/terms.html">Terms of Service & Privacy Policy</a>.</p>
+      <p style="font-size:12px;color:#64748b;margin-top:8px;">Already have an account? <a href="#" id="show-login" onclick="showLogin(event)">Log in</a> · By signing up you agree to our <a href="/terms.html">Terms of Service & Privacy Policy</a>.</p>
 
       <div id="form-message" class="form-message"></div>
     </div>
@@ -818,7 +818,7 @@ async function handleResend(e) {
 
 <footer>
   <div class="container">
-    <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/vessel-class-finder/terms.html">Terms & Privacy</a></p>
+    <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/terms.html">Terms & Privacy</a></p>
   </div>
 </footer>
 

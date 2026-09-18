@@ -1,7 +1,7 @@
 User-agent: *
 Allow: /
 
-# AI search and assistant crawlers are welcome. See /vessel-class-finder/llms.txt
+# AI search and assistant crawlers are welcome. See /llms.txt
 User-agent: GPTBot
 User-agent: OAI-SearchBot
 User-agent: ChatGPT-User
@@ -13,4 +13,4 @@ User-agent: Google-Extended
 User-agent: Applebot-Extended
 Allow: /
 
-Sitemap: https://tsolman.github.io/vessel-class-finder/sitemap.xml
+Sitemap: https://vesselclassfinder.com/sitemap.xml

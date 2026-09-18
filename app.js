@@ -142,6 +142,43 @@ async function parseCsv(filePath) {
     });
 }
 
+// DD/MM/YYYY or DD/MM/YY -> sortable YYYYMMDD ("" when missing)
+function sortableDate(value) {
+    const match = String(value || "").match(/^(\d{2})\/(\d{2})\/(\d{2}|\d{4})$/);
+    if (!match) return "";
+    const year = match[3].length === 2 ? `20${match[3]}` : match[3];
+    return `${year}${match[2]}${match[1]}`;
+}
+
+// Is record `a` more recent than record `b`? Newest row stamp first, then an active record over a
+// withdrawn one (class transfer reported in the same update), then latest status / survey dates.
+function isMoreRecent(a, b) {
+    const keys = [
+        (r) => sortableDate(r.update_date),
+        (r) => (r.status === "Withdrawn" ? "0" : "1"),
+        (r) => sortableDate(r.date_of_latest_status),
+        (r) => sortableDate(r.date_of_survey),
+    ];
+    for (const key of keys) {
+        const [ka, kb] = [key(a), key(b)];
+        if (ka !== kb) return ka > kb;
+    }
+    return false;
+}
+
+// The IACS file has one row per survey cycle / class society, oldest first, so a vessel can appear
+// several times. Keep the most recent row per IMO (keeping the first one served expired survey cycles
+// and, after a class transfer, the previous society).
+function pickLatestRecords(data) {
+    const latestByImo = new Map();
+    for (const vessel of data) {
+        if (!vessel.imo || !vessel.ship_name) continue; // Skip records with missing IMO or vessel name
+        const current = latestByImo.get(vessel.imo);
+        if (!current || isMoreRecent(vessel, current)) latestByImo.set(vessel.imo, vessel);
+    }
+    return [...latestByImo.values()];
+}
+
 // Function to save data into PostgreSQL
 async function saveToDatabase(data) {
     const client = await pool.connect();
@@ -150,17 +187,8 @@ async function saveToDatabase(data) {
     try {
         console.log(`🚀 Deduplicating data before inserting...`);
 
-        // **Step 1: Remove duplicate IMO values and filter out invalid records**
-        const uniqueData = [];
-        const seenImos = new Set();
-
-        for (const vessel of data) {
-            if (!vessel.imo || !vessel.ship_name) continue; // Skip records with missing IMO or vessel name
-            if (!seenImos.has(vessel.imo)) {
-                seenImos.add(vessel.imo);
-                uniqueData.push(vessel);
-            }
-        }
+        // **Step 1: Keep the most recent record per IMO and filter out invalid records**
+        const uniqueData = pickLatestRecords(data);
 
         console.log(`✅ Deduplicated and filtered records. Remaining: ${uniqueData.length}`);
 
@@ -257,7 +285,7 @@ async function run() {
 
 }
 
-export { formatDate, extractShipNameAndDate, saveToDatabase, parseCsv, run };
+export { formatDate, extractShipNameAndDate, pickLatestRecords, saveToDatabase, parseCsv, run };
 
 // Execute the scraper immediately on startup
 if (process.env.NODE_ENV !== "test") run();

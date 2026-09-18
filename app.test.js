@@ -41,7 +41,7 @@ vi.mock("pg", () => {
   return { default: { Pool, Client } };
 });
 
-const { formatDate, extractShipNameAndDate, saveToDatabase, parseCsv, run } =
+const { formatDate, extractShipNameAndDate, pickLatestRecords, saveToDatabase, parseCsv, run } =
   await import("./app.js");
 
 // ─── formatDate ─────────────────────────────────────────────────────────────
@@ -93,6 +93,56 @@ describe("extractShipNameAndDate", () => {
       shipName: "VESSEL",
       updateDate: "01/02/23",
     });
+  });
+});
+
+// ─── pickLatestRecords ──────────────────────────────────────────────────────
+describe("pickLatestRecords", () => {
+  const row = (overrides = {}) => ({
+    imo: "9290361",
+    ship_name: "SEAOATH",
+    update_date: "12/02/25",
+    class: "ABS",
+    date_of_survey: "08/02/2020",
+    date_of_next_survey: "02/02/2025",
+    date_of_latest_status: "31/03/2005",
+    status: "Delivered",
+    reason_for_status: "",
+    ...overrides,
+  });
+
+  it("keeps the newest survey cycle instead of the first row", () => {
+    const newer = row({ update_date: "10/09/26", date_of_survey: "12/02/2025", date_of_next_survey: "02/02/2030" });
+    expect(pickLatestRecords([row(), newer])).toEqual([newer]);
+  });
+
+  it("keeps the new society's record after a class transfer", () => {
+    const withdrawn = row({ update_date: "10/09/26", status: "Withdrawn", reason_for_status: "Change of class" });
+    const newClass = row({ update_date: "10/09/26", class: "LRS", date_of_latest_status: "01/09/2026" });
+    expect(pickLatestRecords([withdrawn, newClass])).toEqual([newClass]);
+    expect(pickLatestRecords([newClass, withdrawn])).toEqual([newClass]);
+  });
+
+  it("reports a withdrawal when it is the newest information", () => {
+    const withdrawn = row({ update_date: "10/09/26", status: "Withdrawn" });
+    expect(pickLatestRecords([row(), withdrawn])).toEqual([withdrawn]);
+  });
+
+  it("falls back to the survey date when row stamps are equal or missing", () => {
+    const older = row({ update_date: "", date_of_survey: "08/02/2020" });
+    const newer = row({ update_date: "", date_of_survey: "12/02/2025" });
+    expect(pickLatestRecords([newer, older])).toEqual([newer]);
+  });
+
+  it("skips records without IMO or ship name and keeps one record per IMO", () => {
+    const result = pickLatestRecords([
+      row({ imo: "" }),
+      row({ ship_name: "" }),
+      row({ imo: "1111111" }),
+      row(),
+      row({ date_of_survey: "01/01/2019" }),
+    ]);
+    expect(result.map((r) => r.imo)).toEqual(["1111111", "9290361"]);
   });
 });
 

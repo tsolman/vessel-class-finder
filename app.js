@@ -23,6 +23,14 @@ const pool = new Pool({
     ssl: { rejectUnauthorized: false }
 });
 
+// Find "EquasisToIACS_<date>_<version>.zip" URLs anywhere in the page source (e.g. serialized Nuxt data,
+// where "/" may be escaped as "\u002F"), returning { url, version } like the <a>-tag scan
+function findZipLinksInPayload(html) {
+    const source = String(html || "").replace(/\\u002F/gi, "/");
+    const urls = new Set(source.match(/https?:\/\/[^"'\s<>]+?_\d+\.zip/g) || []);
+    return [...urls].map((url) => ({ url, version: parseInt(url.match(/_(\d+)\.zip$/)[1], 10) }));
+}
+
 // Function to scrape and get the latest Equasis CSV file URL
 async function getLatestEquasisFileUrl() {
     try {
@@ -42,6 +50,11 @@ async function getLatestEquasisFileUrl() {
                 }
             }
         });
+
+        // The page is now a Nuxt app: the download links live in the embedded page data, not in <a> tags
+        if (fileLinks.length === 0) {
+            fileLinks = findZipLinksInPayload(response.data);
+        }
 
         if (fileLinks.length === 0) {
             throw new Error("❌ No Equasis Data file found.");
@@ -285,7 +298,7 @@ async function run() {
 
 }
 
-export { formatDate, extractShipNameAndDate, pickLatestRecords, saveToDatabase, parseCsv, run };
+export { formatDate, extractShipNameAndDate, findZipLinksInPayload, pickLatestRecords, saveToDatabase, parseCsv, run };
 
 // Execute the scraper immediately on startup
 if (process.env.NODE_ENV !== "test") run();

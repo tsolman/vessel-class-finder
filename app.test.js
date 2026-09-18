@@ -41,7 +41,7 @@ vi.mock("pg", () => {
   return { default: { Pool, Client } };
 });
 
-const { formatDate, extractShipNameAndDate, pickLatestRecords, saveToDatabase, parseCsv, run } =
+const { formatDate, extractShipNameAndDate, findZipLinksInPayload, pickLatestRecords, saveToDatabase, parseCsv, run } =
   await import("./app.js");
 
 // ─── formatDate ─────────────────────────────────────────────────────────────
@@ -93,6 +93,32 @@ describe("extractShipNameAndDate", () => {
       shipName: "VESSEL",
       updateDate: "01/02/23",
     });
+  });
+});
+
+// ─── findZipLinksInPayload ──────────────────────────────────────────────────
+describe("findZipLinksInPayload", () => {
+  it("finds escaped zip URLs in serialized page data with their version", () => {
+    const html =
+      '<script>window.__NUXT__={download_items:[{file:"https:\\u002F\\u002Fiacs.s3.af-south-1.amazonaws.com\\u002Fwp-content\\u002Fuploads\\u002F2026\\u002F09\\u002F18110306\\u002FEquasisToIACS_20260918_976.zip"},' +
+      '{file:"https://iacs.s3.af-south-1.amazonaws.com/wp-content/uploads/2026/09/11150648/EquasisToIACS_20260911_975.zip"}]}</script>';
+    const links = findZipLinksInPayload(html);
+    expect(links).toHaveLength(2);
+    expect(links).toContainEqual({
+      url: "https://iacs.s3.af-south-1.amazonaws.com/wp-content/uploads/2026/09/18110306/EquasisToIACS_20260918_976.zip",
+      version: 976,
+    });
+    expect(links.map((l) => l.version)).toContain(975);
+  });
+
+  it("returns an empty list when there are no zip links", () => {
+    expect(findZipLinksInPayload("<html><a href='/file.pdf'>Download File</a></html>")).toEqual([]);
+    expect(findZipLinksInPayload(undefined)).toEqual([]);
+  });
+
+  it("deduplicates repeated URLs", () => {
+    const url = "https://iacs.org.uk/files/EquasisToIACS_20260918_976.zip";
+    expect(findZipLinksInPayload(`"${url}" "${url}"`)).toEqual([{ url, version: 976 }]);
   });
 });
 

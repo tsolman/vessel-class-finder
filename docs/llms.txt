@@ -1,0 +1,65 @@
+# Vessel Class Finder
+
+> JSON REST API for IACS vessel classification data. Look up any ship by IMO number and get its classification society, class status (In Class / Suspended / Withdrawn), last and next survey dates, and the reason for its latest status change. Data comes from the IACS "Vessels in Class" dataset, which IACS publishes only as a ZIP/CSV download, and is refreshed every Sunday. Free tier: 100 lookups/month. Built by WeAreFabbrik (https://wearefabbrik.com).
+
+Base URL: https://vessel-class-finder-production.up.railway.app
+Authentication: `x-api-key` header. Get a key by registering, verifying your email, then logging in.
+
+## Quick start
+
+1. `POST /register` with `{"email": "...", "password": "..."}` (password min. 6 characters). A verification link is emailed to you.
+2. Click the link (`GET /verify?token=...`). Unverified accounts cannot log in. `POST /resend-verification` with `{"email": "..."}` sends a new link.
+3. `POST /login` with the same credentials. Returns `{"token": "...", "apiKey": "..."}`.
+4. `POST /vessels` with header `x-api-key: <apiKey>` and body `{"imos": [9200079, 9300123]}`.
+
+Example response from `/vessels`:
+
+```json
+[{
+  "imo": 9200079,
+  "vessel_name": "NORDIC AURORA",
+  "update_date": "01/03/26",
+  "class": "DNV",
+  "status": "In Class",
+  "date_of_survey": "15/06/2025",
+  "date_of_next_survey": "15/06/2028",
+  "date_of_latest_status": "01/01/2024",
+  "reason_for_status": ""
+}]
+```
+
+Dates are DD/MM/YYYY strings. IMO numbers not found in the IACS dataset are omitted from the response rather than returned as errors.
+
+## Endpoints
+
+- `POST /register`: create an account (sends a verification email)
+- `GET /verify?token=...`: verify an email address
+- `POST /resend-verification`: resend the verification email
+- `POST /login`: returns a JWT and a new API key
+- `POST /vessels` (API key): classification records for a list of IMO numbers. Each request counts as one lookup.
+- `GET /usage` (API key): `{"month", "used", "limit", "plan"}` for the current calendar month
+- `GET /subscription` (API key): subscription status and expiry
+- `GET /api-keys` (API key): list your API keys
+- `DELETE /api-keys/:key` (API key): revoke a key
+
+Errors are JSON `{"error": "..."}`. Status codes: 400 invalid input, 401 bad credentials, 403 missing/invalid API key or unverified email, 404 not found, 429 monthly quota or rate limit exceeded.
+
+## Plans
+
+- Free: 100 lookups/month, $0
+- Starter: 5,000 lookups/month, $49/mo
+- Pro: 50,000 lookups/month, $199/mo
+- Enterprise: unlimited, custom pricing
+
+To upgrade, email info@wearefabbrik.com.
+
+## Data coverage
+
+Every vessel in the IACS Vessels in Class dataset, which covers ships classed by IACS member societies: ABS, BV, CCS, CRS, DNV, IRS, KR, LR, ClassNK, PRS, RINA, TL. Typical uses include fleet monitoring, marine insurance risk checks, port state compliance, sale-and-purchase due diligence, and enriching vessel records.
+
+## Links
+
+- [Home page](https://tsolman.github.io/vessel-class-finder/): overview, pricing, signup
+- [Guide: querying IACS class status by IMO number](https://tsolman.github.io/vessel-class-finder/blog/vessel-classification-api.html)
+- [Source code and full API reference](https://github.com/tsolman/vessel-class-finder)
+- [Terms of Service & Privacy Policy](https://tsolman.github.io/vessel-class-finder/terms.html)

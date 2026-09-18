@@ -1,7 +1,24 @@
 {
   "name": "vessel-class-finder",
   "version": "1.0.0",
-  "description": "api for maritime classes",
+  "description": "REST API for IACS vessel classification data: class status, classification society and survey dates by IMO number",
+  "keywords": [
+    "iacs",
+    "vessel-classification",
+    "class-status",
+    "imo",
+    "imo-number",
+    "classification-society",
+    "maritime",
+    "shipping",
+    "vessel-api",
+    "rest-api"
+  ],
+  "homepage": "https://tsolman.github.io/vessel-class-finder/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsolman/vessel-class-finder.git"
+  },
   "main": "app.js",
   "type": "module",
   "scripts": {
@@ -9,7 +26,7 @@
     "scrape": "node app.js",
     "test": "NODE_ENV=test vitest run"
   },
-  "author": "WeAreFabbrik",
+  "author": "WeAreFabbrik <info@wearefabbrik.com> (https://wearefabbrik.com)",
   "license": "ISC",
   "engines": {
     "node": ">=18"

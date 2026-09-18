@@ -5,6 +5,77 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vessel Class Finder — IACS Vessel Classification API</title>
   <meta name="description" content="REST API for IACS vessel classification data. Get class status, survey dates, and compliance info by IMO number. Free tier available.">
+  <link rel="canonical" href="https://tsolman.github.io/vessel-class-finder/">
+  <link rel="icon" href="/vessel-class-finder/logo.svg" type="image/svg+xml">
+  <link rel="alternate" type="text/plain" title="LLM-readable summary" href="/vessel-class-finder/llms.txt">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Vessel Class Finder">
+  <meta property="og:title" content="Vessel Class Finder — IACS Vessel Classification API">
+  <meta property="og:description" content="Query IACS class status, classification society, and survey dates for any ship by IMO number. JSON REST API, refreshed weekly. Free tier: 100 lookups/month.">
+  <meta property="og:url" content="https://tsolman.github.io/vessel-class-finder/">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://wearefabbrik.com/#org",
+        "name": "WeAreFabbrik",
+        "url": "https://wearefabbrik.com",
+        "email": "info@wearefabbrik.com"
+      },
+      {
+        "@type": "WebAPI",
+        "@id": "https://tsolman.github.io/vessel-class-finder/#api",
+        "name": "Vessel Class Finder API",
+        "alternateName": ["VesselClassFinder", "IACS vessel classification API"],
+        "description": "REST API that returns IACS vessel-in-class data (classification society, class status, last and next survey dates, status reason) for ships by IMO number. Data is scraped from the IACS 'Vessels in Class' dataset and refreshed weekly.",
+        "url": "https://tsolman.github.io/vessel-class-finder/",
+        "documentation": "https://github.com/tsolman/vessel-class-finder#api-endpoints",
+        "termsOfService": "https://tsolman.github.io/vessel-class-finder/terms.html",
+        "provider": { "@id": "https://wearefabbrik.com/#org" },
+        "keywords": "IACS, vessel classification, class status, IMO number, classification society, ship survey dates, maritime API",
+        "offers": [
+          { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD", "description": "100 lookups per month" },
+          { "@type": "Offer", "name": "Starter", "price": "49", "priceCurrency": "USD", "description": "5,000 lookups per month" },
+          { "@type": "Offer", "name": "Pro", "price": "199", "priceCurrency": "USD", "description": "50,000 lookups per month" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://tsolman.github.io/vessel-class-finder/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is there an API for IACS vessel classification data?",
+            "acceptedAnswer": { "@type": "Answer", "text": "IACS publishes its Vessels in Class data only as a downloadable ZIP/CSV file, not as an API. Vessel Class Finder scrapes that file weekly and serves it as a JSON REST API: POST a list of IMO numbers to /vessels with an x-api-key header and get each ship's classification society, class status and survey dates back." }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I check a ship's class status by IMO number?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Register for a free API key, then send POST /vessels with body {\"imos\": [9200079]}. The response includes the classification society (for example DNV, LR, BV, ABS, ClassNK), the class status (In Class, Suspended, Withdrawn), the last and next survey dates, and the reason for the latest status change." }
+          },
+          {
+            "@type": "Question",
+            "name": "Which classification societies are covered?",
+            "acceptedAnswer": { "@type": "Answer", "text": "All vessels listed in the IACS Vessels in Class dataset, which covers ships classed by IACS member societies such as ABS, BV, CCS, CRS, DNV, IRS, KR, LR, ClassNK, PRS, RINA and TL." }
+          },
+          {
+            "@type": "Question",
+            "name": "How often is the data updated?",
+            "acceptedAnswer": { "@type": "Answer", "text": "The dataset is re-downloaded from IACS every Sunday and swapped in atomically, so the API never serves a partial refresh." }
+          },
+          {
+            "@type": "Question",
+            "name": "How much does the vessel classification API cost?",
+            "acceptedAnswer": { "@type": "Answer", "text": "The free tier includes 100 lookups per month with no credit card. Starter is $49/month for 5,000 lookups, Pro is $199/month for 50,000 lookups, and Enterprise is custom. Contact info@wearefabbrik.com to upgrade." }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -335,6 +406,17 @@
       color: var(--green);
     }
 
+    /* FAQ */
+    .faq { display: flex; flex-direction: column; gap: 12px; }
+    .faq details {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 22px;
+    }
+    .faq summary { font-weight: 600; font-size: 15px; cursor: pointer; }
+    .faq details p { margin-top: 10px; font-size: 14px; color: var(--text-muted); }
+
     /* Footer */
     footer {
       padding: 32px 0;
@@ -363,6 +445,7 @@
       <li><a href="#how-it-works">How It Works</a></li>
       <li><a href="#api">API</a></li>
       <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#faq">FAQ</a></li>
       <li><a href="/vessel-class-finder/blog/vessel-classification-api.html">Blog</a></li>
       <li><a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></li>
     </ul>
@@ -486,6 +569,12 @@
       </div>
       <div class="endpoint">
         <span class="method method-get">GET</span>
+        <code>/usage</code>
+        <span class="desc">Check this month's lookup usage</span>
+      </div>
+
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
         <code>/api-keys</code>
         <span class="desc">List your API keys</span>
       </div>
@@ -549,6 +638,35 @@
         </ul>
         <a href="mailto:info@wearefabbrik.com?subject=Vessel%20Class%20Finder%20-%20Enterprise" class="btn btn-secondary" style="text-align:center;">Contact Us</a>
       </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="container">
+    <div class="section-label">FAQ</div>
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details open>
+        <summary>Is there an API for IACS vessel classification data?</summary>
+        <p>IACS publishes its <em>Vessels in Class</em> data only as a downloadable ZIP/CSV file, not as an API. Vessel Class Finder scrapes that file weekly and serves it as a JSON REST API: POST a list of IMO numbers to <code>/vessels</code> with an <code>x-api-key</code> header and get each ship's classification society, class status and survey dates back.</p>
+      </details>
+      <details>
+        <summary>How do I check a ship's class status by IMO number?</summary>
+        <p>Register for a free API key, then send <code>POST /vessels</code> with body <code>{"imos": [9200079]}</code>. The response includes the classification society (for example DNV, LR, BV, ABS, ClassNK), the class status (In Class, Suspended, Withdrawn), the last and next survey dates, and the reason for the latest status change.</p>
+      </details>
+      <details>
+        <summary>Which classification societies are covered?</summary>
+        <p>All vessels listed in the IACS Vessels in Class dataset, which covers ships classed by IACS member societies such as ABS, BV, CCS, CRS, DNV, IRS, KR, LR, ClassNK, PRS, RINA and TL.</p>
+      </details>
+      <details>
+        <summary>How often is the data updated?</summary>
+        <p>The dataset is re-downloaded from IACS every Sunday and swapped in atomically, so the API never serves a partial refresh.</p>
+      </details>
+      <details>
+        <summary>How much does the vessel classification API cost?</summary>
+        <p>The free tier includes 100 lookups per month with no credit card. Starter is $49/month for 5,000 lookups, Pro is $199/month for 50,000 lookups, and Enterprise is custom. Contact <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a> to upgrade.</p>
+      </details>
     </div>
   </div>
 </section>
@@ -696,7 +814,7 @@ async function handleResend(e) {
 
 <footer>
   <div class="container">
-    <p>Built by <a href="https://fabbrik.dev" target="_blank">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/vessel-class-finder/terms.html">Terms & Privacy</a></p>
+    <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/vessel-class-finder/terms.html">Terms & Privacy</a></p>
   </div>
 </footer>
 

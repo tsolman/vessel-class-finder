@@ -1,6 +1,19 @@
-# Vessel Class Finder
+# Vessel Class Finder: IACS Vessel Classification API
 
-Data pipeline and REST API that scrapes IACS vessel classification data, loads it into PostgreSQL, and serves it via authenticated endpoints.
+Look up any ship's **classification society, class status (In Class / Suspended / Withdrawn) and survey dates by IMO number** through a JSON REST API.
+
+IACS publishes its *Vessels in Class* dataset only as a ZIP/CSV download. This project scrapes that file weekly, loads it into PostgreSQL, and serves it through authenticated endpoints.
+
+- **Hosted API & free key:** https://tsolman.github.io/vessel-class-finder/ (100 lookups/month free)
+- **Guide:** [How to query IACS class status by IMO number](https://tsolman.github.io/vessel-class-finder/blog/vessel-classification-api.html)
+- **LLM-readable summary:** [`llms.txt`](https://tsolman.github.io/vessel-class-finder/llms.txt)
+- **Built by** [WeAreFabbrik](https://wearefabbrik.com)
+
+```bash
+curl -X POST https://vessel-class-finder-production.up.railway.app/vessels \
+  -H "x-api-key: YOUR_API_KEY" -H "Content-Type: application/json" \
+  -d '{"imos": [9200079]}'
+```
 
 ## Prerequisites
 
@@ -25,6 +38,13 @@ PGPASSWORD=your_db_password
 DB_PORT=5432
 PGSSLMODE=require
 JWT_SECRET=your_jwt_secret
+
+# Optional
+RESEND_API_KEY=your_resend_key        # verification emails (skipped if unset)
+APP_URL=https://your-api-host         # base URL for /verify links
+SITE_URL=https://your-marketing-site  # links back to the signup page
+TELEGRAM_BOT_TOKEN=...                # signup notifications
+TELEGRAM_CHAT_ID=...
 ```
 
 3. Create the required database tables:
@@ -95,7 +115,28 @@ Content-Type: application/json
 { "email": "user@example.com", "password": "secret" }
 ```
 
-Response: `{ "message": "User registered", "userId": 1 }`
+Response: `{ "message": "Registered. Check your email to verify your account and activate your API key.", "userId": "uuid..." }`
+
+A verification link is emailed to the user. Accounts must be verified before they can log in.
+
+#### Verify Email
+
+```
+GET /verify?token=...
+```
+
+Opened from the link in the verification email. Links expire after 7 days.
+
+#### Resend Verification Email
+
+```
+POST /resend-verification
+Content-Type: application/json
+
+{ "email": "user@example.com" }
+```
+
+Always responds with the same generic message, so it can't be used to check which emails are registered.
 
 #### Login
 
@@ -107,6 +148,8 @@ Content-Type: application/json
 ```
 
 Response: `{ "message": "Login successful", "token": "jwt...", "apiKey": "uuid..." }`
+
+Unverified accounts get `403` with `{ "error": "...", "unverified": true }`.
 
 ### Vessel Data (requires `x-api-key` header)
 
@@ -215,7 +258,7 @@ All errors return JSON with an `error` field:
 |--------|---------|
 | 400 | Bad request (missing/invalid fields) |
 | 401 | Invalid credentials |
-| 403 | Missing or invalid API key |
+| 403 | Missing or invalid API key, or email not verified |
 | 404 | Resource not found |
 | 429 | Rate limit exceeded |
 | 500 | Internal server error |
@@ -225,7 +268,8 @@ All errors return JSON with an `error` field:
 | Scope | Limit |
 |-------|-------|
 | Global (all routes) | 100 requests / 15 min per IP |
-| `/register`, `/login` | 10 requests / 15 min per IP |
+| `/register`, `/login`, `/resend-verification` | 10 requests / 15 min per IP |
+| `/register`, `/resend-verification` | 5 requests / hour per IP |
 
 ## Running Tests
 

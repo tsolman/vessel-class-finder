@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { v4 as uuidv4 } from "uuid";
+import { timingSafeEqual } from "crypto";
 import rateLimit from "express-rate-limit";
 import pkg from 'pg';
 import { Resend } from "resend";
@@ -24,7 +25,7 @@ const pool = new Pool({
 app.use(express.json());
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Content-Type, x-api-key");
+    res.header("Access-Control-Allow-Headers", "Content-Type, x-api-key, x-admin-key");
     res.header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
     if (req.method === "OPTIONS") return res.sendStatus(204);
     next();
@@ -206,6 +207,10 @@ function verifyResultPage({ heading, body, cta }) {
 </html>`;
 }
 
+function escapeHtml(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 async function notifyTelegram(message) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
@@ -248,7 +253,7 @@ app.post("/register", registerLimiter, authLimiter, async (req, res) => {
             [normalizedEmail, hashedPassword, verificationToken]
         );
         res.json({ message: "Registered. Check your email to verify your account and activate your API key.", userId: result.rows[0].id });
-        notifyTelegram(`New signup (pending verification): ${normalizedEmail}`);
+        notifyTelegram(`New signup (pending verification): ${escapeHtml(normalizedEmail)}`);
         sendVerificationEmail(normalizedEmail, verificationToken);
     } catch (error) {
         console.error(error);
@@ -322,7 +327,7 @@ app.post("/resend-verification", registerLimiter, authLimiter, async (req, res) 
 
     try {
         const result = await pool.query(
-            "SELECT id, verified FROM users WHERE email = $1",
+            "SELECT id, verified FROM users WHERE lower(email) = $1",
             [normalizedEmail]
         );
         if (result.rows.length > 0 && result.rows[0].verified === false) {
@@ -344,7 +349,11 @@ app.post("/resend-verification", registerLimiter, authLimiter, async (req, res) 
 app.post("/login", authLimiter, async (req, res) => {
     try {
         const { email, password } = req.body;
-        const result = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+        if (typeof email !== "string" || typeof password !== "string") {
+            return res.status(401).json({ error: "Invalid credentials" });
+        }
+        // Registration stores emails lowercased; lower() also matches older mixed-case rows.
+        const result = await pool.query("SELECT * FROM users WHERE lower(email) = $1", [email.trim().toLowerCase()]);
 
         if (result.rows.length === 0) return res.status(401).json({ error: "Invalid credentials" });
 
@@ -359,9 +368,16 @@ app.post("/login", authLimiter, async (req, res) => {
 
         const token = jwt.sign({ userId: user.id, email: user.email }, SECRET_KEY, { expiresIn: "7d" });
 
-        // Generate an API key for the user
-        const apiKey = uuidv4();
-        await pool.query("INSERT INTO api_keys (user_id, api_key) VALUES ($1, $2)", [user.id, apiKey]);
+        // Reuse the newest active API key; only mint one if the user has none.
+        const keyResult = await pool.query(
+            "SELECT api_key FROM api_keys WHERE user_id = $1 AND active = TRUE ORDER BY created_at DESC LIMIT 1",
+            [user.id]
+        );
+        let apiKey = keyResult.rows[0]?.api_key;
+        if (!apiKey) {
+            apiKey = uuidv4();
+            await pool.query("INSERT INTO api_keys (user_id, api_key) VALUES ($1, $2)", [user.id, apiKey]);
+        }
 
         res.json({ message: "Login successful", token, apiKey });
     } catch (error) {
@@ -386,6 +402,41 @@ const authenticateAPIKey = async (req, res, next) => {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
     }
+};
+
+// 📌 Middleware: Admin-only routes. Requires x-admin-key to match ADMIN_API_KEY;
+// if ADMIN_API_KEY is unset, admin routes are disabled entirely.
+const authenticateAdmin = (req, res, next) => {
+    const expected = process.env.ADMIN_API_KEY;
+    const provided = req.headers["x-admin-key"];
+    if (!expected || typeof provided !== "string") return res.status(403).json({ error: "Admin access required" });
+    const a = Buffer.from(provided);
+    const b = Buffer.from(expected);
+    if (a.length !== b.length || !timingSafeEqual(a, b)) return res.status(403).json({ error: "Admin access required" });
+    next();
+};
+
+// 📌 Middleware: Validate IMO list. Runs before usage accounting so bad requests
+// don't consume quota. Duplicates are removed so each vessel is billed once.
+const MAX_IMOS_PER_REQUEST = 100;
+
+const validateImos = (req, res, next) => {
+    const { imos } = req.body;
+    if (!imos || !Array.isArray(imos)) return res.status(400).json({ error: "Provide an array of IMOs" });
+    if (imos.length === 0) return res.status(400).json({ error: "Provide at least one IMO" });
+
+    const invalid = imos.filter(imo => !/^\d{1,7}$/.test(String(imo)));
+    if (invalid.length > 0) {
+        return res.status(400).json({ error: "IMO numbers must be positive integers of up to 7 digits", invalid: invalid.slice(0, 10) });
+    }
+
+    const unique = [...new Set(imos.map(imo => Number(imo)))];
+    if (unique.length > MAX_IMOS_PER_REQUEST) {
+        return res.status(400).json({ error: `At most ${MAX_IMOS_PER_REQUEST} IMOs per request` });
+    }
+
+    req.imos = unique;
+    next();
 };
 
 // 📌 Middleware: Check Usage Limits
@@ -416,23 +467,26 @@ const checkUsageLimit = async (req, res, next) => {
         );
 
         const currentUsage = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
+        // Each IMO looked up counts as one lookup.
+        const cost = req.imos ? req.imos.length : 1;
 
-        if (limit !== Infinity && currentUsage >= limit) {
+        if (limit !== Infinity && currentUsage + cost > limit) {
             return res.status(429).json({
                 error: "Monthly lookup limit reached. Upgrade your plan at info@wearefabbrik.com",
                 usage: currentUsage,
+                requested: cost,
                 limit,
                 plan
             });
         }
 
         await pool.query(
-            "INSERT INTO api_usage (user_id, month, request_count) VALUES ($1, $2, 1) ON CONFLICT (user_id, month) DO UPDATE SET request_count = api_usage.request_count + 1",
-            [req.userId, month]
+            "INSERT INTO api_usage (user_id, month, request_count) VALUES ($1, $2, $3) ON CONFLICT (user_id, month) DO UPDATE SET request_count = api_usage.request_count + $3",
+            [req.userId, month, cost]
         );
 
         req.plan = plan;
-        req.usageCount = currentUsage + 1;
+        req.usageCount = currentUsage + cost;
         req.usageLimit = limit;
         next();
     } catch (error) {
@@ -442,13 +496,9 @@ const checkUsageLimit = async (req, res, next) => {
 };
 
 // 📌 API: Fetch Vessel Data by IMO
-app.post("/vessels", authenticateAPIKey, checkUsageLimit, async (req, res) => {
+app.post("/vessels", authenticateAPIKey, validateImos, checkUsageLimit, async (req, res) => {
     try {
-        const { imos } = req.body;
-        if (!imos || !Array.isArray(imos)) return res.status(400).json({ error: "Provide an array of IMOs" });
-
-        const placeholders = imos.map((_, i) => `$${i + 1}`).join(",");
-        const result = await pool.query(`SELECT * FROM vessel_data WHERE imo IN (${placeholders})`, imos);
+        const result = await pool.query("SELECT * FROM vessel_data WHERE imo = ANY($1::bigint[])", [req.imos]);
 
         res.json(result.rows);
     } catch (error) {
@@ -470,11 +520,16 @@ app.get("/subscription", authenticateAPIKey, async (req, res) => {
     }
 });
 
-// 📌 API: Activate Subscription (Admin Use)
-app.post("/subscribe", authenticateAPIKey, async (req, res) => {
+// 📌 API: Activate Subscription (admin only, x-admin-key header)
+const PAID_PLANS = ["starter", "pro", "enterprise"];
+
+app.post("/subscribe", authenticateAdmin, async (req, res) => {
     try {
-        const { email } = req.body;
-        const userResult = await pool.query("SELECT id FROM users WHERE email = $1", [email]);
+        const { email, plan = "starter" } = req.body;
+        if (typeof email !== "string") return res.status(400).json({ error: "Missing email" });
+        if (!PAID_PLANS.includes(plan)) return res.status(400).json({ error: `plan must be one of: ${PAID_PLANS.join(", ")}` });
+
+        const userResult = await pool.query("SELECT id FROM users WHERE lower(email) = $1", [email.trim().toLowerCase()]);
 
         if (userResult.rows.length === 0) return res.status(404).json({ error: "User not found" });
 
@@ -483,11 +538,11 @@ app.post("/subscribe", authenticateAPIKey, async (req, res) => {
         expiresAt.setMonth(expiresAt.getMonth() + 1); // 1-month subscription
 
         await pool.query(
-            "INSERT INTO subscriptions (user_id, status, expires_at) VALUES ($1, 'active', $2) ON CONFLICT (user_id) DO UPDATE SET status = 'active', expires_at = $2",
-            [userId, expiresAt]
+            "INSERT INTO subscriptions (user_id, status, expires_at, plan) VALUES ($1, 'active', $2, $3) ON CONFLICT (user_id) DO UPDATE SET status = 'active', expires_at = $2, plan = $3",
+            [userId, expiresAt, plan]
         );
 
-        res.json({ message: "Subscription activated" });
+        res.json({ message: "Subscription activated", plan, expires_at: expiresAt });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });

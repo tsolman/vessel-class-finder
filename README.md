@@ -40,6 +40,7 @@ PGSSLMODE=require
 JWT_SECRET=your_jwt_secret
 
 # Optional
+ADMIN_API_KEY=long_random_secret      # enables POST /subscribe (disabled if unset)
 RESEND_API_KEY=your_resend_key        # verification emails (skipped if unset)
 APP_URL=https://your-api-host         # base URL for /verify links
 SITE_URL=https://your-marketing-site  # links back to the signup page
@@ -149,6 +150,8 @@ Content-Type: application/json
 
 Response: `{ "message": "Login successful", "token": "jwt...", "apiKey": "uuid..." }`
 
+Returns your most recent active API key, creating one only if you have none. Email matching is case-insensitive.
+
 Unverified accounts get `403` with `{ "error": "...", "unverified": true }`.
 
 ### Vessel Data (requires `x-api-key` header)
@@ -162,6 +165,10 @@ Content-Type: application/json
 
 { "imos": [9200079, 9300123] }
 ```
+
+- Up to **100 IMO numbers** per request (duplicates are removed first).
+- IMOs must be positive integers of up to 7 digits (numbers or numeric strings). Invalid input returns `400` with an `invalid` list and is not charged.
+- Each unique IMO counts as **one lookup** against your monthly quota. IMOs not in the IACS dataset are omitted from the response.
 
 Response:
 
@@ -192,17 +199,21 @@ x-api-key: your-api-key
 
 Response: `{ "status": "active", "expires_at": "2026-04-23T00:00:00.000Z" }` or `{ "status": "inactive" }`
 
-#### Activate Subscription
+#### Activate Subscription (admin only)
 
 ```
 POST /subscribe
-x-api-key: your-api-key
+x-admin-key: your-ADMIN_API_KEY
 Content-Type: application/json
 
-{ "email": "user@example.com" }
+{ "email": "user@example.com", "plan": "pro" }
 ```
 
-Response: `{ "message": "Subscription activated" }`
+`plan` is one of `starter` (default), `pro`, `enterprise`. Activates or extends the plan for one month from now.
+
+Response: `{ "message": "Subscription activated", "plan": "pro", "expires_at": "..." }`
+
+Requires the `x-admin-key` header to match the `ADMIN_API_KEY` env variable. If `ADMIN_API_KEY` is unset, the endpoint always returns `403`.
 
 ### Usage (requires `x-api-key` header)
 
@@ -224,7 +235,7 @@ Response: `{ "month": "2026-03", "used": 47, "limit": 100, "plan": "free" }`
 | Pro | 50,000 | Contact info@wearefabbrik.com |
 | Enterprise | Unlimited | Contact info@wearefabbrik.com |
 
-When you exceed your monthly limit, `/vessels` returns `429` with your current usage and limit.
+Each unique IMO in a `/vessels` request counts as one lookup. If a request would take you over your monthly limit, `/vessels` returns `429` with `usage`, `requested`, `limit` and `plan`, and nothing is charged.
 
 ### API Key Management (requires `x-api-key` header)
 
@@ -258,7 +269,7 @@ All errors return JSON with an `error` field:
 |--------|---------|
 | 400 | Bad request (missing/invalid fields) |
 | 401 | Invalid credentials |
-| 403 | Missing or invalid API key, or email not verified |
+| 403 | Missing or invalid API key, email not verified, or missing admin key |
 | 404 | Resource not found |
 | 429 | Rate limit exceeded |
 | 500 | Internal server error |

@@ -303,7 +303,7 @@
   }
 ]</code></pre>
 
-  <p>You can query multiple IMOs in a single request by passing an array. The response returns all matching vessels; IMO numbers that aren't in the IACS dataset are simply left out. Call <code>GET /usage</code> with the same header to see how many lookups you've used this month.</p>
+  <p>You can query up to 100 IMOs in a single request by passing an array; each unique IMO counts as one lookup. The response returns all matching vessels; IMO numbers that aren't in the IACS dataset are simply left out. Call <code>GET /usage</code> with the same header to see how many lookups you've used this month.</p>
 
   <h2>How the data stays fresh</h2>
 

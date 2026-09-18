@@ -9,7 +9,7 @@ Authentication: `x-api-key` header. Get a key by registering, verifying your ema
 
 1. `POST /register` with `{"email": "...", "password": "..."}` (password min. 6 characters). A verification link is emailed to you.
 2. Click the link (`GET /verify?token=...`). Unverified accounts cannot log in. `POST /resend-verification` with `{"email": "..."}` sends a new link.
-3. `POST /login` with the same credentials. Returns `{"token": "...", "apiKey": "..."}`.
+3. `POST /login` with the same credentials. Returns `{"token": "...", "apiKey": "..."}`. Logging in again returns the same active key.
 4. `POST /vessels` with header `x-api-key: <apiKey>` and body `{"imos": [9200079, 9300123]}`.
 
 Example response from `/vessels`:
@@ -36,13 +36,13 @@ Dates are DD/MM/YYYY strings. IMO numbers not found in the IACS dataset are omit
 - `GET /verify?token=...`: verify an email address
 - `POST /resend-verification`: resend the verification email
 - `POST /login`: returns a JWT and a new API key
-- `POST /vessels` (API key): classification records for a list of IMO numbers. Each request counts as one lookup.
+- `POST /vessels` (API key): classification records for up to 100 IMO numbers per request. Each unique IMO counts as one lookup; invalid input is rejected with 400 and not charged.
 - `GET /usage` (API key): `{"month", "used", "limit", "plan"}` for the current calendar month
 - `GET /subscription` (API key): subscription status and expiry
 - `GET /api-keys` (API key): list your API keys
 - `DELETE /api-keys/:key` (API key): revoke a key
 
-Errors are JSON `{"error": "..."}`. Status codes: 400 invalid input, 401 bad credentials, 403 missing/invalid API key or unverified email, 404 not found, 429 monthly quota or rate limit exceeded.
+Errors are JSON `{"error": "..."}`. Status codes: 400 invalid input (non-numeric IMOs, empty list, more than 100 IMOs), 401 bad credentials, 403 missing/invalid API key or unverified email, 404 not found, 429 monthly quota or rate limit exceeded.
 
 ## Plans
 

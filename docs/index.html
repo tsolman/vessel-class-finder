@@ -505,7 +505,7 @@
       <div class="step">
         <div class="step-num">2</div>
         <h3>Query by IMO</h3>
-        <p>Send a POST with one or more IMO numbers. Get structured JSON back with full classification details.</p>
+        <p>Send a POST with one or more IMO numbers. Up to 100 per request; each IMO counts as one lookup. Get structured JSON back with full classification details.</p>
       </div>
       <div class="step">
         <div class="step-num">3</div>
@@ -565,7 +565,7 @@
       <div class="endpoint">
         <span class="method method-post">POST</span>
         <code>/subscribe</code>
-        <span class="desc">Activate subscription</span>
+        <span class="desc">Activate a paid plan (admin only)</span>
       </div>
       <div class="endpoint">
         <span class="method method-get">GET</span>
@@ -704,6 +704,10 @@ function getInputs() {
   };
 }
 
+function escapeHtml(str) {
+  return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 function setMsg(msg, type, html) {
   msg.className = "form-message " + type;
   msg.removeAttribute("style");
@@ -735,14 +739,14 @@ async function handleSignup() {
     const regData = await regRes.json();
 
     if (!regRes.ok) {
-      setMsg(msg, "error", regData.error || "Registration failed.");
+      setMsg(msg, "error", escapeHtml(regData.error || "Registration failed."));
       signupBtn.disabled = false;
       signupBtn.textContent = "Create Account";
       return;
     }
 
     setMsg(msg, "success",
-      "<strong>Almost there!</strong> We've sent a verification link to <strong>" + email + "</strong>. " +
+      "<strong>Almost there!</strong> We've sent a verification link to <strong>" + escapeHtml(email) + "</strong>. " +
       "Click it to activate your account, then log in below to get your API key." +
       '<p style="margin-top:10px;font-size:13px;">Didn\'t get it? <a href="#" onclick="handleResend(event)">Resend email</a></p>');
     signupBtn.textContent = "Account created";
@@ -777,15 +781,15 @@ async function handleLogin() {
           "Your email isn't verified yet. Check your inbox for the link. " +
           '<a href="#" onclick="handleResend(event)">Resend email</a>');
       } else {
-        setMsg(msg, "error", loginData.error || "Login failed.");
+        setMsg(msg, "error", escapeHtml(loginData.error || "Login failed."));
       }
       loginBtn.disabled = false;
       loginBtn.textContent = "I've verified — Log in & get API key";
       return;
     }
 
-    setMsg(msg, "success", "You're in! Here is your API key (save it now):" +
-      '<div class="api-key-display">' + loginData.apiKey + '</div>' +
+    setMsg(msg, "success", "You're in! Here is your API key (logging in again shows the same key):" +
+      '<div class="api-key-display">' + escapeHtml(loginData.apiKey) + '</div>' +
       '<p style="margin-top:10px;color:#94a3b8;font-size:13px;">Use this as the <code>x-api-key</code> header in your API requests.</p>');
     loginBtn.textContent = "Done!";
   } catch (e) {
@@ -805,7 +809,7 @@ async function handleResend(e) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
     });
-    setMsg(msg, "success", "If that account exists and is unverified, a new link is on its way to " + email + ".");
+    setMsg(msg, "success", "If that account exists and is unverified, a new link is on its way to " + escapeHtml(email) + ".");
   } catch (e) {
     setMsg(msg, "error", "Network error. Please try again.");
   }

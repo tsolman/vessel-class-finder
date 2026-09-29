@@ -45,6 +45,7 @@
     "node-cron": "^4.2.1",
     "pg": "^8.13.3",
     "resend": "^6.12.3",
+    "stripe": "^22.6.2",
     "uuid": "^11.0.5"
   },
   "devDependencies": {

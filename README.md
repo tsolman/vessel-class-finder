@@ -52,6 +52,7 @@ STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...       # from the webhook endpoint for /billing/webhook
 STRIPE_PRICE_STARTER=price_...        # monthly $49 price
 STRIPE_PRICE_PRO=price_...            # monthly $199 price
+STRIPE_PORTAL_CONFIG=bpc_...          # optional: portal configuration for this product (else the account default)
 ```
 
 3. Create the required database tables:

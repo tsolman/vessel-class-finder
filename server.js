@@ -800,7 +800,13 @@ app.post("/billing/portal", authenticateAPIKey, async (req, res) => {
         const customer = result.rows[0]?.stripe_customer_id;
         if (!customer) return res.status(404).json({ error: "No billing account yet. Choose a plan to subscribe." });
 
-        const session = await stripe.billingPortal.sessions.create({ customer, return_url: `${SITE_URL}/#account` });
+        // The Stripe account is shared with other products, so use a dedicated portal
+        // configuration (plan switching between our prices) when one is set.
+        const session = await stripe.billingPortal.sessions.create({
+            customer,
+            return_url: `${SITE_URL}/#account`,
+            ...(process.env.STRIPE_PORTAL_CONFIG ? { configuration: process.env.STRIPE_PORTAL_CONFIG } : {}),
+        });
         res.json({ url: session.url });
     } catch (error) {
         console.error(error);

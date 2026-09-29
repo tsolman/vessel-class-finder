@@ -4,9 +4,9 @@ Look up any ship's **classification society, class status (In Class / Suspended 
 
 IACS publishes its *Vessels in Class* dataset only as a ZIP/CSV download. This project scrapes that file weekly, loads it into PostgreSQL, and serves it through authenticated endpoints.
 
-- **Hosted API & free key:** https://tsolman.github.io/vessel-class-finder/ (100 lookups/month free)
-- **Guide:** [How to query IACS class status by IMO number](https://tsolman.github.io/vessel-class-finder/blog/vessel-classification-api.html)
-- **LLM-readable summary:** [`llms.txt`](https://tsolman.github.io/vessel-class-finder/llms.txt)
+- **Hosted API & free key:** https://vesselclassfinder.com/ (100 lookups/month free)
+- **Guide:** [How to query IACS class status by IMO number](https://vesselclassfinder.com/blog/vessel-classification-api.html)
+- **LLM-readable summary:** [`llms.txt`](https://vesselclassfinder.com/llms.txt)
 - **Built by** [WeAreFabbrik](https://wearefabbrik.com)
 
 ```bash

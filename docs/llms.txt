@@ -59,7 +59,7 @@ Every vessel in the IACS Vessels in Class dataset, which covers ships classed by
 
 ## Links
 
-- [Home page](https://tsolman.github.io/vessel-class-finder/): overview, pricing, signup
-- [Guide: querying IACS class status by IMO number](https://tsolman.github.io/vessel-class-finder/blog/vessel-classification-api.html)
+- [Home page](https://vesselclassfinder.com/): overview, pricing, signup
+- [Guide: querying IACS class status by IMO number](https://vesselclassfinder.com/blog/vessel-classification-api.html)
 - [Source code and full API reference](https://github.com/tsolman/vessel-class-finder)
-- [Terms of Service & Privacy Policy](https://tsolman.github.io/vessel-class-finder/terms.html)
+- [Terms of Service & Privacy Policy](https://vesselclassfinder.com/terms.html)

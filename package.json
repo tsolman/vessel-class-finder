@@ -14,7 +14,7 @@
     "vessel-api",
     "rest-api"
   ],
-  "homepage": "https://tsolman.github.io/vessel-class-finder/",
+  "homepage": "https://vesselclassfinder.com/",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tsolman/vessel-class-finder.git"

@@ -53,6 +53,10 @@ STRIPE_WEBHOOK_SECRET=whsec_...       # from the webhook endpoint for /billing/w
 STRIPE_PRICE_STARTER=price_...        # monthly $49 price
 STRIPE_PRICE_PRO=price_...            # monthly $199 price
 STRIPE_PORTAL_CONFIG=bpc_...          # optional: portal configuration for this product (else the account default)
+
+# Product analytics (server-side events skipped if unset)
+POSTHOG_KEY=phc_...                   # PostHog project API key (same key as docs/analytics.js)
+POSTHOG_HOST=https://eu.i.posthog.com # optional, defaults to the EU cloud
 ```
 
 3. Create the required database tables:

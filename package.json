@@ -44,6 +44,7 @@
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^4.2.1",
     "pg": "^8.13.3",
+    "posthog-node": "^5.21.2",
     "resend": "^6.12.3",
     "stripe": "^22.6.2",
     "uuid": "^11.0.5"

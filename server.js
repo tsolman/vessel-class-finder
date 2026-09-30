@@ -8,6 +8,7 @@ import rateLimit from "express-rate-limit";
 import pkg from 'pg';
 import { Resend } from "resend";
 import Stripe from "stripe";
+import { PostHog } from "posthog-node";
 
 const { Pool } = pkg;
 
@@ -65,6 +66,21 @@ const STRIPE_PRICES = {
     starter: process.env.STRIPE_PRICE_STARTER,
     pro: process.env.STRIPE_PRICE_PRO,
 };
+
+// 📌 Product analytics — disabled until POSTHOG_KEY is set. Events are keyed by the
+// user's UUID (never the email), matching the id the website identifies with.
+const posthog = process.env.POSTHOG_KEY
+    ? new PostHog(process.env.POSTHOG_KEY, { host: process.env.POSTHOG_HOST || "https://eu.i.posthog.com", disableGeoip: true })
+    : null;
+
+function track(userId, event, properties = {}) {
+    if (!posthog || !userId) return;
+    try {
+        posthog.capture({ distinctId: String(userId), event, properties: { ...properties, source: "api" } });
+    } catch (e) {
+        console.error("Analytics capture failed:", e.message);
+    }
+}
 
 // How long an email-verification link stays valid.
 const VERIFICATION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -332,6 +348,7 @@ app.post("/register", registerLimiter, authLimiter, async (req, res) => {
         );
         res.json({ message: "Registered. Check your email to verify your account and activate your API key.", userId: result.rows[0].id });
         notifyTelegram(`New signup (pending verification): ${escapeHtml(normalizedEmail)}`);
+        track(result.rows[0].id, "user_signed_up");
         sendVerificationEmail(normalizedEmail, verificationToken);
     } catch (error) {
         console.error(error);
@@ -378,6 +395,7 @@ app.get("/verify", async (req, res) => {
             "UPDATE users SET verified = TRUE, verification_token = NULL WHERE id = $1",
             [user.id]
         );
+        track(user.id, "email_verified");
 
         res.status(200).send(verifyResultPage({
             heading: "Email verified ✓",
@@ -457,7 +475,8 @@ app.post("/login", authLimiter, async (req, res) => {
             await pool.query("INSERT INTO api_keys (user_id, api_key) VALUES ($1, $2)", [user.id, apiKey]);
         }
 
-        res.json({ message: "Login successful", token, apiKey });
+        res.json({ message: "Login successful", token, apiKey, userId: user.id });
+        track(user.id, "user_logged_in");
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -610,6 +629,7 @@ const checkUsageLimit = async (req, res, next) => {
             const currentUsage = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
             // A batch can be refused while some quota remains; only alert once it's all used.
             if (currentUsage >= limit) sendUsageAlert(req.userId, month, 100, { plan, limit });
+            track(req.userId, "usage_limit_reached", { plan, limit, usage: currentUsage, requested: cost });
             return res.status(429).json({
                 error: `Monthly lookup limit reached. Upgrade your plan at ${UPGRADE_URL}`,
                 upgrade_url: UPGRADE_URL,
@@ -642,6 +662,7 @@ app.post("/vessels", authenticateAPIKey, validateImos, checkUsageLimit, async (r
         const result = await pool.query("SELECT * FROM vessel_data WHERE imo = ANY($1::bigint[])", [req.imos]);
 
         res.json(result.rows);
+        track(req.userId, "api_lookup", { imos: req.imos.length, found: result.rows.length, plan: req.plan });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });
@@ -779,6 +800,7 @@ app.post("/billing/checkout", authenticateAPIKey, async (req, res) => {
         }
 
         const userId = String(req.userId);
+        track(req.userId, "checkout_started", { plan });
         const session = await stripe.checkout.sessions.create({
             mode: "subscription",
             line_items: [{ price, quantity: 1 }],
@@ -824,7 +846,13 @@ app.post("/billing/portal", authenticateAPIKey, async (req, res) => {
 // and an ended subscription never overwrites a different (newer) one on the row.
 const SUBSCRIPTION_GRACE_MS = 2 * 24 * 60 * 60 * 1000; // renewal webhooks can lag the period end
 
-async function syncSubscription(sub) {
+const SUBSCRIPTION_EVENTS = {
+    "checkout.session.completed": "subscription_started",
+    "customer.subscription.updated": "subscription_updated",
+    "customer.subscription.deleted": "subscription_ended",
+};
+
+async function syncSubscription(sub, eventType) {
     const userId = sub.metadata?.userId;
     if (!userId) {
         console.error(`Stripe subscription ${sub.id} has no userId metadata; skipping`);
@@ -851,6 +879,10 @@ async function syncSubscription(sub) {
         [userId, live && plan ? "active" : "inactive", expiresAt, plan || null, customer, sub.id, live]
     );
     if (live && plan) notifyTelegram(`💳 Subscription ${sub.status}: user ${escapeHtml(userId)} on ${plan}`);
+    // customer.subscription.created duplicates checkout.session.completed, so it isn't tracked.
+    if (SUBSCRIPTION_EVENTS[eventType]) {
+        track(userId, SUBSCRIPTION_EVENTS[eventType], { plan: plan || null, stripe_status: sub.status });
+    }
 }
 
 async function handleStripeWebhook(req, res) {
@@ -871,7 +903,7 @@ async function handleStripeWebhook(req, res) {
             subscriptionId = event.data.object.id;
         }
         if (subscriptionId) {
-            await syncSubscription(await stripe.subscriptions.retrieve(subscriptionId));
+            await syncSubscription(await stripe.subscriptions.retrieve(subscriptionId), event.type);
         }
         res.json({ received: true });
     } catch (error) {
@@ -918,6 +950,11 @@ const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== "test") {
     runMigrations().finally(() => {
         app.listen(PORT, () => console.log(`🚀 API running on port ${PORT}`));
+        // Railway sends SIGTERM on redeploy; flush queued analytics events before exiting.
+        process.on("SIGTERM", async () => {
+            if (posthog) await posthog.shutdown().catch(() => {});
+            process.exit(0);
+        });
         pruneOldUsage();
         setInterval(pruneOldUsage, 24 * 60 * 60 * 1000).unref();
     });

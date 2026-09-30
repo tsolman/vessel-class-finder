@@ -17,7 +17,7 @@ curl -X POST https://vessel-class-finder-production.up.railway.app/vessels \
 
 ## Prerequisites
 
-- Node.js >= 18
+- Node.js >= 20
 - PostgreSQL database (e.g., Neon, Supabase, or local)
 
 ## Setup

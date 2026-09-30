@@ -29,7 +29,7 @@
   "author": "WeAreFabbrik <info@wearefabbrik.com> (https://wearefabbrik.com)",
   "license": "ISC",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "dependencies": {
     "adm-zip": "^0.6.1",

@@ -129,6 +129,8 @@
     nav ul { list-style: none; display: flex; gap: 28px; }
     nav ul a { color: var(--text-muted); font-size: 14px; font-weight: 500; }
     nav ul a:hover { color: var(--text); }
+    nav ul a.nav-account { color: var(--accent); }
+    nav ul a.nav-account:hover { color: var(--accent-hover); }
 
     /* Hero */
     .hero {
@@ -518,6 +520,7 @@
       .endpoint span.desc { display: none; }
       .demo-row { flex-direction: column; }
       nav ul { gap: 16px; }
+      nav .nav-secondary { display: none; }
     }
   </style>
 </head>
@@ -527,12 +530,13 @@
   <div class="container">
     <div class="logo">vessel<span>class</span>finder</div>
     <ul>
-      <li><a href="#how-it-works">How It Works</a></li>
+      <li class="nav-secondary"><a href="#how-it-works">How It Works</a></li>
       <li><a href="#api">API</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#faq">FAQ</a></li>
-      <li><a href="/blog/vessel-classification-api.html">Blog</a></li>
-      <li><a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></li>
+      <li class="nav-secondary"><a href="/blog/vessel-classification-api.html">Blog</a></li>
+      <li class="nav-secondary"><a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></li>
+      <li><a href="#signup" id="nav-account" class="nav-account" onclick="navAccount(event)">Log in</a></li>
     </ul>
   </div>
 </nav>
@@ -953,9 +957,21 @@ async function runDemo(e) {
 // ---------- Account & billing ----------
 const PLAN_NAMES = { free: "Free", starter: "Starter", pro: "Pro", enterprise: "Enterprise" };
 
+// Header link: "Log in" when logged out, "Account" when logged in.
+function navAccount(e) {
+  e.preventDefault();
+  if (apiKey) {
+    document.getElementById("account").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+  showLogin();
+  document.getElementById("signup").scrollIntoView({ behavior: "smooth" });
+}
+
 function showAccount() {
   const section = document.getElementById("account");
   section.hidden = false;
+  document.getElementById("nav-account").textContent = "Account";
   document.getElementById("account-key").textContent = apiKey;
   document.getElementById("copy-key").onclick = (e) => copyText(apiKey, e.currentTarget);
   renderSnippets();
@@ -1050,6 +1066,7 @@ function logout(e) {
   apiKey = null;
   store.remove("sessionStorage", "vcf_api_key");
   document.getElementById("account").hidden = true;
+  document.getElementById("nav-account").textContent = "Log in";
   renderSnippets();
 }
 

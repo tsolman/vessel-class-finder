@@ -763,6 +763,21 @@ describe("usage alert emails", () => {
     expect(mockSendEmail).not.toHaveBeenCalled();
   });
 
+  it("doesn't send the 100% alert when a batch is refused but quota remains", async () => {
+    mockAuthMiddleware();
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // refused: 20 IMOs don't fit
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 90 }] });
+
+    const imos = Array.from({ length: 20 }, (_, i) => 1000000 + i);
+    const res = await request(app).post("/vessels").set("x-api-key", VALID_API_KEY).send({ imos });
+    await flush();
+
+    expect(res.status).toBe(429);
+    expect(mockQuery).toHaveBeenCalledTimes(4);
+    expect(mockSendEmail).not.toHaveBeenCalled();
+  });
+
   it("sends the 100% alert when a request is refused", async () => {
     mockAuthMiddleware();
     mockQuery.mockResolvedValueOnce({ rows: [] });
@@ -801,7 +816,7 @@ describe("POST /billing/checkout", () => {
 
   it("reuses an existing Stripe customer", async () => {
     mockAuthMiddleware();
-    mockQuery.mockResolvedValueOnce({ rows: [{ email: "captain@vesselmail.io", stripe_customer_id: "cus_1", stripe_subscription_id: "sub_old", status: "canceled" }] });
+    mockQuery.mockResolvedValueOnce({ rows: [{ email: "captain@vesselmail.io", stripe_customer_id: "cus_1", stripe_subscription_id: "sub_old", status: "inactive", expires_at: new Date(Date.now() - 86400000).toISOString() }] });
     mockStripe.checkout.sessions.create.mockResolvedValueOnce({ url: "https://checkout.stripe.com/x" });
 
     await request(app).post("/billing/checkout").set("x-api-key", VALID_API_KEY).send({ plan: "starter" });
@@ -820,13 +835,35 @@ describe("POST /billing/checkout", () => {
 
   it("sends active subscribers to the billing portal instead", async () => {
     mockAuthMiddleware();
-    mockQuery.mockResolvedValueOnce({ rows: [{ email: "captain@vesselmail.io", stripe_customer_id: "cus_1", stripe_subscription_id: "sub_1", status: "active" }] });
+    mockQuery.mockResolvedValueOnce({ rows: [{ email: "captain@vesselmail.io", stripe_customer_id: "cus_1", stripe_subscription_id: "sub_1", status: "active", expires_at: new Date(Date.now() + 86400000).toISOString() }] });
 
     const res = await request(app).post("/billing/checkout").set("x-api-key", VALID_API_KEY).send({ plan: "pro" });
 
     expect(res.status).toBe(409);
     expect(res.body.portal).toBe(true);
     expect(mockStripe.checkout.sessions.create).not.toHaveBeenCalled();
+  });
+
+  it("blocks checkout for plans granted by hand, without offering the portal", async () => {
+    mockAuthMiddleware();
+    mockQuery.mockResolvedValueOnce({ rows: [{ email: "captain@vesselmail.io", stripe_customer_id: null, stripe_subscription_id: null, status: "active", expires_at: new Date(Date.now() + 86400000).toISOString() }] });
+
+    const res = await request(app).post("/billing/checkout").set("x-api-key", VALID_API_KEY).send({ plan: "starter" });
+
+    expect(res.status).toBe(409);
+    expect(res.body.portal).toBeUndefined();
+    expect(res.body.error).toMatch(/managed by our team/);
+    expect(mockStripe.checkout.sessions.create).not.toHaveBeenCalled();
+  });
+
+  it("allows checkout once a hand-granted plan has expired", async () => {
+    mockAuthMiddleware();
+    mockQuery.mockResolvedValueOnce({ rows: [{ email: "captain@vesselmail.io", stripe_customer_id: null, stripe_subscription_id: null, status: "active", expires_at: new Date(Date.now() - 86400000).toISOString() }] });
+    mockStripe.checkout.sessions.create.mockResolvedValueOnce({ url: "https://checkout.stripe.com/x" });
+
+    const res = await request(app).post("/billing/checkout").set("x-api-key", VALID_API_KEY).send({ plan: "starter" });
+
+    expect(res.status).toBe(200);
   });
 });
 
@@ -901,7 +938,7 @@ describe("POST /billing/webhook", () => {
     expect(params[0]).toBe("user-uuid");
     expect(params[1]).toBe("active");
     expect(params[2].getTime()).toBeGreaterThan(periodEnd * 1000); // period end plus grace
-    expect(params.slice(3)).toEqual(["starter", "cus_1", "sub_1"]);
+    expect(params.slice(3)).toEqual(["starter", "cus_1", "sub_1", true]);
   });
 
   it("maps the Pro price to the pro plan on upgrade", async () => {
@@ -917,9 +954,26 @@ describe("POST /billing/webhook", () => {
     mockStripe.subscriptions.retrieve.mockResolvedValueOnce(subscription({ status: "canceled" }));
     mockQuery.mockResolvedValueOnce({ rows: [] });
     await postEvent({ type: "customer.subscription.deleted", data: { object: { id: "sub_1" } } });
-    const params = mockQuery.mock.calls[0][1];
-    expect(params[1]).toBe("canceled");
+    const [sql, params] = mockQuery.mock.calls[0];
+    expect(params[1]).toBe("inactive"); // DB CHECK allows only active/inactive
     expect(params[2].getTime()).toBeLessThanOrEqual(Date.now());
+    // An ended subscription only updates the row if it's the one on record (or none is).
+    expect(sql).toMatch(/WHERE \$7 OR subscriptions.stripe_subscription_id IS NULL OR subscriptions.stripe_subscription_id = \$6/);
+    expect(params[6]).toBe(false);
+  });
+
+  it("lets a live subscription replace whatever is on the row", async () => {
+    mockStripe.subscriptions.retrieve.mockResolvedValueOnce(subscription({ id: "sub_new" }));
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    await postEvent({ type: "customer.subscription.created", data: { object: { id: "sub_new" } } });
+    expect(mockQuery.mock.calls[0][1][6]).toBe(true);
+  });
+
+  it("acknowledges events for users that no longer exist", async () => {
+    mockStripe.subscriptions.retrieve.mockResolvedValueOnce(subscription());
+    mockQuery.mockRejectedValueOnce(Object.assign(new Error("fk"), { code: "23503", detail: "user missing" }));
+    const res = await postEvent({ type: "customer.subscription.updated", data: { object: { id: "sub_1" } } });
+    expect(res.status).toBe(200);
   });
 
   it("ignores unrelated events", async () => {

@@ -608,7 +608,8 @@ const checkUsageLimit = async (req, res, next) => {
                 [req.userId, month]
             );
             const currentUsage = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
-            sendUsageAlert(req.userId, month, 100, { plan, limit });
+            // A batch can be refused while some quota remains; only alert once it's all used.
+            if (currentUsage >= limit) sendUsageAlert(req.userId, month, 100, { plan, limit });
             return res.status(429).json({
                 error: `Monthly lookup limit reached. Upgrade your plan at ${UPGRADE_URL}`,
                 upgrade_url: UPGRADE_URL,
@@ -761,7 +762,7 @@ app.post("/billing/checkout", authenticateAPIKey, async (req, res) => {
 
     try {
         const userResult = await pool.query(
-            "SELECT users.email, subscriptions.stripe_customer_id, subscriptions.stripe_subscription_id, subscriptions.status FROM users LEFT JOIN subscriptions ON subscriptions.user_id = users.id WHERE users.id = $1",
+            "SELECT users.email, subscriptions.stripe_customer_id, subscriptions.stripe_subscription_id, subscriptions.status, subscriptions.expires_at FROM users LEFT JOIN subscriptions ON subscriptions.user_id = users.id WHERE users.id = $1",
             [req.userId]
         );
         const user = userResult.rows[0];
@@ -769,7 +770,11 @@ app.post("/billing/checkout", authenticateAPIKey, async (req, res) => {
 
         // Plan changes for existing subscribers go through the billing portal, so
         // nobody ends up paying for two subscriptions at once.
-        if (user.stripe_subscription_id && user.status === "active") {
+        if (user.status === "active" && new Date(user.expires_at) > new Date()) {
+            // Plans granted by hand (e.g. Enterprise) have no Stripe subscription to manage.
+            if (!user.stripe_subscription_id) {
+                return res.status(409).json({ error: "Your plan is managed by our team. Contact info@wearefabbrik.com to change it." });
+            }
             return res.status(409).json({ error: "You already have an active subscription. Use Manage billing to change plans.", portal: true });
         }
 
@@ -815,7 +820,8 @@ app.post("/billing/portal", authenticateAPIKey, async (req, res) => {
 });
 
 // Copies a Stripe subscription's state onto our subscriptions row. Always called
-// with a freshly retrieved subscription, so out-of-order webhooks can't regress it.
+// with a freshly retrieved subscription, so out-of-order webhooks can't regress it,
+// and an ended subscription never overwrites a different (newer) one on the row.
 const SUBSCRIPTION_GRACE_MS = 2 * 24 * 60 * 60 * 1000; // renewal webhooks can lag the period end
 
 async function syncSubscription(sub) {
@@ -839,8 +845,10 @@ async function syncSubscription(sub) {
         `INSERT INTO subscriptions (user_id, status, expires_at, plan, stripe_customer_id, stripe_subscription_id)
          VALUES ($1, $2, $3, $4, $5, $6)
          ON CONFLICT (user_id) DO UPDATE SET status = $2, expires_at = $3, plan = COALESCE($4, subscriptions.plan),
-             stripe_customer_id = $5, stripe_subscription_id = $6`,
-        [userId, live && plan ? "active" : "canceled", expiresAt, plan || null, customer, sub.id]
+             stripe_customer_id = $5, stripe_subscription_id = $6
+         WHERE $7 OR subscriptions.stripe_subscription_id IS NULL OR subscriptions.stripe_subscription_id = $6`,
+        // subscriptions.status has a CHECK constraint allowing only 'active' / 'inactive'.
+        [userId, live && plan ? "active" : "inactive", expiresAt, plan || null, customer, sub.id, live]
     );
     if (live && plan) notifyTelegram(`💳 Subscription ${sub.status}: user ${escapeHtml(userId)} on ${plan}`);
 }
@@ -867,6 +875,11 @@ async function handleStripeWebhook(req, res) {
         }
         res.json({ received: true });
     } catch (error) {
+        if (error.code === "23503") {
+            // userId in the subscription metadata no longer exists; retrying won't help.
+            console.error("Stripe webhook for a deleted user; skipping:", error.detail);
+            return res.json({ received: true });
+        }
         console.error(error);
         // Non-2xx makes Stripe retry the event later.
         res.status(500).json({ error: "Webhook handling failed" });

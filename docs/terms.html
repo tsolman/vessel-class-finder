@@ -167,6 +167,7 @@
     <li><strong>Enterprise:</strong> Unlimited (custom agreement)</li>
   </ul>
   <p>When you exceed your monthly limit, the API returns a 429 status code. Usage resets on the first of each calendar month.</p>
+  <p>Starter and Pro are billed monthly in advance by card through Stripe and renew automatically until cancelled. You can change or cancel your plan at any time from the billing portal; a cancellation takes effect at the end of the current billing period.</p>
 
   <h2>5. Acceptable Use</h2>
   <p>You may use the API to build applications, enrich your data, and serve your customers. You may not:</p>
@@ -222,7 +223,8 @@
   <ul>
     <li><strong>Railway</strong> hosts the API.</li>
     <li><strong>Neon</strong> hosts the PostgreSQL database that stores your account and usage data, in the EU (Frankfurt, Germany).</li>
-    <li><strong>Resend</strong> sends account emails (such as email verification) to the address you register with.</li>
+    <li><strong>Resend</strong> sends account emails (such as email verification and usage-limit notices) to the address you register with.</li>
+    <li><strong>Stripe</strong> processes payments for paid plans. Your card details go directly to Stripe and never reach our servers; we store only your Stripe customer and subscription IDs.</li>
     <li><strong>Telegram</strong> delivers internal notifications to our team when a new account is created. These include the email address you registered with.</li>
   </ul>
 
@@ -233,7 +235,8 @@
   <ul>
     <li>We do not use cookies or tracking scripts.</li>
     <li>We do not use analytics services on the landing page.</li>
-    <li>We do not collect payment information directly (paid plans are handled via external payment links).</li>
+    <li>We do not collect or store card details; payments are handled entirely by Stripe.</li>
+    <li>While you are logged in on our website, your API key is kept in your browser's session storage so the account page works. It is cleared when you log out or close the tab.</li>
   </ul>
 
   <h2>How We Use Your Data</h2>
@@ -241,6 +244,7 @@
     <li>To provide and maintain the API service.</li>
     <li>To enforce usage limits and prevent abuse.</li>
     <li>To contact you about service changes or issues with your account.</li>
+    <li>To let you know when you reach 80% and 100% of your monthly lookup limit.</li>
   </ul>
 
   <h2>We Do Not Sell Your Data</h2>

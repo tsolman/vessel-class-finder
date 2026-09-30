@@ -69,7 +69,7 @@
           {
             "@type": "Question",
             "name": "How much does the vessel classification API cost?",
-            "acceptedAnswer": { "@type": "Answer", "text": "The free tier includes 100 lookups per month with no credit card. Starter is $49/month for 5,000 lookups, Pro is $199/month for 50,000 lookups, and Enterprise is custom. Contact info@wearefabbrik.com to upgrade." }
+            "acceptedAnswer": { "@type": "Answer", "text": "The free tier includes 100 lookups per month with no credit card. Starter is $49/month for 5,000 lookups, Pro is $199/month for 50,000 lookups, and Enterprise is custom. Paid plans are billed monthly by card through Stripe and can be upgraded or cancelled anytime; for Enterprise contact info@wearefabbrik.com." }
           }
         ]
       }
@@ -129,6 +129,8 @@
     nav ul { list-style: none; display: flex; gap: 28px; }
     nav ul a { color: var(--text-muted); font-size: 14px; font-weight: 500; }
     nav ul a:hover { color: var(--text); }
+    nav ul a.nav-account { color: var(--accent); }
+    nav ul a.nav-account:hover { color: var(--accent-hover); }
 
     /* Hero */
     .hero {
@@ -428,11 +430,97 @@
     footer a { color: var(--text-muted); }
     footer a:hover { color: var(--text); }
 
+    /* Live demo */
+    .demo {
+      max-width: 520px;
+      margin: 36px auto 0;
+      text-align: left;
+    }
+    .demo-label { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; text-align: center; }
+    .demo-row { display: flex; gap: 8px; }
+    .demo-row input {
+      flex: 1;
+      min-width: 0;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 15px;
+      font-family: 'SF Mono', monospace;
+      outline: none;
+    }
+    .demo-row input:focus { border-color: var(--accent); }
+    .demo-result {
+      margin-top: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 14px;
+    }
+    .demo-result[hidden] { display: none; }
+    .demo-result h3 { font-size: 16px; margin-bottom: 10px; }
+    .demo-result dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; }
+    .demo-result dt { color: var(--text-muted); }
+    .demo-result dd { font-weight: 600; }
+    .demo-result p { margin: 0; font-size: 14px; }
+    .demo-result .error { color: #ef4444; }
+    .demo-result .note { margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+    /* Code tabs */
+    .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+    .tabs button {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .tabs button[aria-selected="true"] { background: rgba(59, 130, 246, 0.15); color: var(--accent); }
+    .code-header .copy-btn { margin-left: auto; }
+    .copy-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .copy-btn:hover { color: var(--text); border-color: var(--text-muted); }
+    .snippets { margin: 32px 0 0; max-width: none; }
+    .snippet-note { font-size: 13px; color: var(--text-muted); margin-top: 10px; }
+    /* Account */
+    #account[hidden] { display: none; }
+    .account-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      display: grid;
+      gap: 20px;
+    }
+    .account-card h3 { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .key-row { display: flex; gap: 8px; align-items: stretch; }
+    .key-row .api-key-display { margin-top: 0; flex: 1; min-width: 0; }
+    .usage-bar { height: 8px; background: var(--code-bg); border-radius: 4px; overflow: hidden; margin: 8px 0 6px; }
+    .usage-bar div { height: 100%; background: var(--accent); width: 0; transition: width 0.4s; }
+    .usage-bar div.warn { background: #eab308; }
+    .usage-bar div.full { background: #ef4444; }
+    .usage-text { font-size: 14px; color: var(--text-muted); }
+    .usage-text strong { color: var(--text); }
+    .plan-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .account-footer { margin-top: 16px; font-size: 13px; color: var(--text-muted); }
     /* Responsive */
     @media (max-width: 600px) {
       .hero { padding: 48px 0 40px; }
       .endpoint span.desc { display: none; }
+      .demo-row { flex-direction: column; }
       nav ul { gap: 16px; }
+      nav .nav-secondary { display: none; }
     }
   </style>
 </head>
@@ -442,12 +530,13 @@
   <div class="container">
     <div class="logo">vessel<span>class</span>finder</div>
     <ul>
-      <li><a href="#how-it-works">How It Works</a></li>
+      <li class="nav-secondary"><a href="#how-it-works">How It Works</a></li>
       <li><a href="#api">API</a></li>
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="#faq">FAQ</a></li>
-      <li><a href="/blog/vessel-classification-api.html">Blog</a></li>
-      <li><a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></li>
+      <li class="nav-secondary"><a href="/blog/vessel-classification-api.html">Blog</a></li>
+      <li class="nav-secondary"><a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></li>
+      <li><a href="#signup" id="nav-account" class="nav-account" onclick="navAccount(event)">Log in</a></li>
     </ul>
   </div>
 </nav>
@@ -461,6 +550,15 @@
       <a href="#signup" class="btn btn-primary">Get Free API Key</a>
       <a href="#api" class="btn btn-secondary">View Docs</a>
     </div>
+
+    <form class="demo" onsubmit="runDemo(event)">
+      <div class="demo-label">Try it now, no signup: enter any 7-digit IMO number</div>
+      <div class="demo-row">
+        <input id="demo-imo" inputmode="numeric" pattern="[0-9]{7}" maxlength="7" placeholder="e.g. 9321483" aria-label="IMO number" required>
+        <button class="btn btn-primary" id="demo-btn" type="submit">Look up</button>
+      </div>
+      <div class="demo-result" id="demo-result" hidden aria-live="polite"></div>
+    </form>
 
     <div class="code-block">
       <div class="code-header">
@@ -565,7 +663,7 @@
       <div class="endpoint">
         <span class="method method-post">POST</span>
         <code>/subscribe</code>
-        <span class="desc">Activate a paid plan (admin only)</span>
+        <span class="desc">Activate an Enterprise plan (admin only)</span>
       </div>
       <div class="endpoint">
         <span class="method method-get">GET</span>
@@ -583,7 +681,26 @@
         <code>/api-keys/:key</code>
         <span class="desc">Revoke an API key</span>
       </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <code>/billing/checkout</code>
+        <span class="desc">Start a Stripe checkout for a paid plan</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <code>/billing/portal</code>
+        <span class="desc">Open the billing portal</span>
+      </div>
     </div>
+
+    <div class="code-block snippets" data-snippets>
+      <div class="code-header">
+        <div class="tabs" role="tablist"></div>
+        <button class="copy-btn" type="button">Copy</button>
+      </div>
+      <pre></pre>
+    </div>
+    <p class="snippet-note">Log in to see these examples with your own API key filled in.</p>
   </div>
 </section>
 
@@ -591,7 +708,7 @@
   <div class="container">
     <div class="section-label">Pricing</div>
     <h2>Start free, scale as you grow</h2>
-    <p class="section-desc">No credit card required. Upgrade when you need more lookups.</p>
+    <p class="section-desc">No credit card required to start. Upgrade by card in under a minute, cancel anytime.</p>
 
     <div class="pricing-grid">
       <div class="price-card">
@@ -614,7 +731,7 @@
           <li>Priority support</li>
           <li>Multiple API keys</li>
         </ul>
-        <a href="mailto:info@wearefabbrik.com?subject=Vessel%20Class%20Finder%20-%20Starter%20Plan" class="btn btn-primary" style="text-align:center;">Contact Us</a>
+        <button type="button" onclick="startCheckout('starter')" class="btn btn-primary" style="text-align:center;">Upgrade to Starter</button>
       </div>
       <div class="price-card">
         <h3>Pro</h3>
@@ -625,7 +742,7 @@
           <li>Dedicated support</li>
           <li>Higher rate limits</li>
         </ul>
-        <a href="mailto:info@wearefabbrik.com?subject=Vessel%20Class%20Finder%20-%20Pro" class="btn btn-secondary" style="text-align:center;">Contact Us</a>
+        <button type="button" onclick="startCheckout('pro')" class="btn btn-secondary" style="text-align:center;">Upgrade to Pro</button>
       </div>
       <div class="price-card">
         <h3>Enterprise</h3>
@@ -665,7 +782,7 @@
       </details>
       <details>
         <summary>How much does the vessel classification API cost?</summary>
-        <p>The free tier includes 100 lookups per month with no credit card. Starter is $49/month for 5,000 lookups, Pro is $199/month for 50,000 lookups, and Enterprise is custom. Contact <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a> to upgrade.</p>
+        <p>The free tier includes 100 lookups per month with no credit card. Starter is $49/month for 5,000 lookups, Pro is $199/month for 50,000 lookups, and Enterprise is custom. Paid plans are billed monthly by card through Stripe and can be upgraded or cancelled anytime from your account; for Enterprise contact <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a>.</p>
       </details>
     </div>
   </div>
@@ -674,7 +791,7 @@
 <section id="signup">
   <div class="container" style="text-align:center;">
     <div class="section-label">Get Started</div>
-    <h2>Get your free API key</h2>
+    <h2 id="signup-heading">Get your free API key</h2>
     <p class="section-desc" style="margin:0 auto 32px;">100 lookups per month. No credit card required.</p>
 
     <div class="signup-form">
@@ -683,15 +800,295 @@
       <input type="text" id="signup-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" placeholder="Leave this field empty">
       <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create Account</button>
       <button class="btn btn-secondary" id="login-btn" onclick="handleLogin()" style="display:none;width:100%;margin-top:8px;">I've verified — Log in &amp; get API key</button>
-      <p style="font-size:12px;color:#64748b;margin-top:8px;">Already have an account? <a href="#" id="show-login" onclick="showLogin(event)">Log in</a> · By signing up you agree to our <a href="/terms.html">Terms of Service & Privacy Policy</a>.</p>
+      <p style="font-size:12px;color:#64748b;margin-top:8px;"><span id="mode-switch">Already have an account? <a href="#" onclick="showLogin(event)">Log in</a></span> · By signing up you agree to our <a href="/terms.html">Terms of Service & Privacy Policy</a>.</p>
 
       <div id="form-message" class="form-message"></div>
     </div>
   </div>
 </section>
 
+<section id="account" hidden>
+  <div class="container">
+    <div class="section-label">Your Account</div>
+    <h2>Make your first request</h2>
+    <p class="section-desc">Copy one of the examples below; your API key is already filled in.</p>
+    <div id="account-message" class="form-message" style="margin:0 0 20px;"></div>
+
+    <div class="account-card">
+      <div>
+        <h3>API key</h3>
+        <div class="key-row">
+          <div class="api-key-display" id="account-key"></div>
+          <button class="copy-btn" type="button" id="copy-key">Copy</button>
+        </div>
+      </div>
+      <div>
+        <h3>This month</h3>
+        <div class="usage-bar"><div id="usage-fill"></div></div>
+        <div class="usage-text" id="usage-text">Loading usage&hellip;</div>
+      </div>
+      <div class="plan-actions" id="plan-actions"></div>
+    </div>
+
+    <div class="code-block snippets" data-snippets>
+      <div class="code-header">
+        <div class="tabs" role="tablist"></div>
+        <button class="copy-btn" type="button">Copy</button>
+      </div>
+      <pre></pre>
+    </div>
+    <p class="account-footer">Keep your key secret: anyone with it can use your quota. <a href="#" onclick="logout(event)">Log out</a></p>
+  </div>
+</section>
+
 <script>
 const API = "https://vessel-class-finder-production.up.railway.app";
+
+// Browser storage can be unavailable (private mode, blocked cookies); never let that break the page.
+const store = {
+  get(area, k) { try { return window[area].getItem(k); } catch (e) { return null; } },
+  set(area, k, v) { try { window[area].setItem(k, v); } catch (e) {} },
+  remove(area, k) { try { window[area].removeItem(k); } catch (e) {} }
+};
+
+let apiKey = store.get("sessionStorage", "vcf_api_key");
+
+// ---------- Quick-start snippets ----------
+const SNIPPETS = {
+  "curl": (key) => `curl -X POST ${API}/vessels \\
+  -H "x-api-key: ${key}" \\
+  -H "Content-Type: application/json" \\
+  -d '{"imos": [9200079, 9321483]}'`,
+  "Python": (key) => `import requests
+
+resp = requests.post(
+    "${API}/vessels",
+    headers={"x-api-key": "${key}"},
+    json={"imos": [9200079, 9321483]},
+)
+resp.raise_for_status()
+for vessel in resp.json():
+    print(vessel["imo"], vessel["class"], vessel["status"], vessel["date_of_next_survey"])`,
+  "JavaScript": (key) => `const res = await fetch("${API}/vessels", {
+  method: "POST",
+  headers: { "x-api-key": "${key}", "Content-Type": "application/json" },
+  body: JSON.stringify({ imos: [9200079, 9321483] }),
+});
+const vessels = await res.json();
+console.table(vessels);`,
+  "Google Sheets": (key) => `// Extensions > Apps Script: paste this, save, then use =VESSEL_CLASS(A2) in any cell.
+// Returns class society, status and next survey date. Each recalculation uses one lookup.
+function VESSEL_CLASS(imo) {
+  const res = UrlFetchApp.fetch("${API}/vessels", {
+    method: "post",
+    contentType: "application/json",
+    headers: { "x-api-key": "${key}" },
+    payload: JSON.stringify({ imos: [Number(imo)] }),
+  });
+  const v = JSON.parse(res.getContentText())[0];
+  return v ? [[v.class, v.status, v.date_of_next_survey]] : "Not found";
+}`
+};
+
+function copyText(text, btn) {
+  const done = () => { const t = btn.textContent; btn.textContent = "Copied"; setTimeout(() => { btn.textContent = t; }, 1500); };
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, () => {});
+}
+
+function renderSnippets() {
+  document.querySelectorAll("[data-snippets]").forEach((box) => {
+    const key = apiKey || "YOUR_API_KEY";
+    const tabs = box.querySelector(".tabs");
+    const pre = box.querySelector("pre");
+    const active = box.dataset.active || "curl";
+    tabs.innerHTML = "";
+    Object.keys(SNIPPETS).forEach((name) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("role", "tab");
+      b.textContent = name;
+      b.setAttribute("aria-selected", String(name === active));
+      b.onclick = () => { box.dataset.active = name; renderSnippets(); };
+      tabs.appendChild(b);
+    });
+    pre.textContent = SNIPPETS[active](key);
+    box.querySelector(".copy-btn").onclick = (e) => copyText(pre.textContent, e.currentTarget);
+  });
+}
+
+// ---------- Live demo ----------
+async function runDemo(e) {
+  e.preventDefault();
+  const imo = document.getElementById("demo-imo").value.trim();
+  const out = document.getElementById("demo-result");
+  const btn = document.getElementById("demo-btn");
+  out.hidden = false;
+  if (!/^\d{7}$/.test(imo)) { out.innerHTML = '<p class="error">IMO numbers have 7 digits.</p>'; return; }
+
+  btn.disabled = true;
+  btn.textContent = "Looking up...";
+  try {
+    const res = await fetch(API + "/demo/" + imo);
+    const data = await res.json();
+    if (!res.ok) {
+      out.innerHTML = '<p class="error">' + escapeHtml(data.error || "Lookup failed.") + "</p>" +
+        (res.status === 429 ? '<p class="note"><a href="#signup">Get a free API key</a> for 100 lookups a month.</p>' : "");
+      return;
+    }
+    const rows = [
+      ["Class society", data.class],
+      ["Status", data.status],
+      ["Last survey", data.date_of_survey],
+      ["Next survey", data.date_of_next_survey],
+      ["Status changed", data.date_of_latest_status],
+      ["Reason", data.reason_for_status]
+    ].filter(([, v]) => v);
+    out.innerHTML = "<h3>" + escapeHtml(data.vessel_name) + " &middot; IMO " + escapeHtml(data.imo) + "</h3><dl>" +
+      rows.map(([k, v]) => "<dt>" + k + "</dt><dd>" + escapeHtml(v) + "</dd>").join("") + "</dl>" +
+      '<p class="note">Need this for a whole fleet? <a href="#signup">Get a free API key</a> and look up 100 ships per request.</p>';
+  } catch (err) {
+    out.innerHTML = '<p class="error">Network error. Please try again.</p>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Look up";
+  }
+}
+
+// ---------- Account & billing ----------
+const PLAN_NAMES = { free: "Free", starter: "Starter", pro: "Pro", enterprise: "Enterprise" };
+
+// Header link: "Log in" when logged out, "Account" when logged in.
+function navAccount(e) {
+  e.preventDefault();
+  if (apiKey) {
+    document.getElementById("account").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+  showLogin();
+  document.getElementById("signup").scrollIntoView({ behavior: "smooth" });
+}
+
+function showAccount() {
+  const section = document.getElementById("account");
+  section.hidden = false;
+  document.getElementById("nav-account").textContent = "Account";
+  document.getElementById("account-key").textContent = apiKey;
+  document.getElementById("copy-key").onclick = (e) => copyText(apiKey, e.currentTarget);
+  renderSnippets();
+  loadUsage();
+}
+
+function accountMessage(type, html) {
+  setMsg(document.getElementById("account-message"), type, html);
+}
+
+async function loadUsage() {
+  try {
+    const res = await fetch(API + "/usage", { headers: { "x-api-key": apiKey } });
+    if (res.status === 403) { logout(); return null; }
+    const u = await res.json();
+    const unlimited = u.limit === "unlimited";
+    const pct = unlimited ? 0 : Math.min(100, Math.round((u.used / u.limit) * 100));
+    const fill = document.getElementById("usage-fill");
+    fill.style.width = pct + "%";
+    fill.className = pct >= 100 ? "full" : pct >= 80 ? "warn" : "";
+    document.getElementById("usage-text").innerHTML =
+      "<strong>" + u.used.toLocaleString() + "</strong> of " + (unlimited ? "unlimited" : u.limit.toLocaleString()) +
+      " lookups used &middot; <strong>" + (PLAN_NAMES[u.plan] || u.plan) + "</strong> plan";
+    renderPlanActions(u.plan);
+    return u;
+  } catch (e) {
+    document.getElementById("usage-text").textContent = "Couldn't load usage right now.";
+    return null;
+  }
+}
+
+function renderPlanActions(plan) {
+  const el = document.getElementById("plan-actions");
+  const btn = (label, onclick, primary) =>
+    '<button type="button" class="btn ' + (primary ? "btn-primary" : "btn-secondary") + '" onclick="' + onclick + '">' + label + "</button>";
+  const enterprise = '<a class="btn btn-secondary" href="mailto:info@wearefabbrik.com?subject=Vessel%20Class%20Finder%20-%20Enterprise">Talk to us about Enterprise</a>';
+  if (plan === "free") {
+    el.innerHTML = btn("Upgrade to Starter &middot; $49/mo", "startCheckout('starter')", true) + btn("Upgrade to Pro &middot; $199/mo", "startCheckout('pro')");
+  } else if (plan === "starter") {
+    el.innerHTML = btn("Upgrade to Pro", "openPortal()", true) + btn("Manage billing", "openPortal()");
+  } else if (plan === "pro") {
+    el.innerHTML = btn("Manage billing", "openPortal()") + enterprise;
+  } else {
+    el.innerHTML = enterprise;
+  }
+}
+
+async function startCheckout(plan) {
+  if (!apiKey) {
+    // Remember the choice across the email-verification round trip.
+    store.set("localStorage", "vcf_pending_plan", plan);
+    const { msg } = getInputs();
+    setMsg(msg, "success", "Create a free account or log in first, then we'll take you straight to checkout for <strong>" + PLAN_NAMES[plan] + "</strong>.");
+    showLogin();
+    document.getElementById("signup").scrollIntoView({ behavior: "smooth" });
+    return;
+  }
+  store.remove("localStorage", "vcf_pending_plan");
+  showAccount();
+  accountMessage("success", "Opening secure checkout&hellip;");
+  document.getElementById("account").scrollIntoView({ behavior: "smooth" });
+  try {
+    const res = await fetch(API + "/billing/checkout", {
+      method: "POST",
+      headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify({ plan })
+    });
+    const data = await res.json();
+    if (res.ok && data.url) { window.location.href = data.url; return; }
+    if (data.portal) { openPortal(); return; }
+    accountMessage("error", escapeHtml(data.error || "Couldn't start checkout.") + (res.status === 503 ? "" :
+      ' You can also email <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a>.'));
+  } catch (e) {
+    accountMessage("error", "Network error. Please try again.");
+  }
+}
+
+async function openPortal() {
+  accountMessage("success", "Opening billing portal&hellip;");
+  try {
+    const res = await fetch(API + "/billing/portal", { method: "POST", headers: { "x-api-key": apiKey } });
+    const data = await res.json();
+    if (res.ok && data.url) { window.location.href = data.url; return; }
+    accountMessage("error", escapeHtml(data.error || "Couldn't open the billing portal."));
+  } catch (e) {
+    accountMessage("error", "Network error. Please try again.");
+  }
+}
+
+function logout(e) {
+  if (e) e.preventDefault();
+  apiKey = null;
+  store.remove("sessionStorage", "vcf_api_key");
+  document.getElementById("account").hidden = true;
+  document.getElementById("nav-account").textContent = "Log in";
+  renderSnippets();
+}
+
+// Back from Stripe: the webhook may land a few seconds after the redirect, so poll briefly.
+async function handleCheckoutReturn() {
+  const params = new URLSearchParams(location.search);
+  const result = params.get("checkout");
+  if (!result) return;
+  history.replaceState(null, "", location.pathname + location.hash);
+  if (!apiKey) return;
+  if (result === "cancel") { showAccount(); accountMessage("error", "Checkout cancelled. You haven't been charged."); return; }
+  accountMessage("success", "Payment received. Activating your plan&hellip;");
+  for (let i = 0; i < 6; i++) {
+    const u = await loadUsage();
+    if (u && u.plan !== "free") {
+      accountMessage("success", "<strong>You're on " + (PLAN_NAMES[u.plan] || u.plan) + ".</strong> Thanks for subscribing! Your new limit is active now.");
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 3000));
+  }
+  accountMessage("success", "Payment received. Your plan can take a minute to activate; refresh this page shortly.");
+}
 
 function getInputs() {
   return {
@@ -714,10 +1111,29 @@ function setMsg(msg, type, html) {
   msg.innerHTML = html;
 }
 
-// Reveal the login button (e.g. returning user who just verified their email).
+// Switch the form between creating an account and logging in to an existing one.
 function showLogin(e) {
   if (e) e.preventDefault();
-  document.getElementById("login-btn").style.display = "block";
+  const { signupBtn, loginBtn } = getInputs();
+  document.getElementById("signup-heading").textContent = "Log in to your account";
+  signupBtn.style.display = "none";
+  loginBtn.className = "btn btn-primary";
+  loginBtn.style.display = "block";
+  loginBtn.style.marginTop = "0";
+  loginBtn.dataset.label = "Log in";
+  loginBtn.textContent = "Log in";
+  loginBtn.disabled = false;
+  document.getElementById("mode-switch").innerHTML = 'New here? <a href="#" onclick="showSignup(event)">Create a free account</a>';
+  document.getElementById("signup-email").focus();
+}
+
+function showSignup(e) {
+  if (e) e.preventDefault();
+  const { signupBtn, loginBtn } = getInputs();
+  document.getElementById("signup-heading").textContent = "Get your free API key";
+  signupBtn.style.display = "block";
+  loginBtn.style.display = "none";
+  document.getElementById("mode-switch").innerHTML = 'Already have an account? <a href="#" onclick="showLogin(event)">Log in</a>';
   document.getElementById("signup-email").focus();
 }
 
@@ -751,6 +1167,8 @@ async function handleSignup() {
       '<p style="margin-top:10px;font-size:13px;">Didn\'t get it? <a href="#" onclick="handleResend(event)">Resend email</a></p>');
     signupBtn.textContent = "Account created";
     signupBtn.disabled = true;
+    loginBtn.dataset.label = "I've verified — Log in & get API key";
+    loginBtn.textContent = loginBtn.dataset.label;
     loginBtn.style.display = "block";
   } catch (e) {
     setMsg(msg, "error", "Network error. Please try again.");
@@ -784,18 +1202,23 @@ async function handleLogin() {
         setMsg(msg, "error", escapeHtml(loginData.error || "Login failed."));
       }
       loginBtn.disabled = false;
-      loginBtn.textContent = "I've verified — Log in & get API key";
+      loginBtn.textContent = loginBtn.dataset.label || "Log in";
       return;
     }
 
-    setMsg(msg, "success", "You're in! Here is your API key (logging in again shows the same key):" +
-      '<div class="api-key-display">' + escapeHtml(loginData.apiKey) + '</div>' +
-      '<p style="margin-top:10px;color:#94a3b8;font-size:13px;">Use this as the <code>x-api-key</code> header in your API requests.</p>');
+    apiKey = loginData.apiKey;
+    store.set("sessionStorage", "vcf_api_key", apiKey);
+    setMsg(msg, "success", "You're in! Your API key and ready-to-run examples are below.");
     loginBtn.textContent = "Done!";
+
+    const pendingPlan = store.get("localStorage", "vcf_pending_plan");
+    if (pendingPlan) { startCheckout(pendingPlan); return; }
+    showAccount();
+    document.getElementById("account").scrollIntoView({ behavior: "smooth" });
   } catch (e) {
     setMsg(msg, "error", "Network error. Please try again.");
     loginBtn.disabled = false;
-    loginBtn.textContent = "I've verified — Log in & get API key";
+    loginBtn.textContent = loginBtn.dataset.label || "Log in";
   }
 }
 
@@ -814,6 +1237,10 @@ async function handleResend(e) {
     setMsg(msg, "error", "Network error. Please try again.");
   }
 }
+
+renderSnippets();
+if (apiKey) showAccount();
+handleCheckoutReturn();
 </script>
 
 <footer>

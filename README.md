@@ -44,8 +44,15 @@ ADMIN_API_KEY=long_random_secret      # enables POST /subscribe (disabled if uns
 RESEND_API_KEY=your_resend_key        # verification emails (skipped if unset)
 APP_URL=https://your-api-host         # base URL for /verify links
 SITE_URL=https://your-marketing-site  # links back to the signup page
-TELEGRAM_BOT_TOKEN=...                # signup notifications
+TELEGRAM_BOT_TOKEN=...                # signup and subscription notifications
 TELEGRAM_CHAT_ID=...
+
+# Stripe billing (checkout/portal return 503 if unset)
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...       # from the webhook endpoint for /billing/webhook
+STRIPE_PRICE_STARTER=price_...        # monthly $49 price
+STRIPE_PRICE_PRO=price_...            # monthly $199 price
+STRIPE_PORTAL_CONFIG=bpc_...          # optional: portal configuration for this product (else the account default)
 ```
 
 3. Create the required database tables:
@@ -209,11 +216,48 @@ Content-Type: application/json
 { "email": "user@example.com", "plan": "pro" }
 ```
 
-`plan` is one of `starter` (default), `pro`, `enterprise`. Activates or extends the plan for one month from now.
+`plan` is one of `starter` (default), `pro`, `enterprise`. Activates or extends the plan for one month from now. Starter and Pro are normally bought through Stripe (below); this endpoint is for Enterprise deals and manual fixes.
 
 Response: `{ "message": "Subscription activated", "plan": "pro", "expires_at": "..." }`
 
 Requires the `x-admin-key` header to match the `ADMIN_API_KEY` env variable. If `ADMIN_API_KEY` is unset, the endpoint always returns `403`.
+
+### Billing
+
+Paid plans are sold through Stripe. The website calls these on the user's behalf.
+
+#### Start Checkout (requires `x-api-key` header)
+
+```
+POST /billing/checkout
+x-api-key: your-api-key
+Content-Type: application/json
+
+{ "plan": "starter" }
+```
+
+Response: `{ "url": "https://checkout.stripe.com/..." }`. Returns `409` with `"portal": true` if the user already has an active Stripe subscription (plan changes go through the portal).
+
+#### Billing Portal (requires `x-api-key` header)
+
+```
+POST /billing/portal
+x-api-key: your-api-key
+```
+
+Response: `{ "url": "https://billing.stripe.com/..." }`, where the user can switch plans, update their card, cancel, and download invoices.
+
+#### Stripe Webhook
+
+`POST /billing/webhook` receives `checkout.session.completed` and `customer.subscription.*` events, verifies the signature with `STRIPE_WEBHOOK_SECRET`, re-fetches the subscription from Stripe, and writes the plan, status and period end (plus a 2-day grace) to `subscriptions`.
+
+### Demo
+
+```
+GET /demo/9321483
+```
+
+No API key. Returns one vessel's classification record. Limited to 10 requests/hour per IP; used by the live lookup on the homepage.
 
 ### Usage (requires `x-api-key` header)
 
@@ -231,11 +275,11 @@ Response: `{ "month": "2026-03", "used": 47, "limit": 100, "plan": "free" }`
 | Plan | Lookups/month | How to get |
 |------|--------------|------------|
 | Free | 100 | Register an account |
-| Starter | 5,000 | Contact info@wearefabbrik.com |
-| Pro | 50,000 | Contact info@wearefabbrik.com |
+| Starter | 5,000 | Upgrade on the website (Stripe, $49/mo) |
+| Pro | 50,000 | Upgrade on the website (Stripe, $199/mo) |
 | Enterprise | Unlimited | Contact info@wearefabbrik.com |
 
-Each unique IMO in a `/vessels` request counts as one lookup. If a request would take you over your monthly limit, `/vessels` returns `429` with `usage`, `requested`, `limit` and `plan`, and nothing is charged.
+Each unique IMO in a `/vessels` request counts as one lookup. If a request would take you over your monthly limit, `/vessels` returns `429` with `usage`, `requested`, `limit`, `plan` and `upgrade_url`, and nothing is charged. Users get one email when they reach 80% of their monthly limit and one at 100% (requires `RESEND_API_KEY`).
 
 ### API Key Management (requires `x-api-key` header)
 
@@ -281,6 +325,7 @@ All errors return JSON with an `error` field:
 | Global (all routes) | 100 requests / 15 min per IP |
 | `/register`, `/login`, `/resend-verification` | 10 requests / 15 min per IP |
 | `/register`, `/resend-verification` | 5 requests / hour per IP |
+| `/demo/:imo` | 10 requests / hour per IP |
 
 ## Running Tests
 

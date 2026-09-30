@@ -7,6 +7,7 @@ import { timingSafeEqual } from "crypto";
 import rateLimit from "express-rate-limit";
 import pkg from 'pg';
 import { Resend } from "resend";
+import Stripe from "stripe";
 
 const { Pool } = pkg;
 
@@ -21,6 +22,9 @@ const pool = new Pool({
     port: process.env.DB_PORT,
     ssl: process.env.PGSSLMODE === "require" ? { rejectUnauthorized: false } : false
 });
+
+// Stripe signs the raw request body, so the webhook is mounted before express.json().
+app.post("/billing/webhook", express.raw({ type: "application/json" }), (req, res) => handleStripeWebhook(req, res));
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -55,6 +59,13 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 const APP_URL = (process.env.APP_URL || "https://vessel-class-finder-production.up.railway.app").replace(/\/$/, "");
 const SITE_URL = (process.env.SITE_URL || "https://vesselclassfinder.com").replace(/\/$/, "");
 
+// 📌 Stripe billing — disabled (endpoints return 503) until STRIPE_SECRET_KEY is set.
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
+const STRIPE_PRICES = {
+    starter: process.env.STRIPE_PRICE_STARTER,
+    pro: process.env.STRIPE_PRICE_PRO,
+};
+
 // How long an email-verification link stays valid.
 const VERIFICATION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -75,6 +86,22 @@ async function runMigrations() {
         console.log("✅ Verification migration applied");
     } catch (e) {
         console.error("⚠️  Verification migration failed (continuing):", e.message);
+    }
+    try {
+        await pool.query(`
+            ALTER TABLE subscriptions
+                ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT,
+                ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT
+        `);
+        // One alert per threshold per month: the flags live on the monthly usage row.
+        await pool.query(`
+            ALTER TABLE api_usage
+                ADD COLUMN IF NOT EXISTS warned_80 BOOLEAN NOT NULL DEFAULT FALSE,
+                ADD COLUMN IF NOT EXISTS warned_100 BOOLEAN NOT NULL DEFAULT FALSE
+        `);
+        console.log("✅ Billing migration applied");
+    } catch (e) {
+        console.error("⚠️  Billing migration failed (continuing):", e.message);
     }
 }
 
@@ -193,6 +220,41 @@ async function sendVerificationEmail(email, token) {
     } catch (e) {
         console.error("Verification email failed:", e.message);
     }
+}
+
+// Branded email wrapper: header, white content card, footer.
+function emailShell(content) {
+    return `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin:0;padding:0;background:#f4f6f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f9;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+        <tr>
+          <td style="background:#0f172a;padding:28px 40px;">
+            <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">vessel<span style="color:#3b82f6;">class</span>finder</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:40px 40px 32px;">${content}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:20px 40px;border-top:1px solid #e2e8f0;">
+            <p style="margin:0;font-size:12px;color:#94a3b8;">
+              Questions? Reply to this email or check our <a href="${SITE_URL}/#api" style="color:#3b82f6;text-decoration:none;">API docs</a>.
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
 }
 
 // Minimal branded HTML page shown after clicking a verification link.
@@ -457,6 +519,54 @@ const validateImos = (req, res, next) => {
 
 // 📌 Middleware: Check Usage Limits
 const PLAN_LIMITS = { free: 100, starter: 5000, pro: 50000, enterprise: Infinity };
+const UPGRADE_URL = `${SITE_URL}/#pricing`;
+
+// Suggested next step up from each plan, used in usage-alert emails.
+const NEXT_PLAN = {
+    free: "Starter ($49/mo, 5,000 lookups)",
+    starter: "Pro ($199/mo, 50,000 lookups)",
+    pro: "Enterprise (unlimited lookups)",
+};
+
+// Emails the user once per month when they reach 80% or 100% of their plan.
+// The conditional UPDATE claims the flag, so concurrent requests send one email.
+async function sendUsageAlert(userId, month, level, { plan, limit }) {
+    if (!resend) return;
+    const flag = level === 100 ? "warned_100" : "warned_80";
+    try {
+        const claimed = await pool.query(
+            `UPDATE api_usage SET ${flag} = TRUE FROM users
+             WHERE api_usage.user_id = $1 AND api_usage.month = $2 AND api_usage.${flag} = FALSE AND users.id = api_usage.user_id
+             RETURNING users.email`,
+            [userId, month]
+        );
+        if (!claimed?.rows?.length) return;
+        const email = claimed.rows[0].email;
+        const limitText = limit.toLocaleString("en-US");
+        const heading = level === 100
+            ? `You've used all ${limitText} lookups this month`
+            : `You've used 80% of your ${limitText} monthly lookups`;
+        const body = level === 100
+            ? "Further requests will return HTTP 429 until your quota resets on the 1st of next month."
+            : "At this rate you may hit your limit before the month ends, and requests will start returning HTTP 429.";
+        const next = NEXT_PLAN[plan];
+        const cta = plan === "pro"
+            ? `<a href="mailto:info@wearefabbrik.com?subject=Vessel%20Class%20Finder%20-%20Enterprise" style="display:inline-block;background:#3b82f6;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:600;">Talk to us about Enterprise →</a>`
+            : `<a href="${UPGRADE_URL}" style="display:inline-block;background:#3b82f6;color:#ffffff;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:600;">Upgrade my plan →</a>`;
+        await resend.emails.send({
+            from: "VesselClassFinder <konstantinos@wearefabbrik.com>",
+            to: email,
+            subject: heading,
+            html: emailShell(`
+            <h1 style="margin:0 0 16px;font-size:22px;font-weight:700;color:#0f172a;">${heading}</h1>
+            <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:#475569;">${body}</p>
+            ${next ? `<p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#475569;">Need more? Move up to <strong>${next}</strong>.</p>` : ""}
+            ${cta}`)
+        });
+    } catch (e) {
+        console.error("Usage alert failed:", e.message);
+    }
+}
 
 const checkUsageLimit = async (req, res, next) => {
     try {
@@ -498,13 +608,22 @@ const checkUsageLimit = async (req, res, next) => {
                 [req.userId, month]
             );
             const currentUsage = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
+            // A batch can be refused while some quota remains; only alert once it's all used.
+            if (currentUsage >= limit) sendUsageAlert(req.userId, month, 100, { plan, limit });
             return res.status(429).json({
-                error: "Monthly lookup limit reached. Upgrade your plan at info@wearefabbrik.com",
+                error: `Monthly lookup limit reached. Upgrade your plan at ${UPGRADE_URL}`,
+                upgrade_url: UPGRADE_URL,
                 usage: currentUsage,
                 requested: cost,
                 limit,
                 plan
             });
+        }
+
+        if (limit !== Infinity) {
+            const used = charged.rows[0].request_count;
+            if (used >= limit) sendUsageAlert(req.userId, month, 100, { plan, limit });
+            else if (used - cost < limit * 0.8 && used >= limit * 0.8) sendUsageAlert(req.userId, month, 80, { plan, limit });
         }
 
         req.plan = plan;
@@ -628,6 +747,164 @@ app.delete("/api-keys/:key", authenticateAPIKey, async (req, res) => {
         );
         if (result.rows.length === 0) return res.status(404).json({ error: "API key not found or already revoked" });
         res.json({ message: "API key revoked" });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// 📌 Billing: Stripe Checkout for self-serve upgrades
+app.post("/billing/checkout", authenticateAPIKey, async (req, res) => {
+    if (!stripe) return res.status(503).json({ error: "Billing is not available yet. Contact info@wearefabbrik.com to upgrade." });
+    const { plan } = req.body;
+    const price = STRIPE_PRICES[plan];
+    if (!price) return res.status(400).json({ error: "plan must be one of: starter, pro" });
+
+    try {
+        const userResult = await pool.query(
+            "SELECT users.email, subscriptions.stripe_customer_id, subscriptions.stripe_subscription_id, subscriptions.status, subscriptions.expires_at FROM users LEFT JOIN subscriptions ON subscriptions.user_id = users.id WHERE users.id = $1",
+            [req.userId]
+        );
+        const user = userResult.rows[0];
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        // Plan changes for existing subscribers go through the billing portal, so
+        // nobody ends up paying for two subscriptions at once.
+        if (user.status === "active" && new Date(user.expires_at) > new Date()) {
+            // Plans granted by hand (e.g. Enterprise) have no Stripe subscription to manage.
+            if (!user.stripe_subscription_id) {
+                return res.status(409).json({ error: "Your plan is managed by our team. Contact info@wearefabbrik.com to change it." });
+            }
+            return res.status(409).json({ error: "You already have an active subscription. Use Manage billing to change plans.", portal: true });
+        }
+
+        const userId = String(req.userId);
+        const session = await stripe.checkout.sessions.create({
+            mode: "subscription",
+            line_items: [{ price, quantity: 1 }],
+            client_reference_id: userId,
+            ...(user.stripe_customer_id ? { customer: user.stripe_customer_id } : { customer_email: user.email }),
+            subscription_data: { metadata: { userId } },
+            metadata: { userId },
+            allow_promotion_codes: true,
+            success_url: `${SITE_URL}/?checkout=success#account`,
+            cancel_url: `${SITE_URL}/?checkout=cancel#pricing`,
+        });
+        res.json({ url: session.url });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Could not start checkout" });
+    }
+});
+
+// 📌 Billing: Stripe customer portal (change plan, update card, cancel, invoices)
+app.post("/billing/portal", authenticateAPIKey, async (req, res) => {
+    if (!stripe) return res.status(503).json({ error: "Billing is not available yet." });
+    try {
+        const result = await pool.query("SELECT stripe_customer_id FROM subscriptions WHERE user_id = $1", [req.userId]);
+        const customer = result.rows[0]?.stripe_customer_id;
+        if (!customer) return res.status(404).json({ error: "No billing account yet. Choose a plan to subscribe." });
+
+        // The Stripe account is shared with other products, so use a dedicated portal
+        // configuration (plan switching between our prices) when one is set.
+        const session = await stripe.billingPortal.sessions.create({
+            customer,
+            return_url: `${SITE_URL}/#account`,
+            ...(process.env.STRIPE_PORTAL_CONFIG ? { configuration: process.env.STRIPE_PORTAL_CONFIG } : {}),
+        });
+        res.json({ url: session.url });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Could not open billing portal" });
+    }
+});
+
+// Copies a Stripe subscription's state onto our subscriptions row. Always called
+// with a freshly retrieved subscription, so out-of-order webhooks can't regress it,
+// and an ended subscription never overwrites a different (newer) one on the row.
+const SUBSCRIPTION_GRACE_MS = 2 * 24 * 60 * 60 * 1000; // renewal webhooks can lag the period end
+
+async function syncSubscription(sub) {
+    const userId = sub.metadata?.userId;
+    if (!userId) {
+        console.error(`Stripe subscription ${sub.id} has no userId metadata; skipping`);
+        return;
+    }
+    const item = sub.items?.data?.[0];
+    const priceId = item?.price?.id;
+    const plan = Object.keys(STRIPE_PRICES).find(p => STRIPE_PRICES[p] === priceId);
+    const live = ["active", "trialing", "past_due"].includes(sub.status);
+    // current_period_end moved from the subscription to its items in newer API versions.
+    const periodEnd = sub.current_period_end ?? item?.current_period_end;
+    const expiresAt = live && periodEnd ? new Date(periodEnd * 1000 + SUBSCRIPTION_GRACE_MS) : new Date();
+    const customer = typeof sub.customer === "string" ? sub.customer : sub.customer?.id;
+
+    if (live && !plan) console.error(`Stripe price ${priceId} doesn't match STRIPE_PRICE_STARTER/PRO`);
+
+    await pool.query(
+        `INSERT INTO subscriptions (user_id, status, expires_at, plan, stripe_customer_id, stripe_subscription_id)
+         VALUES ($1, $2, $3, $4, $5, $6)
+         ON CONFLICT (user_id) DO UPDATE SET status = $2, expires_at = $3, plan = COALESCE($4, subscriptions.plan),
+             stripe_customer_id = $5, stripe_subscription_id = $6
+         WHERE $7 OR subscriptions.stripe_subscription_id IS NULL OR subscriptions.stripe_subscription_id = $6`,
+        // subscriptions.status has a CHECK constraint allowing only 'active' / 'inactive'.
+        [userId, live && plan ? "active" : "inactive", expiresAt, plan || null, customer, sub.id, live]
+    );
+    if (live && plan) notifyTelegram(`💳 Subscription ${sub.status}: user ${escapeHtml(userId)} on ${plan}`);
+}
+
+async function handleStripeWebhook(req, res) {
+    if (!stripe || !process.env.STRIPE_WEBHOOK_SECRET) return res.status(503).json({ error: "Billing not configured" });
+
+    let event;
+    try {
+        event = stripe.webhooks.constructEvent(req.body, req.headers["stripe-signature"], process.env.STRIPE_WEBHOOK_SECRET);
+    } catch (e) {
+        return res.status(400).json({ error: `Webhook signature verification failed: ${e.message}` });
+    }
+
+    try {
+        let subscriptionId = null;
+        if (event.type === "checkout.session.completed" && event.data.object.mode === "subscription") {
+            subscriptionId = event.data.object.subscription;
+        } else if (event.type.startsWith("customer.subscription.")) {
+            subscriptionId = event.data.object.id;
+        }
+        if (subscriptionId) {
+            await syncSubscription(await stripe.subscriptions.retrieve(subscriptionId));
+        }
+        res.json({ received: true });
+    } catch (error) {
+        if (error.code === "23503") {
+            // userId in the subscription metadata no longer exists; retrying won't help.
+            console.error("Stripe webhook for a deleted user; skipping:", error.detail);
+            return res.json({ received: true });
+        }
+        console.error(error);
+        // Non-2xx makes Stripe retry the event later.
+        res.status(500).json({ error: "Webhook handling failed" });
+    }
+}
+
+// 📌 Public demo lookup for the homepage: one IMO at a time, tightly rate-limited
+// per IP so it can't be used to scrape the dataset.
+const demoLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Demo limit reached. Get a free API key for 100 lookups a month." }
+});
+
+app.get("/demo/:imo", demoLimiter, async (req, res) => {
+    if (!/^\d{7}$/.test(req.params.imo)) return res.status(400).json({ error: "IMO numbers have 7 digits" });
+    try {
+        const result = await pool.query(
+            "SELECT imo, vessel_name, class, status, date_of_survey, date_of_next_survey, date_of_latest_status, reason_for_status FROM vessel_data WHERE imo = $1",
+            [Number(req.params.imo)]
+        );
+        if (result.rows.length === 0) return res.status(404).json({ error: "No IACS-classed vessel with that IMO number" });
+        res.json(result.rows[0]);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Internal server error" });

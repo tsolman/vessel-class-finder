@@ -523,6 +523,7 @@
       nav .nav-secondary { display: none; }
     }
   </style>
+  <script src="/analytics.js"></script>
 </head>
 <body>
 
@@ -852,6 +853,7 @@ const store = {
 };
 
 let apiKey = store.get("sessionStorage", "vcf_api_key");
+if (apiKey) window.vcfIdentify(store.get("sessionStorage", "vcf_user_id"));
 
 // ---------- Quick-start snippets ----------
 const SNIPPETS = {
@@ -912,7 +914,10 @@ function renderSnippets() {
       tabs.appendChild(b);
     });
     pre.textContent = SNIPPETS[active](key);
-    box.querySelector(".copy-btn").onclick = (e) => copyText(pre.textContent, e.currentTarget);
+    box.querySelector(".copy-btn").onclick = (e) => {
+      copyText(pre.textContent, e.currentTarget);
+      window.vcfTrack("code_copied", { language: active, logged_in: Boolean(apiKey) });
+    };
   });
 }
 
@@ -930,6 +935,7 @@ async function runDemo(e) {
   try {
     const res = await fetch(API + "/demo/" + imo);
     const data = await res.json();
+    window.vcfTrack("demo_lookup", { result: res.ok ? "found" : res.status === 404 ? "not_found" : res.status === 429 ? "rate_limited" : "error" });
     if (!res.ok) {
       out.innerHTML = '<p class="error">' + escapeHtml(data.error || "Lookup failed.") + "</p>" +
         (res.status === 429 ? '<p class="note"><a href="#signup">Get a free API key</a> for 100 lookups a month.</p>' : "");
@@ -973,7 +979,10 @@ function showAccount() {
   section.hidden = false;
   document.getElementById("nav-account").textContent = "Account";
   document.getElementById("account-key").textContent = apiKey;
-  document.getElementById("copy-key").onclick = (e) => copyText(apiKey, e.currentTarget);
+  document.getElementById("copy-key").onclick = (e) => {
+    copyText(apiKey, e.currentTarget);
+    window.vcfTrack("api_key_copied");
+  };
   renderSnippets();
   loadUsage();
 }
@@ -1020,6 +1029,7 @@ function renderPlanActions(plan) {
 }
 
 async function startCheckout(plan) {
+  window.vcfTrack("upgrade_clicked", { plan, logged_in: Boolean(apiKey) });
   if (!apiKey) {
     // Remember the choice across the email-verification round trip.
     store.set("localStorage", "vcf_pending_plan", plan);
@@ -1050,6 +1060,7 @@ async function startCheckout(plan) {
 }
 
 async function openPortal() {
+  window.vcfTrack("billing_portal_opened");
   accountMessage("success", "Opening billing portal&hellip;");
   try {
     const res = await fetch(API + "/billing/portal", { method: "POST", headers: { "x-api-key": apiKey } });
@@ -1065,6 +1076,8 @@ function logout(e) {
   if (e) e.preventDefault();
   apiKey = null;
   store.remove("sessionStorage", "vcf_api_key");
+  store.remove("sessionStorage", "vcf_user_id");
+  window.vcfResetIdentity();
   document.getElementById("account").hidden = true;
   document.getElementById("nav-account").textContent = "Log in";
   renderSnippets();
@@ -1075,6 +1088,7 @@ async function handleCheckoutReturn() {
   const params = new URLSearchParams(location.search);
   const result = params.get("checkout");
   if (!result) return;
+  window.vcfTrack("checkout_returned", { result });
   history.replaceState(null, "", location.pathname + location.hash);
   if (!apiKey) return;
   if (result === "cancel") { showAccount(); accountMessage("error", "Checkout cancelled. You haven't been charged."); return; }
@@ -1165,6 +1179,7 @@ async function handleSignup() {
       "<strong>Almost there!</strong> We've sent a verification link to <strong>" + escapeHtml(email) + "</strong>. " +
       "Click it to activate your account, then log in below to get your API key." +
       '<p style="margin-top:10px;font-size:13px;">Didn\'t get it? <a href="#" onclick="handleResend(event)">Resend email</a></p>');
+    window.vcfTrack("signup_submitted");
     signupBtn.textContent = "Account created";
     signupBtn.disabled = true;
     loginBtn.dataset.label = "I've verified — Log in & get API key";
@@ -1208,6 +1223,9 @@ async function handleLogin() {
 
     apiKey = loginData.apiKey;
     store.set("sessionStorage", "vcf_api_key", apiKey);
+    store.set("sessionStorage", "vcf_user_id", loginData.userId);
+    window.vcfIdentify(loginData.userId);
+    window.vcfTrack("login");
     setMsg(msg, "success", "You're in! Your API key and ready-to-run examples are below.");
     loginBtn.textContent = "Done!";
 

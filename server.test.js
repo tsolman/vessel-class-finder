@@ -56,6 +56,15 @@ vi.mock("stripe", () => ({
   }),
 }));
 
+const mockCapture = vi.fn();
+vi.mock("posthog-node", () => ({
+  PostHog: vi.fn(function () {
+    this.capture = mockCapture;
+    this.shutdown = vi.fn(() => Promise.resolve());
+  }),
+}));
+
+process.env.POSTHOG_KEY = "phc_test";
 process.env.RESEND_API_KEY = "re_test";
 process.env.STRIPE_SECRET_KEY = "sk_test";
 process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
@@ -77,6 +86,7 @@ function mockAuthMiddleware() {
 beforeEach(() => {
   mockQuery.mockReset();
   mockSendEmail.mockClear();
+  mockCapture.mockClear();
   for (const fn of [
     mockStripe.checkout.sessions.create,
     mockStripe.billingPortal.sessions.create,
@@ -171,6 +181,7 @@ describe("POST /login", () => {
       message: "Login successful",
       token: "mock_token",
       apiKey: "mock-uuid-key",
+      userId: 1,
     });
     expect(mockQuery.mock.calls[2][0]).toMatch(/INSERT INTO api_keys/);
   });
@@ -1010,5 +1021,52 @@ describe("GET /demo/:imo", () => {
     mockQuery.mockResolvedValueOnce({ rows: [] });
     const res = await request(app).get("/demo/1234567");
     expect(res.status).toBe(404);
+  });
+});
+
+describe("analytics", () => {
+  const events = () => mockCapture.mock.calls.map(([c]) => c);
+
+  it("tracks signups by user id, never by email", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [{ id: "user-uuid" }] });
+    await request(app).post("/register").send({ email: "captain@vesselmail.io", password: "password123" });
+
+    expect(events()).toEqual([{ distinctId: "user-uuid", event: "user_signed_up", properties: { source: "api" } }]);
+    expect(JSON.stringify(mockCapture.mock.calls)).not.toMatch(/vesselmail/);
+  });
+
+  it("tracks API lookups with batch size and hits", async () => {
+    mockAuthMiddleware();
+    mockUsageUnderLimit();
+    mockQuery.mockResolvedValueOnce({ rows: [{ imo: 1234567 }] });
+    await request(app).post("/vessels").set("x-api-key", VALID_API_KEY).send({ imos: [1234567, 7654321] });
+
+    expect(events()).toEqual([{ distinctId: "1", event: "api_lookup", properties: { imos: 2, found: 1, plan: "free", source: "api" } }]);
+  });
+
+  it("tracks refused lookups as usage_limit_reached", async () => {
+    mockAuthMiddleware();
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 100 }] });
+    await request(app).post("/vessels").set("x-api-key", VALID_API_KEY).send({ imos: [1234567] });
+
+    expect(events().map((e) => e.event)).toContain("usage_limit_reached");
+    expect(events().map((e) => e.event)).not.toContain("api_lookup");
+  });
+
+  it("tracks subscription starts from checkout but not the duplicate created event", async () => {
+    const sub = {
+      id: "sub_1", status: "active", customer: "cus_1", metadata: { userId: "user-uuid" },
+      items: { data: [{ price: { id: "price_pro" }, current_period_end: Math.floor(Date.now() / 1000) + 86400 }] },
+    };
+    for (const type of ["customer.subscription.created", "checkout.session.completed"]) {
+      mockStripe.webhooks.constructEvent.mockReturnValueOnce({ type, data: { object: { id: "sub_1", mode: "subscription", subscription: "sub_1" } } });
+      mockStripe.subscriptions.retrieve.mockResolvedValueOnce(sub);
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+      await request(app).post("/billing/webhook").set("stripe-signature", "sig").set("Content-Type", "application/json").send("{}");
+    }
+
+    expect(events()).toEqual([{ distinctId: "user-uuid", event: "subscription_started", properties: { plan: "pro", stripe_status: "active", source: "api" } }]);
   });
 });

@@ -118,6 +118,7 @@
     footer a { color: var(--text-muted); }
     footer a:hover { color: var(--text); }
   </style>
+  <script src="/analytics.js"></script>
 </head>
 <body>
 
@@ -224,6 +225,7 @@
     <li><strong>Railway</strong> hosts the API.</li>
     <li><strong>Neon</strong> hosts the PostgreSQL database that stores your account and usage data, in the EU (Frankfurt, Germany).</li>
     <li><strong>Resend</strong> sends account emails (such as email verification and usage-limit notices) to the address you register with.</li>
+    <li><strong>PostHog</strong> (EU-hosted, Frankfurt) provides product analytics: which pages are viewed and which features are used (for example demo lookups, sign-ups, API lookups and plan changes). Events are linked to your account ID, never your email address, and we don't send IP-based location data.</li>
     <li><strong>Stripe</strong> processes payments for paid plans. Your card details go directly to Stripe and never reach our servers; we store only your Stripe customer and subscription IDs.</li>
     <li><strong>Telegram</strong> delivers internal notifications to our team when a new account is created. These include the email address you registered with.</li>
   </ul>
@@ -233,10 +235,9 @@
 
   <h2>What We Do Not Collect</h2>
   <ul>
-    <li>We do not use cookies or tracking scripts.</li>
-    <li>We do not use analytics services on the landing page.</li>
+    <li>We do not use cookies. Our analytics (PostHog) runs without cookies or browser storage, has no automatic click tracking or session recording, and is never used for advertising.</li>
     <li>We do not collect or store card details; payments are handled entirely by Stripe.</li>
-    <li>While you are logged in on our website, your API key is kept in your browser's session storage so the account page works. It is cleared when you log out or close the tab.</li>
+    <li>While you are logged in on our website, your API key and account ID are kept in your browser's session storage so the account page works. They are cleared when you log out or close the tab.</li>
   </ul>
 
   <h2>How We Use Your Data</h2>
@@ -245,6 +246,7 @@
     <li>To enforce usage limits and prevent abuse.</li>
     <li>To contact you about service changes or issues with your account.</li>
     <li>To let you know when you reach 80% and 100% of your monthly lookup limit.</li>
+    <li>To understand, in aggregate, how the site and API are used so we can improve them.</li>
   </ul>
 
   <h2>We Do Not Sell Your Data</h2>

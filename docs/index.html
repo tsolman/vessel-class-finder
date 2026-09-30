@@ -787,7 +787,7 @@
 <section id="signup">
   <div class="container" style="text-align:center;">
     <div class="section-label">Get Started</div>
-    <h2>Get your free API key</h2>
+    <h2 id="signup-heading">Get your free API key</h2>
     <p class="section-desc" style="margin:0 auto 32px;">100 lookups per month. No credit card required.</p>
 
     <div class="signup-form">
@@ -796,7 +796,7 @@
       <input type="text" id="signup-website" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" placeholder="Leave this field empty">
       <button class="btn btn-primary" id="signup-btn" onclick="handleSignup()">Create Account</button>
       <button class="btn btn-secondary" id="login-btn" onclick="handleLogin()" style="display:none;width:100%;margin-top:8px;">I've verified — Log in &amp; get API key</button>
-      <p style="font-size:12px;color:#64748b;margin-top:8px;">Already have an account? <a href="#" id="show-login" onclick="showLogin(event)">Log in</a> · By signing up you agree to our <a href="/terms.html">Terms of Service & Privacy Policy</a>.</p>
+      <p style="font-size:12px;color:#64748b;margin-top:8px;"><span id="mode-switch">Already have an account? <a href="#" onclick="showLogin(event)">Log in</a></span> · By signing up you agree to our <a href="/terms.html">Terms of Service & Privacy Policy</a>.</p>
 
       <div id="form-message" class="form-message"></div>
     </div>
@@ -1094,10 +1094,29 @@ function setMsg(msg, type, html) {
   msg.innerHTML = html;
 }
 
-// Reveal the login button (e.g. returning user who just verified their email).
+// Switch the form between creating an account and logging in to an existing one.
 function showLogin(e) {
   if (e) e.preventDefault();
-  document.getElementById("login-btn").style.display = "block";
+  const { signupBtn, loginBtn } = getInputs();
+  document.getElementById("signup-heading").textContent = "Log in to your account";
+  signupBtn.style.display = "none";
+  loginBtn.className = "btn btn-primary";
+  loginBtn.style.display = "block";
+  loginBtn.style.marginTop = "0";
+  loginBtn.dataset.label = "Log in";
+  loginBtn.textContent = "Log in";
+  loginBtn.disabled = false;
+  document.getElementById("mode-switch").innerHTML = 'New here? <a href="#" onclick="showSignup(event)">Create a free account</a>';
+  document.getElementById("signup-email").focus();
+}
+
+function showSignup(e) {
+  if (e) e.preventDefault();
+  const { signupBtn, loginBtn } = getInputs();
+  document.getElementById("signup-heading").textContent = "Get your free API key";
+  signupBtn.style.display = "block";
+  loginBtn.style.display = "none";
+  document.getElementById("mode-switch").innerHTML = 'Already have an account? <a href="#" onclick="showLogin(event)">Log in</a>';
   document.getElementById("signup-email").focus();
 }
 
@@ -1131,6 +1150,8 @@ async function handleSignup() {
       '<p style="margin-top:10px;font-size:13px;">Didn\'t get it? <a href="#" onclick="handleResend(event)">Resend email</a></p>');
     signupBtn.textContent = "Account created";
     signupBtn.disabled = true;
+    loginBtn.dataset.label = "I've verified — Log in & get API key";
+    loginBtn.textContent = loginBtn.dataset.label;
     loginBtn.style.display = "block";
   } catch (e) {
     setMsg(msg, "error", "Network error. Please try again.");
@@ -1164,7 +1185,7 @@ async function handleLogin() {
         setMsg(msg, "error", escapeHtml(loginData.error || "Login failed."));
       }
       loginBtn.disabled = false;
-      loginBtn.textContent = "I've verified — Log in & get API key";
+      loginBtn.textContent = loginBtn.dataset.label || "Log in";
       return;
     }
 
@@ -1180,7 +1201,7 @@ async function handleLogin() {
   } catch (e) {
     setMsg(msg, "error", "Network error. Please try again.");
     loginBtn.disabled = false;
-    loginBtn.textContent = "I've verified — Log in & get API key";
+    loginBtn.textContent = loginBtn.dataset.label || "Log in";
   }
 }
 

@@ -3,7 +3,7 @@
 // consent banner is needed. No autocapture or session recording; only page views and
 // the named events the site sends through vcfTrack().
 (function () {
-  const POSTHOG_KEY = "";
+  const POSTHOG_KEY = "phc_ojRBGzT2B3SGBZiTDrubvEMSHDREZ9KRbM4AWHsnLmre";
   const API_HOST = "https://eu.i.posthog.com";
 
   const queue = [];

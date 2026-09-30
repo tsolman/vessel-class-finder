@@ -54,7 +54,7 @@
           {
             "@type": "Question",
             "name": "How do I check a ship's class status by IMO number?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Register for a free API key, then send POST /vessels with body {\"imos\": [9200079]}. The response includes the classification society (for example DNV, LR, BV, ABS, ClassNK), the class status (In Class, Suspended, Withdrawn), the last and next survey dates, and the reason for the latest status change." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Register for a free API key, then send POST /vessels with body {\"imos\": [9200079]}. The response includes the classification society (for example NV for DNV, LRS for Lloyd's Register, NKK for ClassNK, BV, ABS), the class status (Delivered, Reinstated or Reassigned when in class; Suspended; Withdrawn), the last and next survey dates, and the reason for the latest status change." }
           },
           {
             "@type": "Question",
@@ -534,6 +534,7 @@
       <li class="nav-secondary"><a href="#how-it-works">How It Works</a></li>
       <li><a href="#api">API</a></li>
       <li><a href="#pricing">Pricing</a></li>
+      <li class="nav-secondary"><a href="/class-societies/">Class societies</a></li>
       <li><a href="#faq">FAQ</a></li>
       <li class="nav-secondary"><a href="/blog/vessel-classification-api.html">Blog</a></li>
       <li class="nav-secondary"><a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></li>
@@ -578,8 +579,8 @@
 [{
   <span class="key">"imo"</span>: <span class="num">9200079</span>,
   <span class="key">"vessel_name"</span>: <span class="str">"NORDIC AURORA"</span>,
-  <span class="key">"class"</span>: <span class="str">"DNV"</span>,
-  <span class="key">"status"</span>: <span class="str">"In Class"</span>,
+  <span class="key">"class"</span>: <span class="str">"NV"</span>,
+  <span class="key">"status"</span>: <span class="str">"Delivered"</span>,
   <span class="key">"date_of_survey"</span>: <span class="str">"15/06/2025"</span>,
   <span class="key">"date_of_next_survey"</span>: <span class="str">"15/06/2028"</span>,
   <span class="key">"date_of_latest_status"</span>: <span class="str">"01/01/2024"</span>,
@@ -771,7 +772,7 @@
       </details>
       <details>
         <summary>How do I check a ship's class status by IMO number?</summary>
-        <p>Register for a free API key, then send <code>POST /vessels</code> with body <code>{"imos": [9200079]}</code>. The response includes the classification society (for example DNV, LR, BV, ABS, ClassNK), the class status (In Class, Suspended, Withdrawn), the last and next survey dates, and the reason for the latest status change.</p>
+        <p>Register for a free API key, then send <code>POST /vessels</code> with body <code>{"imos": [9200079]}</code>. The response includes the classification society (for example NV for DNV, LRS for Lloyd's Register, NKK for ClassNK, BV, ABS), the class status (Delivered, Reinstated or Reassigned when in class; Suspended; Withdrawn), the last and next survey dates, and the reason for the latest status change.</p>
       </details>
       <details>
         <summary>Which classification societies are covered?</summary>
@@ -1263,6 +1264,7 @@ handleCheckoutReturn();
 
 <footer>
   <div class="container">
+    <p><a href="/class-societies/">Classification societies</a> &middot; <a href="/iacs-class-status-codes.html">IACS status codes</a> &middot; <a href="/use-cases/sanctions-kyc-screening.html">Sanctions &amp; KYC</a> &middot; <a href="/use-cases/charter-vetting.html">Charter vetting</a> &middot; <a href="/use-cases/marine-insurance.html">Marine insurance</a></p>
     <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/terms.html">Terms & Privacy</a></p>
   </div>
 </footer>

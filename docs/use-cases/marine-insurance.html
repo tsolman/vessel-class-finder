@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vessel Class Status for Marine Insurance Underwriting</title>
+  <meta name="description" content="Check hull and P&amp;I risks by IMO: class society, status, survey dates. Monitor a book of vessels for suspensions and withdrawals. Free tier available.">
+  <link rel="canonical" href="https://vesselclassfinder.com/use-cases/marine-insurance.html">
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Vessel Class Finder">
+  <meta property="og:title" content="Vessel Class Status for Marine Insurance Underwriting">
+  <meta property="og:description" content="Check hull and P&amp;I risks by IMO: class society, status, survey dates. Monitor a book of vessels for suspensions and withdrawals. Free tier available.">
+  <meta property="og:url" content="https://vesselclassfinder.com/use-cases/marine-insurance.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/seo.css">
+  <script src="/analytics.js"></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://vesselclassfinder.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Vessel class status for marine insurance underwriters and brokers",
+      "item": "https://vesselclassfinder.com/use-cases/marine-insurance.html"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is class status important for hull and machinery insurance?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Maintaining class is typically a condition of hull and machinery and P&I cover. Check the wording of your own policy for what applies."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How can I monitor a fleet for suspended or withdrawn class?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Send your IMO list to POST /vessels in batches of up to 100, store the results, and compare them each week after the Sunday data refresh. Look for changes in status or class."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How often is the class data updated?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The data is refreshed weekly from IACS, every Sunday, and swapped in atomically. Run your monitoring check after that."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if a vessel is not in the dataset?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The dataset covers only vessels classed by the 12 IACS members. A missing vessel may be classed by a non-IACS society or have no class. Ask the assured for the class certificate."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does it cost to check a book of vessels?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Each IMO is one lookup. The free plan includes 100 lookups a month. Starter is $49 a month for 5,000 lookups and Pro is $199 a month for 50,000. Enterprise is custom."
+      }
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">vessel<span>class</span>finder</a>
+    <ul>
+      <li class="nav-secondary"><a href="/class-societies/">Class societies</a></li>
+      <li class="nav-secondary"><a href="/iacs-class-status-codes.html">Status codes</a></li>
+      <li><a href="/#api">API</a></li>
+      <li><a href="/#pricing">Pricing</a></li>
+      <li><a href="/#signup" class="nav-account">Get API key</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article>
+  <div class="breadcrumb">
+    <a href="/">Home</a> / Vessel class status for marine insurance underwriters and brokers
+  </div>
+
+  <h1>Vessel class status for marine insurance underwriters and brokers</h1>
+  <div class="meta">Data from the IACS Vessels in Class dataset, as of 30 September 2026. Refreshed weekly.</div>
+
+  <div class="answer"><p>Underwriters check a vessel's class status because maintaining class is typically a condition of hull and machinery and P&amp;I cover. Vessel Class Finder returns the class society, status, survey dates and the reason for the latest status change from the IACS Vessels in Class dataset, by IMO number. You can check one vessel at submission or re-check a whole book by API.</p></div>
+
+  <form class="demo" data-demo>
+    <label for="demo-imo">Try it: check a ship's class status by IMO number (free, no signup)</label>
+    <div class="demo-row">
+      <input id="demo-imo" inputmode="numeric" pattern="[0-9]{7}" maxlength="7" placeholder="7-digit IMO, e.g. 9321483" aria-label="IMO number" required>
+      <button class="btn" type="submit">Look up</button>
+    </div>
+    <div class="demo-result" hidden aria-live="polite"></div>
+  </form>
+
+  <h2>Why class matters to hull and P&amp;I underwriters</h2>
+  <p>Class maintained is typically a condition of cover. If class is suspended or withdrawn, that can change how the risk is viewed. Read the wording of your own policies for what applies.</p><p>Class data helps at three points:</p><ul><li><strong>At submission:</strong> confirm the vessel is classed by an IACS member and the survey position looks normal.</li><li><strong>During the policy year:</strong> catch suspensions, withdrawals and transfers between societies.</li><li><strong>At renewal:</strong> see whether the vessel's status changed since you last looked.</li></ul>
+
+  <h2>Workflow: monitor a book of vessels</h2>
+  <ol><li>Export the IMO numbers from your policy or placement system.</li><li>Call <code>POST /vessels</code> with your <code>x-api-key</code> and batches of up to 100 IMOs, for example <code>{"imos":["9074729","9321483"]}</code>.</li><li>Store each result with the date you ran it.</li><li>The dataset refreshes weekly on Sunday. Run your check on Monday and compare with last week's stored results.</li><li>Flag any vessel where <code>status</code> changed to <em>Suspended</em> or <em>Withdrawn</em>, where <code>class</code> changed, or where <code>date_of_next_survey</code> is now in the past.</li><li>Send flagged vessels to the underwriter or broker who handles the account, and ask the assured for the class certificates.</li></ol><p>You can try a single IMO first with the free lookup box. No signup is needed.</p>
+
+  <h2>Fields and statuses to check, and what they mean</h2>
+  <ul><li><strong>class</strong>: the society code, for example NV (DNV), LRS (LR), NKK (ClassNK), TLV (Türk Loydu). A change between checks means a transfer.</li><li><strong>status</strong>: <em>Delivered</em> means currently classed. <em>Suspended</em> (575 vessels) and <em>Withdrawn</em> (4,848) mean class is not in force with that society. <em>Reinstated</em> (3,381) means class was restored. <em>Reassigned</em> (1,382) means class was reassigned, for example after a transfer.</li><li><strong>reason_for_status</strong>: <em>Survey overdue</em>, <em>Non-compliance with conditions of class / recommendations</em>, <em>Casualty</em>, <em>Sold for recycling (scrap)</em>, <em>Transfer of class to another IACS member</em> or <em>Transfer of class to a non-IACS society</em>. A transfer to a non-IACS society or a casualty usually needs a conversation with the assured.</li><li><strong>date_of_survey</strong> and <strong>date_of_next_survey</strong>: the last survey and the next one due.</li><li><strong>date_of_latest_status</strong>: when the current status took effect. Use it to date the change in your file.</li></ul><p>Dates are DD/MM/YYYY strings.</p>
+
+  <h2>What this data does not replace</h2>
+  <p>The data comes from IACS's public dataset. It is not a substitute for official class records or certificates from the society, and it is not a coverage or claims decision on its own.</p><p>It covers only IACS-classed vessels. A vessel that is missing from the dataset may be classed by a non-IACS society, or may have no class. On a hull risk, that is worth checking.</p>
+
+  <div class="cta-box">
+    <h3>Check a whole fleet at once</h3>
+    <p>Free API key: 100 lookups a month, up to 100 IMO numbers per request. Paid plans from $49/month.</p>
+    <a href="/#signup" class="btn">Get a free API key</a>
+  </div>
+
+  <h2>Frequently asked questions</h2>
+  <div class="faq">
+    <details>
+      <summary>Is class status important for hull and machinery insurance?</summary>
+      <p>Yes. Maintaining class is typically a condition of hull and machinery and P&amp;I cover. Check the wording of your own policy for what applies.</p>
+    </details>
+    <details>
+      <summary>How can I monitor a fleet for suspended or withdrawn class?</summary>
+      <p>Send your IMO list to POST /vessels in batches of up to 100, store the results, and compare them each week after the Sunday data refresh. Look for changes in status or class.</p>
+    </details>
+    <details>
+      <summary>How often is the class data updated?</summary>
+      <p>The data is refreshed weekly from IACS, every Sunday, and swapped in atomically. Run your monitoring check after that.</p>
+    </details>
+    <details>
+      <summary>What if a vessel is not in the dataset?</summary>
+      <p>The dataset covers only vessels classed by the 12 IACS members. A missing vessel may be classed by a non-IACS society or have no class. Ask the assured for the class certificate.</p>
+    </details>
+    <details>
+      <summary>How much does it cost to check a book of vessels?</summary>
+      <p>Each IMO is one lookup. The free plan includes 100 lookups a month. Starter is $49 a month for 5,000 lookups and Pro is $199 a month for 50,000. Enterprise is custom.</p>
+    </details>
+  </div>
+
+  <h2>Related</h2>
+  <ul>
+    <li><a href="/iacs-class-status-codes.html">IACS class status codes explained</a></li>
+    <li><a href="/class-societies/">IACS classification societies compared</a></li>
+    <li><a href="/use-cases/sanctions-kyc-screening.html">Vessel class checks for sanctions and KYC screening</a></li>
+    <li><a href="/use-cases/charter-vetting.html">Check a nominated vessel's class status before fixture</a></li>
+  </ul>
+</article>
+
+<footer>
+  <div>
+    <p><a href="/class-societies/">Classification societies</a> &middot; <a href="/iacs-class-status-codes.html">IACS status codes</a> &middot; <a href="/use-cases/sanctions-kyc-screening.html">Vessel class checks for sanctions and KYC screening</a> &middot; <a href="/use-cases/charter-vetting.html">Check a nominated vessel's class status before fixture</a> &middot; <a href="/use-cases/marine-insurance.html">Vessel class status for marine insurance underwriters and brokers</a></p>
+    <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/terms.html">Terms &amp; Privacy</a></p>
+  </div>
+</footer>
+
+<script src="/seo-demo.js"></script>
+</body>
+</html>

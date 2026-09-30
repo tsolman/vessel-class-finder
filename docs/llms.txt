@@ -1,6 +1,6 @@
 # Vessel Class Finder
 
-> JSON REST API for IACS vessel classification data. Look up any ship by IMO number and get its classification society, class status (In Class / Suspended / Withdrawn), last and next survey dates, and the reason for its latest status change. Data comes from the IACS "Vessels in Class" dataset, which IACS publishes only as a ZIP/CSV download, and is refreshed every Sunday. Free tier: 100 lookups/month. Built by WeAreFabbrik (https://wearefabbrik.com).
+> JSON REST API for IACS vessel classification data. Look up any ship by IMO number and get its classification society, class status (Delivered / Reinstated / Reassigned / Suspended / Withdrawn), last and next survey dates, and the reason for its latest status change. Data comes from the IACS "Vessels in Class" dataset, which IACS publishes only as a ZIP/CSV download, and is refreshed every Sunday. Free tier: 100 lookups/month. Built by WeAreFabbrik (https://wearefabbrik.com).
 
 Base URL: https://vessel-class-finder-production.up.railway.app
 Authentication: `x-api-key` header. Get a key by registering, verifying your email, then logging in.
@@ -19,8 +19,8 @@ Example response from `/vessels`:
   "imo": 9200079,
   "vessel_name": "NORDIC AURORA",
   "update_date": "01/03/26",
-  "class": "DNV",
-  "status": "In Class",
+  "class": "NV",
+  "status": "Delivered",
   "date_of_survey": "15/06/2025",
   "date_of_next_survey": "15/06/2028",
   "date_of_latest_status": "01/01/2024",
@@ -64,5 +64,22 @@ Every vessel in the IACS Vessels in Class dataset, which covers ships classed by
 
 - [Home page](https://vesselclassfinder.com/): overview, pricing, signup
 - [Guide: querying IACS class status by IMO number](https://vesselclassfinder.com/blog/vessel-classification-api.html)
+- [IACS class status codes explained](https://vesselclassfinder.com/iacs-class-status-codes.html): what Delivered, Reinstated, Reassigned, Suspended and Withdrawn mean, plus every reason code, with current counts
+- [IACS classification societies compared](https://vesselclassfinder.com/class-societies/): codes (NV = DNV, NKK = ClassNK, LRS = Lloyd's Register, TLV = Türk Loydu), fleet sizes and status breakdowns
+- [ClassNK class status lookup](https://vesselclassfinder.com/class-societies/classnk.html): IACS code NKK
+- [Bureau Veritas class status lookup](https://vesselclassfinder.com/class-societies/bureau-veritas.html): IACS code BV
+- [ABS class status lookup](https://vesselclassfinder.com/class-societies/abs.html): IACS code ABS
+- [DNV class status lookup](https://vesselclassfinder.com/class-societies/dnv.html): IACS code NV
+- [Lloyd's Register class status lookup](https://vesselclassfinder.com/class-societies/lloyds-register.html): IACS code LRS
+- [RINA class status lookup](https://vesselclassfinder.com/class-societies/rina.html): IACS code RINA
+- [China Classification Society class status lookup](https://vesselclassfinder.com/class-societies/china-classification-society.html): IACS code CCS
+- [Korean Register class status lookup](https://vesselclassfinder.com/class-societies/korean-register.html): IACS code KR
+- [Indian Register of Shipping class status lookup](https://vesselclassfinder.com/class-societies/indian-register.html): IACS code IRS
+- [Polish Register of Shipping class status lookup](https://vesselclassfinder.com/class-societies/polish-register.html): IACS code PRS
+- [Croatian Register of Shipping class status lookup](https://vesselclassfinder.com/class-societies/croatian-register.html): IACS code CRS
+- [Türk Loydu class status lookup](https://vesselclassfinder.com/class-societies/turk-loydu.html): IACS code TLV
+- [Vessel class checks for sanctions and KYC screening](https://vesselclassfinder.com/use-cases/sanctions-kyc-screening.html)
+- [Class status checks for charter vetting](https://vesselclassfinder.com/use-cases/charter-vetting.html)
+- [Class status for marine insurance underwriting](https://vesselclassfinder.com/use-cases/marine-insurance.html)
 - [Source code and full API reference](https://github.com/tsolman/vessel-class-finder)
 - [Terms of Service & Privacy Policy](https://vesselclassfinder.com/terms.html)

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IACS Class Status Codes Explained: Delivered, Suspended...</title>
+  <meta name="description" content="What IACS class statuses mean: Delivered, Reinstated, Reassigned, Suspended and Withdrawn, plus every reason code, with counts from the live Vessels in Class dataset.">
+  <link rel="canonical" href="https://vesselclassfinder.com/iacs-class-status-codes.html">
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Vessel Class Finder">
+  <meta property="og:title" content="IACS Class Status Codes Explained: Delivered, Suspended...">
+  <meta property="og:description" content="What IACS class statuses mean: Delivered, Reinstated, Reassigned, Suspended and Withdrawn, plus every reason code, with counts from the live Vessels in Class dataset.">
+  <meta property="og:url" content="https://vesselclassfinder.com/iacs-class-status-codes.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/seo.css">
+  <script src="/analytics.js"></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://vesselclassfinder.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "IACS status codes",
+      "item": "https://vesselclassfinder.com/iacs-class-status-codes.html"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What does 'Delivered' mean in IACS class status?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It is the normal in-class status: the ship entered the society's class (typically on delivery as a newbuilding, or on transfer from another society) and has had no suspension or withdrawal since."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between class suspended and class withdrawn?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Suspended means class is temporarily invalid, usually because of an overdue survey or an unmet condition of class, and can be reinstated. Withdrawn means the society no longer classes the ship at all."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is a ship with Reinstated or Reassigned status in class?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Reinstated means class was restored after a suspension; Reassigned means class was assigned again after a withdrawal or transfer. Both are in-class statuses, though the history is worth reviewing in due diligence."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does 'Transfer of class to a non-IACS society' mean?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The ship left an IACS member for a society outside IACS. It is recorded for 431 ships in the current dataset and is often treated as a risk indicator in vetting and sanctions screening."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How can I check a ship's IACS class status?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Enter its IMO number in the lookup on this page, or query up to 100 IMO numbers at once through the Vessel Class Finder API. Data comes from the IACS Vessels in Class dataset and is refreshed weekly."
+      }
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "DefinedTermSet",
+  "name": "IACS class statuses",
+  "hasDefinedTerm": [
+    {
+      "@type": "DefinedTerm",
+      "name": "Delivered",
+      "description": "The normal in-class status. The ship entered this society's class (typically on delivery as a newbuilding, or on transfer from another society) and no suspension or withdrawal has been recorded since.",
+      "url": "https://vesselclassfinder.com/iacs-class-status-codes.html#delivered"
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Reinstated",
+      "description": "Class was suspended at some point (for example for an overdue survey) and has since been reinstated once the society's requirements were met. The ship is in class.",
+      "url": "https://vesselclassfinder.com/iacs-class-status-codes.html#reinstated"
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Reassigned",
+      "description": "The ship had class withdrawn or transferred and was later assigned class again. The ship is in class; the history is worth a look in due diligence.",
+      "url": "https://vesselclassfinder.com/iacs-class-status-codes.html#reassigned"
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Suspended",
+      "description": "Class is temporarily invalid, most often because a survey is overdue or a condition of class was not dealt with in time. Until it is reinstated the ship should be treated as not in class, which typically matters for insurance, charter parties and port state control.",
+      "url": "https://vesselclassfinder.com/iacs-class-status-codes.html#suspended"
+    },
+    {
+      "@type": "DefinedTerm",
+      "name": "Withdrawn",
+      "description": "The society no longer classes the ship. Reasons range from routine (transfer to another IACS member, sale for recycling) to red flags (transfer to a non-IACS society, non-compliance, owner's request with no new class).",
+      "url": "https://vesselclassfinder.com/iacs-class-status-codes.html#withdrawn"
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">vessel<span>class</span>finder</a>
+    <ul>
+      <li class="nav-secondary"><a href="/class-societies/">Class societies</a></li>
+      <li class="nav-secondary"><a href="/iacs-class-status-codes.html">Status codes</a></li>
+      <li><a href="/#api">API</a></li>
+      <li><a href="/#pricing">Pricing</a></li>
+      <li><a href="/#signup" class="nav-account">Get API key</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article class="wide">
+  <div class="breadcrumb">
+    <a href="/">Home</a> / IACS status codes
+  </div>
+
+  <h1>IACS class status codes explained</h1>
+  <div class="meta">Data from the IACS Vessels in Class dataset, as of 30 September 2026. Refreshed weekly.</div>
+
+  <div class="answer"><p>The IACS Vessels in Class dataset uses five class statuses. <strong>Delivered</strong>, <strong>Reinstated</strong> and <strong>Reassigned</strong> mean the ship is in class; <strong>Suspended</strong> means class is temporarily invalid; <strong>Withdrawn</strong> means the society no longer classes the ship. Each status change can carry a reason, such as "Survey overdue" or "Transfer of class to a non-IACS society".</p></div>
+
+  <h2>IACS class statuses</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Status</th><th>In class?</th><th class="num">Ships</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><a href="#delivered">Delivered</a></td><td>Yes</td><td class="num">46,063</td><td>In class. The ship entered this society's class and has had no later suspension or withdrawal.</td></tr>
+      <tr><td><a href="#reinstated">Reinstated</a></td><td>Yes</td><td class="num">3,381</td><td>In class again after a suspension.</td></tr>
+      <tr><td><a href="#reassigned">Reassigned</a></td><td>Yes</td><td class="num">1,382</td><td>Class assigned again after a withdrawal or transfer.</td></tr>
+      <tr><td><a href="#suspended">Suspended</a></td><td>No</td><td class="num">575</td><td>Class temporarily not valid until the society's requirements are met.</td></tr>
+      <tr><td><a href="#withdrawn">Withdrawn</a></td><td>No</td><td class="num">4,848</td><td>No longer classed by this society.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="delivered">Delivered</h2>
+  <p>The normal in-class status. The ship entered this society's class (typically on delivery as a newbuilding, or on transfer from another society) and no suspension or withdrawal has been recorded since. 46,063 ships (76.5% of the dataset) currently have this status.</p>
+  <h2 id="reinstated">Reinstated</h2>
+  <p>Class was suspended at some point (for example for an overdue survey) and has since been reinstated once the society's requirements were met. The ship is in class. 3,381 ships (5.6% of the dataset) currently have this status.</p>
+  <h2 id="reassigned">Reassigned</h2>
+  <p>The ship had class withdrawn or transferred and was later assigned class again. The ship is in class; the history is worth a look in due diligence. 1,382 ships (2.3% of the dataset) currently have this status.</p>
+  <h2 id="suspended">Suspended</h2>
+  <p>Class is temporarily invalid, most often because a survey is overdue or a condition of class was not dealt with in time. Until it is reinstated the ship should be treated as not in class, which typically matters for insurance, charter parties and port state control. 575 ships (1.0% of the dataset) currently have this status.</p>
+  <h2 id="withdrawn">Withdrawn</h2>
+  <p>The society no longer classes the ship. Reasons range from routine (transfer to another IACS member, sale for recycling) to red flags (transfer to a non-IACS society, non-compliance, owner's request with no new class). 4,848 ships (8.1% of the dataset) currently have this status.</p>
+
+  <h2 id="reasons">Reasons for status changes</h2>
+  <p>IACS records a reason with many status changes. These are all the reasons in the current dataset:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Reason</th><th class="num">Ships</th></tr></thead>
+    <tbody>
+      <tr><td>by society for other reasons</td><td class="num">3,645</td></tr>
+      <tr><td>Survey overdue</td><td class="num">1,589</td></tr>
+      <tr><td>Transfer of class to another IACS member</td><td class="num">1,316</td></tr>
+      <tr><td>Owner's request for other reasons</td><td class="num">644</td></tr>
+      <tr><td>Transfer of class to a non-IACS society</td><td class="num">431</td></tr>
+      <tr><td>Sold for recycling (scrap)</td><td class="num">266</td></tr>
+      <tr><td>Non-compliance with conditions of class / recommendations</td><td class="num">178</td></tr>
+      <tr><td>Casualty</td><td class="num">67</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">A reason describes the ship's latest status change, so it can appear alongside an in-class status (for example "Survey overdue" on a ship that was suspended and later reinstated).</p>
+
+  <form class="demo" data-demo>
+    <label for="demo-imo">Check a ship's current status by IMO number (free, no signup)</label>
+    <div class="demo-row">
+      <input id="demo-imo" inputmode="numeric" pattern="[0-9]{7}" maxlength="7" placeholder="7-digit IMO, e.g. 9321483" aria-label="IMO number" required>
+      <button class="btn" type="submit">Look up</button>
+    </div>
+    <div class="demo-result" hidden aria-live="polite"></div>
+  </form>
+
+  <h2>Status in the API</h2>
+  <p>Every record from <code>/vessels</code> includes <code>status</code>, <code>reason_for_status</code> and <code>date_of_latest_status</code>, so you can filter a fleet for suspended or withdrawn ships in one request:</p>
+<pre><code>{
+  "imo": 1000617,
+  "class": "LRS",
+  "status": "Withdrawn",
+  "reason_for_status": "Survey overdue",
+  "date_of_latest_status": "25/01/2025",
+  "date_of_next_survey": "30/12/2026"
+}</code></pre>
+
+  <div class="cta-box">
+    <h3>Check a whole fleet at once</h3>
+    <p>Free API key: 100 lookups a month, up to 100 IMO numbers per request. Paid plans from $49/month.</p>
+    <a href="/#signup" class="btn">Get a free API key</a>
+  </div>
+
+  <h2>Frequently asked questions</h2>
+  <div class="faq">
+    <details>
+      <summary>What does 'Delivered' mean in IACS class status?</summary>
+      <p>It is the normal in-class status: the ship entered the society's class (typically on delivery as a newbuilding, or on transfer from another society) and has had no suspension or withdrawal since.</p>
+    </details>
+    <details>
+      <summary>What is the difference between class suspended and class withdrawn?</summary>
+      <p>Suspended means class is temporarily invalid, usually because of an overdue survey or an unmet condition of class, and can be reinstated. Withdrawn means the society no longer classes the ship at all.</p>
+    </details>
+    <details>
+      <summary>Is a ship with Reinstated or Reassigned status in class?</summary>
+      <p>Yes. Reinstated means class was restored after a suspension; Reassigned means class was assigned again after a withdrawal or transfer. Both are in-class statuses, though the history is worth reviewing in due diligence.</p>
+    </details>
+    <details>
+      <summary>What does 'Transfer of class to a non-IACS society' mean?</summary>
+      <p>The ship left an IACS member for a society outside IACS. It is recorded for 431 ships in the current dataset and is often treated as a risk indicator in vetting and sanctions screening.</p>
+    </details>
+    <details>
+      <summary>How can I check a ship's IACS class status?</summary>
+      <p>Enter its IMO number in the lookup on this page, or query up to 100 IMO numbers at once through the Vessel Class Finder API. Data comes from the IACS Vessels in Class dataset and is refreshed weekly.</p>
+    </details>
+  </div>
+  <p class="note">Status meanings summarise how the statuses are used in the IACS dataset. Class certificates and the classification society's own records remain authoritative.</p>
+</article>
+
+<footer>
+  <div>
+    <p><a href="/class-societies/">Classification societies</a> &middot; <a href="/iacs-class-status-codes.html">IACS status codes</a> &middot; <a href="/use-cases/sanctions-kyc-screening.html">Vessel class checks for sanctions and KYC screening</a> &middot; <a href="/use-cases/charter-vetting.html">Check a nominated vessel's class status before fixture</a> &middot; <a href="/use-cases/marine-insurance.html">Vessel class status for marine insurance underwriters and brokers</a></p>
+    <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/terms.html">Terms &amp; Privacy</a></p>
+  </div>
+</footer>
+
+<script src="/seo-demo.js"></script>
+</body>
+</html>

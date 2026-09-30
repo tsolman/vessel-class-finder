@@ -1,0 +1,14 @@
+[
+  { "code": "NKK", "slug": "classnk", "name": "ClassNK", "fullName": "Nippon Kaiji Kyokai (ClassNK)", "aka": ["ClassNK", "NK", "Nippon Kaiji Kyokai"], "founded": 1899, "hq": "Tokyo, Japan", "website": "https://www.classnk.or.jp" },
+  { "code": "BV", "slug": "bureau-veritas", "name": "Bureau Veritas", "fullName": "Bureau Veritas (BV)", "aka": ["BV", "Bureau Veritas Marine & Offshore"], "founded": 1828, "hq": "Paris, France", "website": "https://marine-offshore.bureauveritas.com" },
+  { "code": "ABS", "slug": "abs", "name": "ABS", "fullName": "American Bureau of Shipping (ABS)", "aka": ["ABS", "American Bureau of Shipping"], "founded": 1862, "hq": "Spring, Texas, USA", "website": "https://ww2.eagle.org" },
+  { "code": "NV", "slug": "dnv", "name": "DNV", "fullName": "DNV (formerly DNV GL and Det Norske Veritas)", "aka": ["DNV", "DNV GL", "Det Norske Veritas", "Germanischer Lloyd"], "founded": 1864, "hq": "Høvik, Norway", "website": "https://www.dnv.com" },
+  { "code": "LRS", "slug": "lloyds-register", "name": "Lloyd's Register", "fullName": "Lloyd's Register (LR)", "aka": ["LR", "Lloyd's Register", "Lloyds Register"], "founded": 1760, "hq": "London, United Kingdom", "website": "https://www.lr.org" },
+  { "code": "RINA", "slug": "rina", "name": "RINA", "fullName": "RINA (Registro Italiano Navale)", "aka": ["RINA", "Registro Italiano Navale"], "founded": 1861, "hq": "Genoa, Italy", "website": "https://www.rina.org" },
+  { "code": "CCS", "slug": "china-classification-society", "name": "China Classification Society", "fullName": "China Classification Society (CCS)", "aka": ["CCS"], "founded": 1956, "hq": "Beijing, China", "website": "https://www.ccs.org.cn" },
+  { "code": "KR", "slug": "korean-register", "name": "Korean Register", "fullName": "Korean Register (KR)", "aka": ["KR", "Korean Register of Shipping"], "founded": 1960, "hq": "Busan, South Korea", "website": "https://www.krs.co.kr" },
+  { "code": "IRS", "slug": "indian-register", "name": "Indian Register of Shipping", "fullName": "Indian Register of Shipping (IRS, IRClass)", "aka": ["IRS", "IRClass"], "founded": 1975, "hq": "Mumbai, India", "website": "https://www.irclass.org" },
+  { "code": "PRS", "slug": "polish-register", "name": "Polish Register of Shipping", "fullName": "Polish Register of Shipping (PRS, Polski Rejestr Statków)", "aka": ["PRS", "Polski Rejestr Statków"], "founded": 1936, "hq": "Gdańsk, Poland", "website": "https://www.prs.pl" },
+  { "code": "CRS", "slug": "croatian-register", "name": "Croatian Register of Shipping", "fullName": "Croatian Register of Shipping (CRS)", "aka": ["CRS", "Hrvatski registar brodova"], "founded": 1949, "hq": "Split, Croatia", "website": "https://www.crs.hr" },
+  { "code": "TLV", "slug": "turk-loydu", "name": "Türk Loydu", "fullName": "Türk Loydu (TL)", "aka": ["TL", "Turk Loydu", "Turkish Lloyd"], "founded": 1962, "hq": "Istanbul, Türkiye", "website": "https://www.turkloydu.org" }
+]

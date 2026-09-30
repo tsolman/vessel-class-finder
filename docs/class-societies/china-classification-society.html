@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>China Classification Society Class Status Lookup by IMO Number</title>
+  <meta name="description" content="Check any China Classification Society-classed ship's class status and survey dates by IMO number. 4,376 ships listed under IACS code CCS, 4,100 in class. Free lookup and API.">
+  <link rel="canonical" href="https://vesselclassfinder.com/class-societies/china-classification-society.html">
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Vessel Class Finder">
+  <meta property="og:title" content="China Classification Society Class Status Lookup by IMO Number">
+  <meta property="og:description" content="Check any China Classification Society-classed ship's class status and survey dates by IMO number. 4,376 ships listed under IACS code CCS, 4,100 in class. Free lookup and API.">
+  <meta property="og:url" content="https://vesselclassfinder.com/class-societies/china-classification-society.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/seo.css">
+  <script src="/analytics.js"></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://vesselclassfinder.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Classification societies",
+      "item": "https://vesselclassfinder.com/class-societies/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "China Classification Society",
+      "item": "https://vesselclassfinder.com/class-societies/china-classification-society.html"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I check if a ship is classed by China Classification Society?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Enter the ship's 7-digit IMO number in the lookup on this page. If China Classification Society classes it, the result shows class society CCS, the class status and the last and next survey dates. For many ships at once, use the API with up to 100 IMO numbers per request."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What code does China Classification Society use in IACS data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "CCS. The IACS Vessels in Class dataset and this API identify China Classification Society (CCS) as \"CCS\"."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How many ships does China Classification Society class?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "As of 30 September 2026, the IACS dataset lists 4,376 ships under China Classification Society, of which 4,100 are in class (Delivered, Reinstated or Reassigned), 10 suspended and 265 withdrawn. That makes it number 7 of the 12 IACS members by ships listed."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this official China Classification Society data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It is China Classification Society's own data as published by IACS in its Vessels in Class dataset, refreshed weekly. It is not a substitute for class certificates or the society's own records, which remain authoritative."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I get China Classification Society class status through an API?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. POST a list of IMO numbers to /vessels with your API key and each result includes the class society code, status, survey dates and reason for the latest status change. The free tier includes 100 lookups a month."
+      }
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">vessel<span>class</span>finder</a>
+    <ul>
+      <li class="nav-secondary"><a href="/class-societies/">Class societies</a></li>
+      <li class="nav-secondary"><a href="/iacs-class-status-codes.html">Status codes</a></li>
+      <li><a href="/#api">API</a></li>
+      <li><a href="/#pricing">Pricing</a></li>
+      <li><a href="/#signup" class="nav-account">Get API key</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article>
+  <div class="breadcrumb">
+    <a href="/">Home</a> / <a href="/class-societies/">Classification societies</a> / China Classification Society
+  </div>
+
+  <h1>China Classification Society class status lookup</h1>
+  <div class="meta">Data from the IACS Vessels in Class dataset, as of 30 September 2026. Refreshed weekly.</div>
+
+  <div class="answer"><p><strong>China Classification Society (CCS)</strong> appears in the IACS data under the code <code>CCS</code>. As of 30 September 2026 the IACS dataset lists <strong>4,376 ships</strong> classed by China Classification Society: 4,100 in class, 10 suspended and 265 withdrawn. Look up any China Classification Society-classed ship by IMO number below, or check up to 100 at once through the API.</p></div>
+
+  <form class="demo" data-demo>
+    <label for="demo-imo">Check a ship's China Classification Society class status by IMO number (free, no signup)</label>
+    <div class="demo-row">
+      <input id="demo-imo" inputmode="numeric" pattern="[0-9]{7}" maxlength="7" placeholder="7-digit IMO, e.g. 9321483" aria-label="IMO number" required>
+      <button class="btn" type="submit">Look up</button>
+    </div>
+    <div class="demo-result" hidden aria-live="polite"></div>
+  </form>
+
+  <div class="stats">
+    <div class="stat"><b>4,376</b><span>ships listed</span></div>
+    <div class="stat"><b>4,100</b><span>in class</span></div>
+    <div class="stat"><b>10</b><span>suspended</span></div>
+    <div class="stat"><b>265</b><span>withdrawn</span></div>
+  </div>
+
+  <h2>China Classification Society fleet by class status</h2>
+  <p>How the 4,376 ships listed under <code>CCS</code> break down by their latest IACS status:</p>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Status</th><th class="num">Vessels</th><th class="num">Share</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><a href="/iacs-class-status-codes.html#delivered">Delivered</a></td><td class="num">3,749</td><td class="num">85.7%</td><td>In class</td></tr>
+      <tr><td><a href="/iacs-class-status-codes.html#reinstated">Reinstated</a></td><td class="num">273</td><td class="num">6.2%</td><td>In class</td></tr>
+      <tr><td><a href="/iacs-class-status-codes.html#reassigned">Reassigned</a></td><td class="num">78</td><td class="num">1.8%</td><td>In class</td></tr>
+      <tr><td><a href="/iacs-class-status-codes.html#suspended">Suspended</a></td><td class="num">10</td><td class="num">0.2%</td><td>Not in class</td></tr>
+      <tr><td><a href="/iacs-class-status-codes.html#withdrawn">Withdrawn</a></td><td class="num">265</td><td class="num">6.1%</td><td>Not in class</td></tr>
+      <tr><td>No status recorded</td><td class="num">1</td><td class="num">0.0%</td><td>Not stated</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Most common reasons for status changes</h2>
+  <p>The reason recorded with each ship's latest status change, where one is given:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Reason</th><th class="num">Vessels</th></tr></thead>
+    <tbody>
+      <tr><td>Survey overdue</td><td class="num">69</td></tr>
+      <tr><td>Transfer of class to a non-IACS society</td><td class="num">54</td></tr>
+      <tr><td>Owner's request for other reasons</td><td class="num">46</td></tr>
+      <tr><td>Sold for recycling (scrap)</td><td class="num">38</td></tr>
+      <tr><td>by society for other reasons</td><td class="num">33</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>About China Classification Society</h2>
+  <ul>
+    <li><strong>Full name:</strong> China Classification Society (CCS)</li>
+    <li><strong>Also known as:</strong> CCS</li>
+    <li><strong>Founded:</strong> 1956</li>
+    <li><strong>Headquarters:</strong> Beijing, China</li>
+    <li><strong>IACS code:</strong> <code>CCS</code></li>
+    <li><strong>Website:</strong> <a href="https://www.ccs.org.cn" rel="noopener" target="_blank">www.ccs.org.cn</a></li>
+  </ul>
+
+  <h2>Check China Classification Society class status through the API</h2>
+  <p>Send IMO numbers to <code>/vessels</code>. Ships classed by China Classification Society come back with <code>"class": "CCS"</code>:</p>
+<pre><code>curl -X POST https://vessel-class-finder-production.up.railway.app/vessels \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"imos": [9321483, 9074729]}'</code></pre>
+  <p>Filter the response on <code>class == "CCS"</code> to find the China Classification Society-classed ships in a list, and on <code>status</code> to find any that are <a href="/iacs-class-status-codes.html#suspended">suspended</a> or <a href="/iacs-class-status-codes.html#withdrawn">withdrawn</a>.</p>
+
+  <div class="cta-box">
+    <h3>Check a whole fleet at once</h3>
+    <p>Free API key: 100 lookups a month, up to 100 IMO numbers per request. Paid plans from $49/month.</p>
+    <a href="/#signup" class="btn">Get a free API key</a>
+  </div>
+
+  <h2>Frequently asked questions</h2>
+  <div class="faq">
+    <details>
+      <summary>How do I check if a ship is classed by China Classification Society?</summary>
+      <p>Enter the ship's 7-digit IMO number in the lookup on this page. If China Classification Society classes it, the result shows class society CCS, the class status and the last and next survey dates. For many ships at once, use the API with up to 100 IMO numbers per request.</p>
+    </details>
+    <details>
+      <summary>What code does China Classification Society use in IACS data?</summary>
+      <p>CCS. The IACS Vessels in Class dataset and this API identify China Classification Society (CCS) as &quot;CCS&quot;.</p>
+    </details>
+    <details>
+      <summary>How many ships does China Classification Society class?</summary>
+      <p>As of 30 September 2026, the IACS dataset lists 4,376 ships under China Classification Society, of which 4,100 are in class (Delivered, Reinstated or Reassigned), 10 suspended and 265 withdrawn. That makes it number 7 of the 12 IACS members by ships listed.</p>
+    </details>
+    <details>
+      <summary>Is this official China Classification Society data?</summary>
+      <p>It is China Classification Society's own data as published by IACS in its Vessels in Class dataset, refreshed weekly. It is not a substitute for class certificates or the society's own records, which remain authoritative.</p>
+    </details>
+    <details>
+      <summary>Can I get China Classification Society class status through an API?</summary>
+      <p>Yes. POST a list of IMO numbers to /vessels with your API key and each result includes the class society code, status, survey dates and reason for the latest status change. The free tier includes 100 lookups a month.</p>
+    </details>
+  </div>
+
+  <h2>Other IACS classification societies</h2>
+  <ul class="related">
+    <li><a href="/class-societies/classnk.html">ClassNK</a> <span class="note">(10,117 ships)</span></li>
+    <li><a href="/class-societies/bureau-veritas.html">Bureau Veritas</a> <span class="note">(9,958 ships)</span></li>
+    <li><a href="/class-societies/abs.html">ABS</a> <span class="note">(8,787 ships)</span></li>
+    <li><a href="/class-societies/dnv.html">DNV</a> <span class="note">(7,753 ships)</span></li>
+    <li><a href="/class-societies/lloyds-register.html">Lloyd's Register</a> <span class="note">(7,606 ships)</span></li>
+    <li><a href="/class-societies/rina.html">RINA</a> <span class="note">(5,842 ships)</span></li>
+    <li><a href="/class-societies/korean-register.html">Korean Register</a> <span class="note">(2,559 ships)</span></li>
+    <li><a href="/class-societies/indian-register.html">Indian Register of Shipping</a> <span class="note">(1,639 ships)</span></li>
+    <li><a href="/class-societies/polish-register.html">Polish Register of Shipping</a> <span class="note">(608 ships)</span></li>
+    <li><a href="/class-societies/croatian-register.html">Croatian Register of Shipping</a> <span class="note">(494 ships)</span></li>
+    <li><a href="/class-societies/turk-loydu.html">Türk Loydu</a> <span class="note">(484 ships)</span></li>
+  </ul>
+  <p class="note">Numbers come from IACS's public Vessels in Class dataset and cover only ships classed by IACS members. They are not a substitute for class certificates or the society's own records.</p>
+</article>
+
+<footer>
+  <div>
+    <p><a href="/class-societies/">Classification societies</a> &middot; <a href="/iacs-class-status-codes.html">IACS status codes</a> &middot; <a href="/use-cases/sanctions-kyc-screening.html">Vessel class checks for sanctions and KYC screening</a> &middot; <a href="/use-cases/charter-vetting.html">Check a nominated vessel's class status before fixture</a> &middot; <a href="/use-cases/marine-insurance.html">Vessel class status for marine insurance underwriters and brokers</a></p>
+    <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/terms.html">Terms &amp; Privacy</a></p>
+  </div>
+</footer>
+
+<script src="/seo-demo.js"></script>
+</body>
+</html>

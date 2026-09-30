@@ -234,7 +234,7 @@
       <tr><td><code>imo</code></td><td>IMO number (unique vessel identifier)</td></tr>
       <tr><td><code>vessel_name</code></td><td>Current registered name</td></tr>
       <tr><td><code>class</code></td><td>Classification society (DNV, LR, BV, etc.)</td></tr>
-      <tr><td><code>status</code></td><td>Class status (In Class, Suspended, Withdrawn)</td></tr>
+      <tr><td><code>status</code></td><td>Class status (Delivered, Reinstated or Reassigned when in class; Suspended; Withdrawn)</td></tr>
       <tr><td><code>date_of_survey</code></td><td>Last survey date</td></tr>
       <tr><td><code>date_of_next_survey</code></td><td>Next survey due date</td></tr>
       <tr><td><code>date_of_latest_status</code></td><td>When the status last changed</td></tr>
@@ -295,8 +295,8 @@
   {
     "imo": 9200079,
     "vessel_name": "NORDIC AURORA",
-    "class": "DNV",
-    "status": "In Class",
+    "class": "NV",
+    "status": "Delivered",
     "date_of_survey": "15/06/2025",
     "date_of_next_survey": "15/06/2028",
     "date_of_latest_status": "01/01/2024",
@@ -348,6 +348,7 @@
 
 <footer>
   <div>
+    <p><a href="/class-societies/">Classification societies</a> &middot; <a href="/iacs-class-status-codes.html">IACS status codes</a> &middot; <a href="/use-cases/sanctions-kyc-screening.html">Sanctions &amp; KYC</a> &middot; <a href="/use-cases/charter-vetting.html">Charter vetting</a> &middot; <a href="/use-cases/marine-insurance.html">Marine insurance</a></p>
     <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a></p>
   </div>
 </footer>

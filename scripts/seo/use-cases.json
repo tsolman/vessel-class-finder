@@ -1,0 +1,166 @@
+[
+  {
+    "slug": "sanctions-kyc-screening",
+    "title": "Vessel Class Check for Sanctions & KYC Screening",
+    "meta_description": "Check a vessel's IACS class status by IMO. Class withdrawal or a move to a non-IACS society is a KYC red flag. Batch API, 100 free lookups a month.",
+    "h1": "Vessel class checks for sanctions and KYC screening",
+    "primary_keyword": "vessel sanctions screening class status",
+    "answer": "A vessel's classification status is a useful risk indicator in sanctions and KYC screening. A withdrawn or suspended class, a transfer to a non-IACS society, or no IACS record at all are patterns that often deserve a closer look. Vessel Class Finder returns this data by IMO number from the IACS Vessels in Class dataset. It does not match names against sanctions lists, so use it alongside your screening tool.",
+    "sections": [
+      {
+        "h2": "Why class status matters for compliance teams",
+        "html": "<p>Most large commercial ships are classed by one of the 12 IACS members. A vessel that leaves IACS class, or loses class, has changed something about how it is surveyed and insured. That is not proof of wrongdoing. It is a reason to ask questions.</p><p>Compliance teams commonly treat these as risk indicators, alongside other signals of dark fleet or shadow fleet activity:</p><ul><li>Class <strong>withdrawn</strong> or <strong>suspended</strong>, especially with a reason such as <em>Survey overdue</em> or <em>Non-compliance with conditions of class</em>.</li><li>Class moved with the reason <em>Transfer of class to a non-IACS society</em>.</li><li>A recent status change on an older vessel.</li><li>No IACS record at all for a vessel that trades internationally.</li></ul><p>Class data does not replace sanctions list matching, ownership research or AIS analysis. It adds one more independent data point to the file.</p>"
+      },
+      {
+        "h2": "Workflow: screen a vessel or a list of vessels",
+        "html": "<ol><li>Collect the IMO numbers for the vessels in the deal, cargo or counterparty portfolio.</li><li>Send them to <code>POST /vessels</code> with your <code>x-api-key</code> header and a body like <code>{\"imos\":[\"9074729\",\"9321483\"]}</code>. One request takes up to 100 IMOs.</li><li>Check <code>status</code> and <code>reason_for_status</code> for each result.</li><li>Flag any vessel with <em>Withdrawn</em>, <em>Suspended</em>, or a reason of <em>Transfer of class to a non-IACS society</em>.</li><li>Flag any IMO that returns no record. Absence from the dataset means the vessel is not classed by an IACS member, which is worth checking.</li><li>Record <code>date_of_latest_status</code> and the date you ran the check in your case file. Then route flagged vessels to enhanced due diligence and ask for the class certificates from the society.</li></ol><p>You can also try a single IMO first with the free lookup box on the site. No signup is needed.</p>"
+      },
+      {
+        "h2": "Fields and statuses to check",
+        "html": "<p>Each record has <code>imo</code>, <code>vessel_name</code>, <code>class</code>, <code>status</code>, <code>date_of_survey</code>, <code>date_of_next_survey</code>, <code>date_of_latest_status</code> and <code>reason_for_status</code>. Dates are DD/MM/YYYY strings.</p><ul><li><strong>Withdrawn</strong> (4,848 vessels): the society no longer classes the vessel. Read the reason. Scrapping and transfer are common. Non-compliance and owner's request are more worth a question.</li><li><strong>Suspended</strong> (575): class is not currently in force. Treat as a higher risk indicator until reinstated.</li><li><strong>Reinstated</strong> (3,381): class was restored after a suspension or withdrawal. Check how long the gap lasted using <code>date_of_latest_status</code>.</li><li><strong>Reassigned</strong> (1,382): class was reassigned, for example after a transfer. Check the <code>class</code> code to see who holds it now.</li><li><strong>Delivered</strong> (46,063): the vessel entered class with this society and is currently classed.</li><li><strong>No status</strong>: some rows (3,974) have no status. Treat these as needing a manual check.</li></ul><p><code>date_of_latest_status</code> and <code>date_of_next_survey</code> give you dates to cite in a review. A next-survey date in the past on a vessel that is still trading is a flag on its own.</p>"
+      },
+      {
+        "h2": "What this data does not cover",
+        "html": "<p>The data comes from IACS's public Vessels in Class dataset. It is refreshed weekly, every Sunday. It is not a substitute for official class records or certificates from the society.</p><p>It covers only IACS-classed vessels. Ships classed by non-IACS societies, or with no class, will not appear. That absence is a signal, but it is not evidence of sanctions evasion by itself. Use it to decide where to look next.</p><p>The API does not screen names or IMOs against sanctions lists. It provides class data that complements the tools you already use.</p>"
+      }
+    ],
+    "faq": [
+      {
+        "q": "Is a vessel's class status a sanctions red flag?",
+        "a": "It can be an indicator, not proof. Withdrawn or suspended class, or a transfer to a non-IACS society, are patterns compliance teams often treat as a reason for enhanced due diligence. Combine them with ownership, voyage and sanctions list checks."
+      },
+      {
+        "q": "Does Vessel Class Finder check vessels against sanctions lists?",
+        "a": "No. It returns classification data from the IACS Vessels in Class dataset by IMO number. Use it alongside a sanctions screening tool."
+      },
+      {
+        "q": "What does it mean if an IMO number is not found?",
+        "a": "The vessel is not in the IACS Vessels in Class dataset. It may be classed by a non-IACS society or have no class. This is worth checking with the owner or manager, and by asking for class certificates."
+      },
+      {
+        "q": "Can I screen a whole list of vessels at once?",
+        "a": "Yes. Send up to 100 IMO numbers in one POST /vessels request. Each IMO counts as one lookup against your monthly allowance."
+      },
+      {
+        "q": "How do I keep an audit trail of a class check?",
+        "a": "Store the API response with the date you ran it. The response includes date_of_latest_status, date_of_survey and date_of_next_survey, which show the class position at the time. The dataset refreshes weekly."
+      }
+    ],
+    "related_statuses": [
+      "Withdrawn",
+      "Suspended",
+      "Reinstated",
+      "Reassigned"
+    ]
+  },
+  {
+    "slug": "charter-vetting",
+    "title": "Vessel Class Status Check for Charter Vetting",
+    "meta_description": "Check class status, overdue surveys and recent status changes for a nominated vessel by IMO before fixture. IACS data via API, 100 free lookups a month.",
+    "h1": "Check a nominated vessel's class status before fixture",
+    "primary_keyword": "vessel class status check charter vetting",
+    "answer": "To vet a nominated vessel's class, look up its IMO number in the IACS Vessels in Class dataset. Check that the status shows the vessel is currently classed, that the next survey date is not in the past, and that there was no recent status change. Vessel Class Finder returns these fields in one API call or one free lookup.",
+    "sections": [
+      {
+        "h2": "What chartering and vetting teams check",
+        "html": "<p>When an owner nominates a vessel, the class record is one of the first things to confirm. It is quick, and it can end a nomination early.</p><ul><li>Is the vessel classed by an IACS member today?</li><li>Has class ever been suspended or withdrawn, and when did that last change?</li><li>Is a survey overdue?</li><li>Did the vessel move between societies recently?</li></ul><p>These checks do not replace your vetting inspection, or the class certificates the owner must provide. They help you decide quickly which nominations to take further.</p>"
+      },
+      {
+        "h2": "Workflow: vet a nomination in five steps",
+        "html": "<ol><li>Take the IMO number from the nomination. Do not rely on the vessel name alone, because names change.</li><li>Look it up with the free lookup box on the site, or call <code>POST /vessels</code> with <code>{\"imos\":[\"9074729\"]}</code> and your <code>x-api-key</code>.</li><li>Confirm <code>status</code> is <em>Delivered</em> or <em>Reinstated</em>, and that <code>class</code> shows the society you expect.</li><li>Compare <code>date_of_next_survey</code> with today's date. If it is in the past, ask the owner why.</li><li>Read <code>date_of_latest_status</code> and <code>reason_for_status</code>. A recent change needs an explanation before fixture.</li></ol><p>For a shortlist of several nominated ships, send up to 100 IMOs in one request.</p>"
+      },
+      {
+        "h2": "Fields and statuses to check, and what they mean",
+        "html": "<ul><li><strong>status</strong>: <em>Delivered</em> means the vessel entered class with that society and is currently classed. <em>Reinstated</em> means class was restored after a suspension or withdrawal. Ask what caused the gap. <em>Suspended</em> and <em>Withdrawn</em> mean the vessel is not currently in class with that society. <em>Reassigned</em> means class was reassigned, for example after a transfer.</li><li><strong>date_of_survey</strong>: the date of the last survey recorded.</li><li><strong>date_of_next_survey</strong>: the next survey due. A date in the past suggests an overdue survey. \"Survey overdue\" is one of the most common reasons behind a suspension or withdrawal (1,589 vessels).</li><li><strong>date_of_latest_status</strong>: when the current status took effect. A very recent date deserves a question.</li><li><strong>reason_for_status</strong>: for example <em>Transfer of class to another IACS member</em>, <em>Owner's request for other reasons</em> or <em>Casualty</em>.</li><li><strong>class</strong>: the society code, such as NV for DNV, LRS for LR or NKK for ClassNK.</li></ul><p>Dates are DD/MM/YYYY strings. Parse them as day first.</p>"
+      },
+      {
+        "h2": "Limits of the data",
+        "html": "<p>The data comes from IACS's public dataset and is refreshed weekly, every Sunday. A change made yesterday may not show yet. It is not a substitute for official class records or certificates from the society.</p><p>It covers only IACS-classed vessels. If an IMO is not found, the vessel may be classed by a non-IACS society or have no class. Treat that as something to check before you fix, not as a final answer.</p>"
+      }
+    ],
+    "faq": [
+      {
+        "q": "How do I check a ship's class status by IMO number?",
+        "a": "Enter the IMO in the free lookup box on the site, or send it to the POST /vessels endpoint. You get the class society, status, survey dates and the reason for the latest status."
+      },
+      {
+        "q": "How can I tell if a vessel's survey is overdue?",
+        "a": "Compare date_of_next_survey with today's date. If it is in the past, the survey may be overdue. Ask the owner for the current class certificates and survey status."
+      },
+      {
+        "q": "What does Delivered mean in the class status?",
+        "a": "In the IACS dataset, Delivered means the vessel entered class with that society. In practice it is the status of a vessel that is currently classed."
+      },
+      {
+        "q": "Should I still ask for class certificates?",
+        "a": "Yes. This data comes from IACS's public dataset and does not replace official class records or certificates from the society. Use it to screen nominations quickly and to know what to ask for."
+      },
+      {
+        "q": "Can I vet several nominated vessels at once?",
+        "a": "Yes. One POST /vessels request takes up to 100 IMOs. Each IMO counts as one lookup, and the free plan includes 100 lookups a month."
+      }
+    ],
+    "related_statuses": [
+      "Delivered",
+      "Reinstated",
+      "Suspended",
+      "Withdrawn",
+      "Reassigned"
+    ]
+  },
+  {
+    "slug": "marine-insurance",
+    "title": "Vessel Class Status for Marine Insurance Underwriting",
+    "meta_description": "Check hull and P&I risks by IMO: class society, status, survey dates. Monitor a book of vessels for suspensions and withdrawals. Free tier available.",
+    "h1": "Vessel class status for marine insurance underwriters and brokers",
+    "primary_keyword": "vessel class status marine insurance underwriting",
+    "answer": "Underwriters check a vessel's class status because maintaining class is typically a condition of hull and machinery and P&I cover. Vessel Class Finder returns the class society, status, survey dates and the reason for the latest status change from the IACS Vessels in Class dataset, by IMO number. You can check one vessel at submission or re-check a whole book by API.",
+    "sections": [
+      {
+        "h2": "Why class matters to hull and P&I underwriters",
+        "html": "<p>Class maintained is typically a condition of cover. If class is suspended or withdrawn, that can change how the risk is viewed. Read the wording of your own policies for what applies.</p><p>Class data helps at three points:</p><ul><li><strong>At submission:</strong> confirm the vessel is classed by an IACS member and the survey position looks normal.</li><li><strong>During the policy year:</strong> catch suspensions, withdrawals and transfers between societies.</li><li><strong>At renewal:</strong> see whether the vessel's status changed since you last looked.</li></ul>"
+      },
+      {
+        "h2": "Workflow: monitor a book of vessels",
+        "html": "<ol><li>Export the IMO numbers from your policy or placement system.</li><li>Call <code>POST /vessels</code> with your <code>x-api-key</code> and batches of up to 100 IMOs, for example <code>{\"imos\":[\"9074729\",\"9321483\"]}</code>.</li><li>Store each result with the date you ran it.</li><li>The dataset refreshes weekly on Sunday. Run your check on Monday and compare with last week's stored results.</li><li>Flag any vessel where <code>status</code> changed to <em>Suspended</em> or <em>Withdrawn</em>, where <code>class</code> changed, or where <code>date_of_next_survey</code> is now in the past.</li><li>Send flagged vessels to the underwriter or broker who handles the account, and ask the assured for the class certificates.</li></ol><p>You can try a single IMO first with the free lookup box. No signup is needed.</p>"
+      },
+      {
+        "h2": "Fields and statuses to check, and what they mean",
+        "html": "<ul><li><strong>class</strong>: the society code, for example NV (DNV), LRS (LR), NKK (ClassNK), TLV (Türk Loydu). A change between checks means a transfer.</li><li><strong>status</strong>: <em>Delivered</em> means currently classed. <em>Suspended</em> (575 vessels) and <em>Withdrawn</em> (4,848) mean class is not in force with that society. <em>Reinstated</em> (3,381) means class was restored. <em>Reassigned</em> (1,382) means class was reassigned, for example after a transfer.</li><li><strong>reason_for_status</strong>: <em>Survey overdue</em>, <em>Non-compliance with conditions of class / recommendations</em>, <em>Casualty</em>, <em>Sold for recycling (scrap)</em>, <em>Transfer of class to another IACS member</em> or <em>Transfer of class to a non-IACS society</em>. A transfer to a non-IACS society or a casualty usually needs a conversation with the assured.</li><li><strong>date_of_survey</strong> and <strong>date_of_next_survey</strong>: the last survey and the next one due.</li><li><strong>date_of_latest_status</strong>: when the current status took effect. Use it to date the change in your file.</li></ul><p>Dates are DD/MM/YYYY strings.</p>"
+      },
+      {
+        "h2": "What this data does not replace",
+        "html": "<p>The data comes from IACS's public dataset. It is not a substitute for official class records or certificates from the society, and it is not a coverage or claims decision on its own.</p><p>It covers only IACS-classed vessels. A vessel that is missing from the dataset may be classed by a non-IACS society, or may have no class. On a hull risk, that is worth checking.</p>"
+      }
+    ],
+    "faq": [
+      {
+        "q": "Is class status important for hull and machinery insurance?",
+        "a": "Yes. Maintaining class is typically a condition of hull and machinery and P&I cover. Check the wording of your own policy for what applies."
+      },
+      {
+        "q": "How can I monitor a fleet for suspended or withdrawn class?",
+        "a": "Send your IMO list to POST /vessels in batches of up to 100, store the results, and compare them each week after the Sunday data refresh. Look for changes in status or class."
+      },
+      {
+        "q": "How often is the class data updated?",
+        "a": "The data is refreshed weekly from IACS, every Sunday, and swapped in atomically. Run your monitoring check after that."
+      },
+      {
+        "q": "What if a vessel is not in the dataset?",
+        "a": "The dataset covers only vessels classed by the 12 IACS members. A missing vessel may be classed by a non-IACS society or have no class. Ask the assured for the class certificate."
+      },
+      {
+        "q": "How much does it cost to check a book of vessels?",
+        "a": "Each IMO is one lookup. The free plan includes 100 lookups a month. Starter is $49 a month for 5,000 lookups and Pro is $199 a month for 50,000. Enterprise is custom."
+      }
+    ],
+    "related_statuses": [
+      "Suspended",
+      "Withdrawn",
+      "Reinstated",
+      "Reassigned",
+      "Delivered"
+    ]
+  }
+]

@@ -1,6 +1,6 @@
 # Vessel Class Finder: IACS Vessel Classification API
 
-Look up any ship's **classification society, class status (In Class / Suspended / Withdrawn) and survey dates by IMO number** through a JSON REST API.
+Look up any ship's **classification society, class status (Delivered / Reinstated / Reassigned / Suspended / Withdrawn) and survey dates by IMO number** through a JSON REST API.
 
 IACS publishes its *Vessels in Class* dataset only as a ZIP/CSV download. This project scrapes that file weekly, loads it into PostgreSQL, and serves it through authenticated endpoints.
 
@@ -193,7 +193,7 @@ Response:
     "date_of_survey": "15/06/2025",
     "date_of_next_survey": "15/06/2028",
     "date_of_latest_status": "01/01/2024",
-    "status": "In Class",
+    "status": "Delivered",
     "reason_for_status": ""
   }
 ]
@@ -342,3 +342,11 @@ Uses Vitest with mocked database and external dependencies. Tests cover utility 
 ## License
 
 ISC
+
+## SEO pages
+
+The classification-society pages (`docs/class-societies/`), the status-code glossary and the use-case pages are generated from `scripts/seo/` and committed to `docs/`. To refresh their numbers after a data update:
+
+```bash
+npm run seo   # snapshots stats from the database, regenerates the pages and sitemap.xml
+```

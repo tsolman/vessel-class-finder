@@ -24,7 +24,8 @@
   "scripts": {
     "start": "node server.js",
     "scrape": "node app.js",
-    "test": "NODE_ENV=test vitest run"
+    "test": "NODE_ENV=test vitest run",
+    "seo": "node scripts/seo/snapshot-stats.mjs && node scripts/seo/build.mjs"
   },
   "author": "WeAreFabbrik <info@wearefabbrik.com> (https://wearefabbrik.com)",
   "license": "ISC",

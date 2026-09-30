@@ -1,0 +1,510 @@
+{
+  "asOf": "2026-09-30",
+  "totals": {
+    "total": 60223,
+    "statuses": {
+      "None": 3974,
+      "Suspended": 575,
+      "Delivered": 46063,
+      "Reinstated": 3381,
+      "Reassigned": 1382,
+      "Withdrawn": 4848
+    },
+    "reasons": {
+      "by society for other reasons": 3645,
+      "Survey overdue": 1589,
+      "Owner's request for other reasons": 644,
+      "Transfer of class to another IACS member": 1316,
+      "Sold for recycling (scrap)": 266,
+      "Transfer of class to a non-IACS society": 431,
+      "Casualty": 67,
+      "Non-compliance with conditions of class / recommendations": 178
+    }
+  },
+  "societies": {
+    "CRS": {
+      "total": 494,
+      "statuses": {
+        "None": 141,
+        "Suspended": 9,
+        "Delivered": 147,
+        "Reinstated": 51,
+        "Reassigned": 94,
+        "Withdrawn": 52
+      },
+      "reasons": [
+        {
+          "reason": "by society for other reasons",
+          "n": 49
+        },
+        {
+          "reason": "Survey overdue",
+          "n": 11
+        },
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 1
+        }
+      ]
+    },
+    "NKK": {
+      "total": 10117,
+      "statuses": {
+        "Suspended": 74,
+        "Reassigned": 248,
+        "Reinstated": 382,
+        "None": 67,
+        "Withdrawn": 967,
+        "Delivered": 8379
+      },
+      "reasons": [
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 489
+        },
+        {
+          "reason": "Survey overdue",
+          "n": 279
+        },
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 169
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 59
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 40
+        },
+        {
+          "reason": "Casualty",
+          "n": 4
+        },
+        {
+          "reason": "by society for other reasons",
+          "n": 1
+        }
+      ]
+    },
+    "LRS": {
+      "total": 7606,
+      "statuses": {
+        "Delivered": 7175,
+        "None": 11,
+        "Withdrawn": 318,
+        "Reinstated": 7,
+        "Suspended": 95
+      },
+      "reasons": [
+        {
+          "reason": "by society for other reasons",
+          "n": 332
+        },
+        {
+          "reason": "Survey overdue",
+          "n": 51
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 21
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 4
+        },
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 4
+        },
+        {
+          "reason": "Non-compliance with conditions of class / recommendations",
+          "n": 1
+        }
+      ]
+    },
+    "CCS": {
+      "total": 4376,
+      "statuses": {
+        "Reinstated": 273,
+        "Withdrawn": 265,
+        "Delivered": 3749,
+        "Reassigned": 78,
+        "None": 1,
+        "Suspended": 10
+      },
+      "reasons": [
+        {
+          "reason": "Survey overdue",
+          "n": 69
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 54
+        },
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 46
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 38
+        },
+        {
+          "reason": "by society for other reasons",
+          "n": 33
+        },
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 31
+        },
+        {
+          "reason": "Non-compliance with conditions of class / recommendations",
+          "n": 2
+        },
+        {
+          "reason": "Casualty",
+          "n": 2
+        }
+      ]
+    },
+    "BV": {
+      "total": 9958,
+      "statuses": {
+        "Withdrawn": 861,
+        "Suspended": 59,
+        "None": 768,
+        "Reinstated": 651,
+        "Reassigned": 603,
+        "Delivered": 7016
+      },
+      "reasons": [
+        {
+          "reason": "Survey overdue",
+          "n": 295
+        },
+        {
+          "reason": "by society for other reasons",
+          "n": 215
+        },
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 200
+        },
+        {
+          "reason": "Non-compliance with conditions of class / recommendations",
+          "n": 111
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 51
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 31
+        },
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 8
+        },
+        {
+          "reason": "Casualty",
+          "n": 5
+        }
+      ]
+    },
+    "NV": {
+      "total": 7753,
+      "statuses": {
+        "Reassigned": 43,
+        "None": 1668,
+        "Reinstated": 900,
+        "Suspended": 62,
+        "Withdrawn": 177,
+        "Delivered": 4903
+      },
+      "reasons": [
+        {
+          "reason": "by society for other reasons",
+          "n": 2599
+        },
+        {
+          "reason": "Survey overdue",
+          "n": 106
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 42
+        },
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 35
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 10
+        },
+        {
+          "reason": "Casualty",
+          "n": 3
+        }
+      ]
+    },
+    "ABS": {
+      "total": 8787,
+      "statuses": {
+        "Withdrawn": 502,
+        "Delivered": 8109,
+        "Reinstated": 130,
+        "None": 5,
+        "Suspended": 41
+      },
+      "reasons": [
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 351
+        },
+        {
+          "reason": "Survey overdue",
+          "n": 149
+        },
+        {
+          "reason": "by society for other reasons",
+          "n": 112
+        },
+        {
+          "reason": "Casualty",
+          "n": 37
+        },
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 21
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 15
+        },
+        {
+          "reason": "Non-compliance with conditions of class / recommendations",
+          "n": 6
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 6
+        }
+      ]
+    },
+    "PRS": {
+      "total": 608,
+      "statuses": {
+        "Delivered": 303,
+        "Suspended": 31,
+        "Withdrawn": 138,
+        "Reinstated": 136
+      },
+      "reasons": [
+        {
+          "reason": "Survey overdue",
+          "n": 61
+        },
+        {
+          "reason": "by society for other reasons",
+          "n": 45
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 17
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 17
+        },
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 14
+        },
+        {
+          "reason": "Casualty",
+          "n": 6
+        },
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 6
+        },
+        {
+          "reason": "Non-compliance with conditions of class / recommendations",
+          "n": 3
+        }
+      ]
+    },
+    "RINA": {
+      "total": 5842,
+      "statuses": {
+        "Delivered": 3853,
+        "Reinstated": 257,
+        "Withdrawn": 783,
+        "Suspended": 61,
+        "Reassigned": 197,
+        "None": 691
+      },
+      "reasons": [
+        {
+          "reason": "by society for other reasons",
+          "n": 253
+        },
+        {
+          "reason": "Survey overdue",
+          "n": 245
+        },
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 143
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 84
+        },
+        {
+          "reason": "Non-compliance with conditions of class / recommendations",
+          "n": 52
+        },
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 33
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 31
+        },
+        {
+          "reason": "Casualty",
+          "n": 3
+        }
+      ]
+    },
+    "KR": {
+      "total": 2559,
+      "statuses": {
+        "Suspended": 68,
+        "None": 619,
+        "Reinstated": 249,
+        "Delivered": 1312,
+        "Withdrawn": 283,
+        "Reassigned": 28
+      },
+      "reasons": [
+        {
+          "reason": "Survey overdue",
+          "n": 138
+        },
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 137
+        },
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 41
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 30
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 11
+        },
+        {
+          "reason": "Casualty",
+          "n": 1
+        }
+      ]
+    },
+    "TLV": {
+      "total": 484,
+      "statuses": {
+        "Reinstated": 78,
+        "Withdrawn": 73,
+        "Reassigned": 19,
+        "Delivered": 302,
+        "None": 2,
+        "Suspended": 10
+      },
+      "reasons": [
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 28
+        },
+        {
+          "reason": "Survey overdue",
+          "n": 25
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 9
+        },
+        {
+          "reason": "by society for other reasons",
+          "n": 6
+        },
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 6
+        },
+        {
+          "reason": "Casualty",
+          "n": 4
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 3
+        },
+        {
+          "reason": "Non-compliance with conditions of class / recommendations",
+          "n": 2
+        }
+      ]
+    },
+    "IRS": {
+      "total": 1639,
+      "statuses": {
+        "Withdrawn": 429,
+        "None": 1,
+        "Reassigned": 72,
+        "Suspended": 55,
+        "Reinstated": 267,
+        "Delivered": 815
+      },
+      "reasons": [
+        {
+          "reason": "Owner's request for other reasons",
+          "n": 183
+        },
+        {
+          "reason": "Survey overdue",
+          "n": 160
+        },
+        {
+          "reason": "Transfer of class to a non-IACS society",
+          "n": 113
+        },
+        {
+          "reason": "Transfer of class to another IACS member",
+          "n": 14
+        },
+        {
+          "reason": "Sold for recycling (scrap)",
+          "n": 11
+        },
+        {
+          "reason": "Casualty",
+          "n": 2
+        },
+        {
+          "reason": "Non-compliance with conditions of class / recommendations",
+          "n": 1
+        }
+      ]
+    }
+  }
+}

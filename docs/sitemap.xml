@@ -2,17 +2,102 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://vesselclassfinder.com/</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-09-30</lastmod>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://vesselclassfinder.com/blog/vessel-classification-api.html</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-09-30</lastmod>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://vesselclassfinder.com/terms.html</loc>
-    <lastmod>2026-09-18</lastmod>
+    <lastmod>2026-09-30</lastmod>
     <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/classnk.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/bureau-veritas.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/abs.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/dnv.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/lloyds-register.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/rina.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/china-classification-society.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/korean-register.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/indian-register.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/polish-register.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/croatian-register.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/class-societies/turk-loydu.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/iacs-class-status-codes.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/use-cases/sanctions-kyc-screening.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/use-cases/charter-vetting.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://vesselclassfinder.com/use-cases/marine-insurance.html</loc>
+    <lastmod>2026-09-30</lastmod>
+    <priority>0.7</priority>
   </url>
 </urlset>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vessel Class Check for Sanctions &amp; KYC Screening</title>
+  <meta name="description" content="Check a vessel's IACS class status by IMO. Class withdrawal or a move to a non-IACS society is a KYC red flag. Batch API, 100 free lookups a month.">
+  <link rel="canonical" href="https://vesselclassfinder.com/use-cases/sanctions-kyc-screening.html">
+  <link rel="icon" href="/logo.svg" type="image/svg+xml">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Vessel Class Finder">
+  <meta property="og:title" content="Vessel Class Check for Sanctions &amp; KYC Screening">
+  <meta property="og:description" content="Check a vessel's IACS class status by IMO. Class withdrawal or a move to a non-IACS society is a KYC red flag. Batch API, 100 free lookups a month.">
+  <meta property="og:url" content="https://vesselclassfinder.com/use-cases/sanctions-kyc-screening.html">
+  <meta name="twitter:card" content="summary">
+  <link rel="stylesheet" href="/seo.css">
+  <script src="/analytics.js"></script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://vesselclassfinder.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Vessel class checks for sanctions and KYC screening",
+      "item": "https://vesselclassfinder.com/use-cases/sanctions-kyc-screening.html"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is a vessel's class status a sanctions red flag?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It can be an indicator, not proof. Withdrawn or suspended class, or a transfer to a non-IACS society, are patterns compliance teams often treat as a reason for enhanced due diligence. Combine them with ownership, voyage and sanctions list checks."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Vessel Class Finder check vessels against sanctions lists?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It returns classification data from the IACS Vessels in Class dataset by IMO number. Use it alongside a sanctions screening tool."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What does it mean if an IMO number is not found?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The vessel is not in the IACS Vessels in Class dataset. It may be classed by a non-IACS society or have no class. This is worth checking with the owner or manager, and by asking for class certificates."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I screen a whole list of vessels at once?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Send up to 100 IMO numbers in one POST /vessels request. Each IMO counts as one lookup against your monthly allowance."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I keep an audit trail of a class check?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Store the API response with the date you ran it. The response includes date_of_latest_status, date_of_survey and date_of_next_survey, which show the class position at the time. The dataset refreshes weekly."
+      }
+    }
+  ]
+}
+  </script>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="logo">vessel<span>class</span>finder</a>
+    <ul>
+      <li class="nav-secondary"><a href="/class-societies/">Class societies</a></li>
+      <li class="nav-secondary"><a href="/iacs-class-status-codes.html">Status codes</a></li>
+      <li><a href="/#api">API</a></li>
+      <li><a href="/#pricing">Pricing</a></li>
+      <li><a href="/#signup" class="nav-account">Get API key</a></li>
+    </ul>
+  </div>
+</nav>
+
+<article>
+  <div class="breadcrumb">
+    <a href="/">Home</a> / Vessel class checks for sanctions and KYC screening
+  </div>
+
+  <h1>Vessel class checks for sanctions and KYC screening</h1>
+  <div class="meta">Data from the IACS Vessels in Class dataset, as of 30 September 2026. Refreshed weekly.</div>
+
+  <div class="answer"><p>A vessel's classification status is a useful risk indicator in sanctions and KYC screening. A withdrawn or suspended class, a transfer to a non-IACS society, or no IACS record at all are patterns that often deserve a closer look. Vessel Class Finder returns this data by IMO number from the IACS Vessels in Class dataset. It does not match names against sanctions lists, so use it alongside your screening tool.</p></div>
+
+  <form class="demo" data-demo>
+    <label for="demo-imo">Try it: check a ship's class status by IMO number (free, no signup)</label>
+    <div class="demo-row">
+      <input id="demo-imo" inputmode="numeric" pattern="[0-9]{7}" maxlength="7" placeholder="7-digit IMO, e.g. 9321483" aria-label="IMO number" required>
+      <button class="btn" type="submit">Look up</button>
+    </div>
+    <div class="demo-result" hidden aria-live="polite"></div>
+  </form>
+
+  <h2>Why class status matters for compliance teams</h2>
+  <p>Most large commercial ships are classed by one of the 12 IACS members. A vessel that leaves IACS class, or loses class, has changed something about how it is surveyed and insured. That is not proof of wrongdoing. It is a reason to ask questions.</p><p>Compliance teams commonly treat these as risk indicators, alongside other signals of dark fleet or shadow fleet activity:</p><ul><li>Class <strong>withdrawn</strong> or <strong>suspended</strong>, especially with a reason such as <em>Survey overdue</em> or <em>Non-compliance with conditions of class</em>.</li><li>Class moved with the reason <em>Transfer of class to a non-IACS society</em>.</li><li>A recent status change on an older vessel.</li><li>No IACS record at all for a vessel that trades internationally.</li></ul><p>Class data does not replace sanctions list matching, ownership research or AIS analysis. It adds one more independent data point to the file.</p>
+
+  <h2>Workflow: screen a vessel or a list of vessels</h2>
+  <ol><li>Collect the IMO numbers for the vessels in the deal, cargo or counterparty portfolio.</li><li>Send them to <code>POST /vessels</code> with your <code>x-api-key</code> header and a body like <code>{"imos":["9074729","9321483"]}</code>. One request takes up to 100 IMOs.</li><li>Check <code>status</code> and <code>reason_for_status</code> for each result.</li><li>Flag any vessel with <em>Withdrawn</em>, <em>Suspended</em>, or a reason of <em>Transfer of class to a non-IACS society</em>.</li><li>Flag any IMO that returns no record. Absence from the dataset means the vessel is not classed by an IACS member, which is worth checking.</li><li>Record <code>date_of_latest_status</code> and the date you ran the check in your case file. Then route flagged vessels to enhanced due diligence and ask for the class certificates from the society.</li></ol><p>You can also try a single IMO first with the free lookup box on the site. No signup is needed.</p>
+
+  <h2>Fields and statuses to check</h2>
+  <p>Each record has <code>imo</code>, <code>vessel_name</code>, <code>class</code>, <code>status</code>, <code>date_of_survey</code>, <code>date_of_next_survey</code>, <code>date_of_latest_status</code> and <code>reason_for_status</code>. Dates are DD/MM/YYYY strings.</p><ul><li><strong>Withdrawn</strong> (4,848 vessels): the society no longer classes the vessel. Read the reason. Scrapping and transfer are common. Non-compliance and owner's request are more worth a question.</li><li><strong>Suspended</strong> (575): class is not currently in force. Treat as a higher risk indicator until reinstated.</li><li><strong>Reinstated</strong> (3,381): class was restored after a suspension or withdrawal. Check how long the gap lasted using <code>date_of_latest_status</code>.</li><li><strong>Reassigned</strong> (1,382): class was reassigned, for example after a transfer. Check the <code>class</code> code to see who holds it now.</li><li><strong>Delivered</strong> (46,063): the vessel entered class with this society and is currently classed.</li><li><strong>No status</strong>: some rows (3,974) have no status. Treat these as needing a manual check.</li></ul><p><code>date_of_latest_status</code> and <code>date_of_next_survey</code> give you dates to cite in a review. A next-survey date in the past on a vessel that is still trading is a flag on its own.</p>
+
+  <h2>What this data does not cover</h2>
+  <p>The data comes from IACS's public Vessels in Class dataset. It is refreshed weekly, every Sunday. It is not a substitute for official class records or certificates from the society.</p><p>It covers only IACS-classed vessels. Ships classed by non-IACS societies, or with no class, will not appear. That absence is a signal, but it is not evidence of sanctions evasion by itself. Use it to decide where to look next.</p><p>The API does not screen names or IMOs against sanctions lists. It provides class data that complements the tools you already use.</p>
+
+  <div class="cta-box">
+    <h3>Check a whole fleet at once</h3>
+    <p>Free API key: 100 lookups a month, up to 100 IMO numbers per request. Paid plans from $49/month.</p>
+    <a href="/#signup" class="btn">Get a free API key</a>
+  </div>
+
+  <h2>Frequently asked questions</h2>
+  <div class="faq">
+    <details>
+      <summary>Is a vessel's class status a sanctions red flag?</summary>
+      <p>It can be an indicator, not proof. Withdrawn or suspended class, or a transfer to a non-IACS society, are patterns compliance teams often treat as a reason for enhanced due diligence. Combine them with ownership, voyage and sanctions list checks.</p>
+    </details>
+    <details>
+      <summary>Does Vessel Class Finder check vessels against sanctions lists?</summary>
+      <p>No. It returns classification data from the IACS Vessels in Class dataset by IMO number. Use it alongside a sanctions screening tool.</p>
+    </details>
+    <details>
+      <summary>What does it mean if an IMO number is not found?</summary>
+      <p>The vessel is not in the IACS Vessels in Class dataset. It may be classed by a non-IACS society or have no class. This is worth checking with the owner or manager, and by asking for class certificates.</p>
+    </details>
+    <details>
+      <summary>Can I screen a whole list of vessels at once?</summary>
+      <p>Yes. Send up to 100 IMO numbers in one POST /vessels request. Each IMO counts as one lookup against your monthly allowance.</p>
+    </details>
+    <details>
+      <summary>How do I keep an audit trail of a class check?</summary>
+      <p>Store the API response with the date you ran it. The response includes date_of_latest_status, date_of_survey and date_of_next_survey, which show the class position at the time. The dataset refreshes weekly.</p>
+    </details>
+  </div>
+
+  <h2>Related</h2>
+  <ul>
+    <li><a href="/iacs-class-status-codes.html">IACS class status codes explained</a></li>
+    <li><a href="/class-societies/">IACS classification societies compared</a></li>
+    <li><a href="/use-cases/charter-vetting.html">Check a nominated vessel's class status before fixture</a></li>
+    <li><a href="/use-cases/marine-insurance.html">Vessel class status for marine insurance underwriters and brokers</a></li>
+  </ul>
+</article>
+
+<footer>
+  <div>
+    <p><a href="/class-societies/">Classification societies</a> &middot; <a href="/iacs-class-status-codes.html">IACS status codes</a> &middot; <a href="/use-cases/sanctions-kyc-screening.html">Vessel class checks for sanctions and KYC screening</a> &middot; <a href="/use-cases/charter-vetting.html">Check a nominated vessel's class status before fixture</a> &middot; <a href="/use-cases/marine-insurance.html">Vessel class status for marine insurance underwriters and brokers</a></p>
+    <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/terms.html">Terms &amp; Privacy</a></p>
+  </div>
+</footer>
+
+<script src="/seo-demo.js"></script>
+</body>
+</html>

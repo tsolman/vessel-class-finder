@@ -125,3 +125,14 @@ describe('checkUsage', () => {
     await expect(checkUsage(cfg(vi.fn(), null))).rejects.toThrow(/No API key/);
   });
 });
+
+describe('leading zeros', () => {
+  it('treats 0123456 and 123456 as the same IMO, as the API does', async () => {
+    const fetch = async () => ({ ok: true, status: 200, json: async () => [{ imo: '123456', class: 'NV', status: 'Delivered' }] });
+    const { lookupVessels } = await import('../src/client.js');
+    const out = await lookupVessels({ apiKey: 'k', baseUrl: 'http://x', fetch }, ['0123456']);
+    expect(out.not_found).toEqual([]);
+    expect(out.found).toBe(1);
+  });
+});
+

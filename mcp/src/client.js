@@ -37,7 +37,8 @@ export function normalizeImo(value) {
       `Invalid IMO "${String(value)}": an IMO number must be 1-7 digits (ships normally have a 7-digit IMO such as 9321483).`
     );
   }
-  return s.trim();
+  // Canonical form drops leading zeros, matching how the API stores IMOs as integers.
+  return String(Number(s.trim()));
 }
 
 export function normalizeImos(values) {

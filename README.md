@@ -193,7 +193,7 @@ Response:
     "imo": 9200079,
     "vessel_name": "EXAMPLE VESSEL",
     "update_date": "01/03/26",
-    "class": "LR",
+    "class": "LRS",
     "date_of_survey": "15/06/2025",
     "date_of_next_survey": "15/06/2028",
     "date_of_latest_status": "01/01/2024",

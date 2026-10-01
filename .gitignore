@@ -3,3 +3,6 @@ node_modules/
 .env
 equasis_data.zip
 equasis_extracted/
+
+# Local marketing drafts (repo is public)
+marketing/

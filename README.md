@@ -15,6 +15,10 @@ curl -X POST https://vessel-class-finder-production.up.railway.app/vessels \
   -d '{"imos": [9200079]}'
 ```
 
+## MCP server
+
+Use Vessel Class Finder directly from AI assistants (Claude Desktop, Claude Code, Cursor) via the [`vessel-class-finder-mcp`](mcp/README.md) server: ask "Is IMO 9321483 in class?" or screen a list of ships for suspended or withdrawn class. See [mcp/README.md](mcp/README.md) for setup.
+
 ## Prerequisites
 
 - Node.js >= 20

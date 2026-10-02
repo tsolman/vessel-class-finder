@@ -17,6 +17,10 @@ curl -X POST https://vessel-class-finder-production.up.railway.app/vessels \
 
 ## MCP server
 
+**Remote (no install):** `https://vessel-class-finder-production.up.railway.app/mcp` (Streamable HTTP, stateless). `lookup_vessel` works without a key against a shared daily allowance (`MCP_PUBLIC_DAILY_LIMIT`, default 500); `lookup_vessels` and `check_usage` need an API key sent as `Authorization: Bearer <key>` or `x-api-key`, and charge the key's plan like `POST /vessels`. Setup guide: https://vesselclassfinder.com/mcp.html
+
+**Local (stdio):**
+
 Use Vessel Class Finder directly from AI assistants (Claude Desktop, Claude Code, Cursor) via the [`vessel-class-finder-mcp`](mcp/README.md) server: ask "Is IMO 9321483 in class?" or screen a list of ships for suspended or withdrawn class. See [mcp/README.md](mcp/README.md) for setup.
 
 ## Prerequisites

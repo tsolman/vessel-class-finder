@@ -1070,3 +1070,90 @@ describe("analytics", () => {
     expect(events()).toEqual([{ distinctId: "user-uuid", event: "subscription_started", properties: { plan: "pro", stripe_status: "active", source: "api" } }]);
   });
 });
+
+describe("POST /mcp (remote MCP)", () => {
+  const rpc = (method, params = {}, id = 1) => ({ jsonrpc: "2.0", id, method, params });
+  const post = (body, key) => {
+    const r = request(app).post("/mcp").set("Accept", "application/json, text/event-stream").set("Content-Type", "application/json");
+    if (key) r.set("Authorization", `Bearer ${key}`);
+    return r.send(body);
+  };
+  const callTool = (name, args, key) => post(rpc("tools/call", { name, arguments: args }), key);
+  const toolText = (res) => res.body.result.content[0].text;
+
+  it("initializes and lists three read-only tools with titles", async () => {
+    const init = await post(rpc("initialize", { protocolVersion: "2025-06-18", capabilities: {}, clientInfo: { name: "test", version: "1" } }));
+    expect(init.status).toBe(200);
+    expect(init.body.result.serverInfo.name).toBe("vessel-class-finder");
+
+    const list = await post(rpc("tools/list", {}, 2));
+    const tools = list.body.result.tools;
+    expect(tools.map((t) => t.name).sort()).toEqual(["check_usage", "lookup_vessel", "lookup_vessels"]);
+    for (const t of tools) {
+      expect(t.title || t.annotations.title).toBeTruthy();
+      expect(t.annotations.readOnlyHint).toBe(true);
+    }
+  });
+
+  it("looks up one ship without a key", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [{ imo: "9321483", vessel_name: "EMMA MAERSK", class: "ABS", status: "Delivered" }] });
+    const res = await callTool("lookup_vessel", { imo: "9321483" });
+    const out = JSON.parse(toolText(res));
+    expect(out.found).toBe(true);
+    expect(out.vessel.in_class).toBe(true);
+    expect(mockQuery.mock.calls[0][1]).toEqual([[9321483]]);
+  });
+
+  it("reports ships missing from IACS data as not found", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    const out = JSON.parse(toolText(await callTool("lookup_vessel", { imo: "1234567" })));
+    expect(out.found).toBe(false);
+  });
+
+  it("rejects malformed IMOs without querying", async () => {
+    const res = await callTool("lookup_vessel", { imo: "12ab" });
+    expect(res.body.result.isError).toBe(true);
+    expect(mockQuery).not.toHaveBeenCalled();
+  });
+
+  it("requires an API key for batch lookups", async () => {
+    const res = await callTool("lookup_vessels", { imos: ["9321483"] });
+    expect(res.body.result.isError).toBe(true);
+    expect(toolText(res)).toMatch(/API key/);
+    expect(mockQuery).not.toHaveBeenCalled();
+  });
+
+  it("rejects an invalid API key with 401", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    const res = await post(rpc("tools/list"), "bad-key");
+    expect(res.status).toBe(401);
+  });
+
+  it("charges batch lookups to the key's plan", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [{ user_id: "user-uuid" }] }); // key -> user
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // subscription: free
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 2 }] }); // charge 2
+    mockQuery.mockResolvedValueOnce({ rows: [{ imo: "9321483", class: "NV", status: "Withdrawn" }] });
+    const res = await callTool("lookup_vessels", { imos: ["9321483", "9074729", "9321483"] }, "good-key");
+    const out = JSON.parse(toolText(res));
+    expect(out.requested).toBe(2);
+    expect(out.not_found).toEqual(["9074729"]);
+    expect(out.vessels[0].in_class).toBe(false);
+    expect(mockQuery.mock.calls[2][1][2]).toBe(2); // cost charged
+  });
+
+  it("returns a limit error when the plan is used up", async () => {
+    mockQuery.mockResolvedValueOnce({ rows: [{ user_id: "user-uuid" }] });
+    mockQuery.mockResolvedValueOnce({ rows: [] });
+    mockQuery.mockResolvedValueOnce({ rows: [] }); // refused
+    mockQuery.mockResolvedValueOnce({ rows: [{ request_count: 100 }] });
+    const res = await callTool("lookup_vessels", { imos: ["9321483"] }, "good-key");
+    expect(res.body.result.isError).toBe(true);
+    expect(toolText(res)).toMatch(/limit reached/);
+  });
+
+  it("rejects GET with 405 (stateless server)", async () => {
+    const res = await request(app).get("/mcp");
+    expect(res.status).toBe(405);
+  });
+});

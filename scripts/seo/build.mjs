@@ -380,6 +380,82 @@ ${useCases.filter((o) => o.slug !== u.slug).map((o) => `    <li><a href="/use-ca
     });
 }
 
+// ---------- MCP connector docs ----------
+function mcpPage() {
+    const MCP_URL = `${API}/mcp`;
+    const faq = [
+        { q: "Can Claude check a ship's class status?",
+          a: `Yes. Add Vessel Class Finder as a connector (URL ${MCP_URL}) and ask Claude, for example, "Is IMO 9321483 in class?". Claude calls the lookup_vessel tool and answers from the IACS Vessels in Class data.` },
+        { q: "Do I need an API key?",
+          a: "No for single-ship lookups, which share a free daily allowance. Yes for batch lookups of up to 100 ships and for usage checks: connect with your API key, and lookups count against your plan exactly as API calls do." },
+        { q: "Which AI tools does it work with?",
+          a: "Any client that supports remote MCP servers over Streamable HTTP, including Claude (web, desktop and mobile), Claude Code and Cursor. A local stdio version is also available as an npm package." },
+        { q: "What data does the connector send to Vessel Class Finder?",
+          a: "Only the tool calls: the IMO numbers looked up and, if you connect with one, your API key. It never receives your conversation. See the privacy policy for details." },
+    ];
+    const body = `
+  <div class="answer"><p>Vessel Class Finder has a remote MCP server at <code>${MCP_URL}</code>, so Claude and other AI assistants can look up any IACS-classed ship's class society, class status and survey dates by IMO number. Single-ship lookups work without an account; connect with an API key for batch lookups of up to 100 ships.</p></div>
+
+  <h2>Tools</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Tool</th><th>API key</th><th>What it does</th></tr></thead>
+    <tbody>
+      <tr><td><code>lookup_vessel</code></td><td>Optional</td><td>One ship by IMO: society, status, in class or not, last and next survey, reason for the latest status change</td></tr>
+      <tr><td><code>lookup_vessels</code></td><td>Required</td><td>1–100 ships in one call, plus the IMOs not found in IACS data</td></tr>
+      <tr><td><code>check_usage</code></td><td>Required</td><td>Your plan and lookups used and remaining this month</td></tr>
+    </tbody>
+  </table></div>
+  <p>All tools are read-only. Without a key, <code>lookup_vessel</code> uses a shared free daily allowance; with a key, every lookup counts against your plan (Free: 100 a month).</p>
+
+  <h2>Add it to Claude</h2>
+  <ol>
+    <li>In Claude, open <strong>Settings → Connectors</strong> and choose <strong>Add custom connector</strong> (or find Vessel Class Finder in the connector directory once it's listed).</li>
+    <li>Enter the URL <code>${MCP_URL}</code>.</li>
+    <li>Ask, for example: <em>"Is IMO 9321483 in class, and when is its next survey?"</em></li>
+  </ol>
+
+  <h2>Claude Code</h2>
+<pre><code># Single-ship lookups, no key
+claude mcp add --transport http vessel-class-finder ${MCP_URL}
+
+# With your API key for batch lookups
+claude mcp add --transport http vessel-class-finder ${MCP_URL} \\
+  --header "Authorization: Bearer YOUR_API_KEY"</code></pre>
+
+  <h2>Cursor and other MCP clients</h2>
+<pre><code>{
+  "mcpServers": {
+    "vessel-class-finder": {
+      "url": "${MCP_URL}",
+      "headers": { "Authorization": "Bearer YOUR_API_KEY" }
+    }
+  }
+}</code></pre>
+  <p>Leave out <code>headers</code> to use single-ship lookups without a key. Get a free key at <a href="/#signup">vesselclassfinder.com</a>.</p>
+
+  <h2>Example questions</h2>
+  <ul>
+    <li>Which classification society classes IMO 9321483, and is it in class?</li>
+    <li>Check these 20 IMO numbers and list any with suspended or withdrawn class.</li>
+    <li>Which of these ships has a class survey due in the next three months?</li>
+    <li>How many lookups do I have left this month?</li>
+  </ul>
+
+  <h2>Limits</h2>
+  <p>Data is the IACS Vessels in Class dataset, refreshed weekly. It covers ships classed by the 12 IACS members and is not a substitute for class certificates or the society's own records. See <a href="/iacs-class-status-codes.html">what each status means</a>.</p>
+${faqBlock(faq)}
+  <p class="note">Support: <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a> &middot; <a href="/terms.html#privacy">Privacy policy</a></p>`;
+    return page({
+        urlPath: "/mcp.html",
+        title: "Vessel Class Finder MCP Server for Claude and AI Assistants",
+        description: "Let Claude and other AI assistants check a ship's IACS class status by IMO number. Remote MCP server: free single-ship lookups, batch lookups with an API key.",
+        h1: "Use Vessel Class Finder in Claude and other AI assistants",
+        breadcrumb: [{ name: "MCP server" }],
+        body,
+        jsonld: [faqLd(faq)],
+    });
+}
+
 // ---------- write ----------
 const written = [];
 function write(urlPath, html) {
@@ -392,6 +468,7 @@ function write(urlPath, html) {
 write("/class-societies/", hubPage());
 for (const soc of societies) write(`/class-societies/${soc.slug}.html`, societyPage(soc));
 write("/iacs-class-status-codes.html", glossaryPage());
+write("/mcp.html", mcpPage());
 for (const u of useCases) write(`/use-cases/${u.slug}.html`, useCasePage(u));
 
 // Sitemap: hand-written pages plus everything generated above.

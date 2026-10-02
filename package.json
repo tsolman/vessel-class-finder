@@ -33,6 +33,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
     "adm-zip": "^0.6.1",
     "axios": "^1.7.9",
     "bcryptjs": "^3.0.0",
@@ -48,7 +49,8 @@
     "posthog-node": "^5.21.2",
     "resend": "^6.12.3",
     "stripe": "^22.6.2",
-    "uuid": "^11.0.5"
+    "uuid": "^11.0.5",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "supertest": "^7.2.2",

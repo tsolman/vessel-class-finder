@@ -9,6 +9,7 @@ import pkg from 'pg';
 import { Resend } from "resend";
 import Stripe from "stripe";
 import { PostHog } from "posthog-node";
+import { mountMcp } from "./mcp-remote.js";
 
 const { Pool } = pkg;
 
@@ -26,6 +27,10 @@ const pool = new Pool({
 
 // Stripe signs the raw request body, so the webhook is mounted before express.json().
 app.post("/billing/webhook", express.raw({ type: "application/json" }), (req, res) => handleStripeWebhook(req, res));
+
+// Remote MCP endpoint has its own CORS, body parsing and rate limits (its traffic comes
+// from shared AI-provider IPs), so it's mounted before the global middleware.
+mountMcp(app, { pool, chargeLookups: (...args) => chargeLookups(...args), track: (...args) => track(...args) });
 
 app.use(express.json());
 app.use((req, res, next) => {
@@ -587,68 +592,77 @@ async function sendUsageAlert(userId, month, level, { plan, limit }) {
     }
 }
 
+// Charges `cost` lookups to the user's monthly quota. Check and charge happen in one
+// statement so concurrent requests can't both pass the check and overshoot the limit.
+// Returns { ok: true, plan, limit, used } or { ok: false, plan, limit, usage }.
+async function chargeLookups(userId, cost) {
+    const month = new Date().toISOString().slice(0, 7);
+
+    const subResult = await pool.query(
+        "SELECT plan, status, expires_at FROM subscriptions WHERE user_id = $1",
+        [userId]
+    );
+
+    let plan = "free";
+    if (subResult.rows.length > 0) {
+        const sub = subResult.rows[0];
+        if (sub.status === "active" && new Date(sub.expires_at) > new Date()) {
+            plan = sub.plan || "starter";
+        }
+    }
+
+    const limit = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+
+    const charged = await pool.query(
+        `INSERT INTO api_usage (user_id, month, request_count)
+            SELECT $1, $2, $3::int WHERE $4::int IS NULL OR $3::int <= $4::int
+         ON CONFLICT (user_id, month) DO UPDATE
+            SET request_count = api_usage.request_count + $3::int
+            WHERE $4::int IS NULL OR api_usage.request_count + $3::int <= $4::int
+         RETURNING request_count`,
+        [userId, month, cost, limit === Infinity ? null : limit]
+    );
+
+    if (charged.rows.length === 0) {
+        const usageResult = await pool.query(
+            "SELECT request_count FROM api_usage WHERE user_id = $1 AND month = $2",
+            [userId, month]
+        );
+        const usage = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
+        // A batch can be refused while some quota remains; only alert once it's all used.
+        if (usage >= limit) sendUsageAlert(userId, month, 100, { plan, limit });
+        track(userId, "usage_limit_reached", { plan, limit, usage, requested: cost });
+        return { ok: false, plan, limit, usage };
+    }
+
+    const used = charged.rows[0].request_count;
+    if (limit !== Infinity) {
+        if (used >= limit) sendUsageAlert(userId, month, 100, { plan, limit });
+        else if (used - cost < limit * 0.8 && used >= limit * 0.8) sendUsageAlert(userId, month, 80, { plan, limit });
+    }
+    return { ok: true, plan, limit, used };
+}
+
 const checkUsageLimit = async (req, res, next) => {
     try {
-        const month = new Date().toISOString().slice(0, 7);
-
-        const subResult = await pool.query(
-            "SELECT plan, status, expires_at FROM subscriptions WHERE user_id = $1",
-            [req.userId]
-        );
-
-        let plan = "free";
-        if (subResult.rows.length > 0) {
-            const sub = subResult.rows[0];
-            if (sub.status === "active" && new Date(sub.expires_at) > new Date()) {
-                plan = sub.plan || "starter";
-            }
-        }
-
-        const limit = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
-
         // Each IMO looked up counts as one lookup.
         const cost = req.imos ? req.imos.length : 1;
+        const result = await chargeLookups(req.userId, cost);
 
-        // Check and charge in one statement so concurrent requests can't both pass
-        // the check and overshoot the limit. Returns no row when over the limit.
-        const charged = await pool.query(
-            `INSERT INTO api_usage (user_id, month, request_count)
-                SELECT $1, $2, $3::int WHERE $4::int IS NULL OR $3::int <= $4::int
-             ON CONFLICT (user_id, month) DO UPDATE
-                SET request_count = api_usage.request_count + $3::int
-                WHERE $4::int IS NULL OR api_usage.request_count + $3::int <= $4::int
-             RETURNING request_count`,
-            [req.userId, month, cost, limit === Infinity ? null : limit]
-        );
-
-        if (charged.rows.length === 0) {
-            const usageResult = await pool.query(
-                "SELECT request_count FROM api_usage WHERE user_id = $1 AND month = $2",
-                [req.userId, month]
-            );
-            const currentUsage = usageResult.rows.length > 0 ? usageResult.rows[0].request_count : 0;
-            // A batch can be refused while some quota remains; only alert once it's all used.
-            if (currentUsage >= limit) sendUsageAlert(req.userId, month, 100, { plan, limit });
-            track(req.userId, "usage_limit_reached", { plan, limit, usage: currentUsage, requested: cost });
+        if (!result.ok) {
             return res.status(429).json({
                 error: `Monthly lookup limit reached. Upgrade your plan at ${UPGRADE_URL}`,
                 upgrade_url: UPGRADE_URL,
-                usage: currentUsage,
+                usage: result.usage,
                 requested: cost,
-                limit,
-                plan
+                limit: result.limit,
+                plan: result.plan
             });
         }
 
-        if (limit !== Infinity) {
-            const used = charged.rows[0].request_count;
-            if (used >= limit) sendUsageAlert(req.userId, month, 100, { plan, limit });
-            else if (used - cost < limit * 0.8 && used >= limit * 0.8) sendUsageAlert(req.userId, month, 80, { plan, limit });
-        }
-
-        req.plan = plan;
-        req.usageCount = charged.rows[0].request_count;
-        req.usageLimit = limit;
+        req.plan = result.plan;
+        req.usageCount = result.used;
+        req.usageLimit = result.limit;
         next();
     } catch (error) {
         console.error(error);

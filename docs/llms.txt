@@ -64,6 +64,7 @@ Every vessel in the IACS Vessels in Class dataset, which covers ships classed by
 
 - [Home page](https://vesselclassfinder.com/): overview, pricing, signup
 - [Guide: querying IACS class status by IMO number](https://vesselclassfinder.com/blog/vessel-classification-api.html)
+- [MCP server for Claude and AI assistants](https://vesselclassfinder.com/mcp.html): remote MCP endpoint https://vessel-class-finder-production.up.railway.app/mcp with tools lookup_vessel (no key needed), lookup_vessels and check_usage (API key as Bearer token)
 - [IACS class status codes explained](https://vesselclassfinder.com/iacs-class-status-codes.html): what Delivered, Reinstated, Reassigned, Suspended and Withdrawn mean, plus every reason code, with current counts
 - [IACS classification societies compared](https://vesselclassfinder.com/class-societies/): codes (NV = DNV, NKK = ClassNK, LRS = Lloyd's Register, TLV = Türk Loydu), fleet sizes and status breakdowns
 - [ClassNK class status lookup](https://vesselclassfinder.com/class-societies/classnk.html): IACS code NKK

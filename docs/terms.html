@@ -208,7 +208,7 @@
 
   <hr class="divider">
 
-  <h1>Privacy Policy</h1>
+  <h1 id="privacy">Privacy Policy</h1>
   <div class="meta">Last updated: September 2026</div>
 
   <h2>What We Collect</h2>
@@ -218,6 +218,9 @@
 
   <h3>API usage data</h3>
   <p>We track the number of lookups (IMO numbers queried) you make per calendar month, associated with your user ID. This is used to enforce plan limits and display your usage.</p>
+
+  <h3 id="mcp">AI assistant connector (MCP server)</h3>
+  <p>When you use Vessel Class Finder from Claude or another AI assistant through our MCP server, we receive only the tool calls the assistant makes: the IMO numbers looked up and, if you connected with one, your API key (used to identify your account and count lookups against your plan). We never receive your conversation with the assistant. Without an API key, lookups are counted only toward a shared daily allowance and are not linked to you. We record an analytics event for each tool call (the tool used and, for batch lookups, how many IMO numbers, not which ones). Hosting server logs (IP address, timestamps) are kept as described under Server logs.</p>
 
   <h3>Service providers</h3>
   <p>We use a small number of providers to run the Service. They process data only on our behalf:</p>

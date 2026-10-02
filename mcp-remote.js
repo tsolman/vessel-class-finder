@@ -67,7 +67,7 @@ function buildServer({ pool, userId, chargeLookups, track }) {
     const server = new McpServer({ name: "vessel-class-finder", version: "1.0.0" });
     const needKey = () => new ToolError(
         `This tool needs a Vessel Class Finder API key. Get a free one (100 lookups/month) at ${SIGNUP_URL} ` +
-        "and connect with it as a Bearer token or x-api-key header. Without a key, use lookup_vessel for one ship at a time."
+        "and connect with it as a Bearer token or x-api-key header. Single-ship lookups work without a key."
     );
 
     async function fetchVessels(imos) {
@@ -84,7 +84,7 @@ function buildServer({ pool, userId, chargeLookups, track }) {
                 "Use when the user asks whether a ship is in class, who classes it, or when its next class survey is due. " +
                 "Returns vessel_name, class (society code), society (full name), status, in_class, last and next survey dates, and the reason for the latest status change. " +
                 STATUS_HELP + " If found is false, the ship is not classed by an IACS member or the IMO is wrong. " +
-                "Works without an API key (shared daily allowance); for many ships use lookup_vessels.",
+                "Works without an API key (shared daily allowance).",
             inputSchema: { imo: z.union([z.string(), z.number()]).describe('A 7-digit IMO number, e.g. "9321483".') },
             annotations: { title: "Look up a ship's class status", readOnlyHint: true, openWorldHint: false },
         },

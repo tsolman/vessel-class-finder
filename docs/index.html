@@ -430,7 +430,7 @@
     footer a { color: var(--text-muted); }
     footer a:hover { color: var(--text); }
 
-    /* Product Hunt badge (self-hosted image, no third-party requests) */
+    /* Product Hunt badge (image loads from api.producthunt.com; see privacy policy) */
     .ph-badge { display: inline-block; margin-top: 20px; }
     .ph-badge img { display: block; }
 
@@ -556,7 +556,7 @@
       <a href="#signup" class="btn btn-primary">Get Free API Key</a>
       <a href="#api" class="btn btn-secondary">View Docs</a>
     </div>
-    <a class="ph-badge" href="https://www.producthunt.com/posts/vessel-class-finder?utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-vessel-class-finder" target="_blank" rel="noopener" onclick="window.vcfTrack('producthunt_badge_clicked', { where: 'hero' })"><img src="/press/producthunt-badge.svg" alt="Find Vessel Class Finder on Product Hunt" width="196" height="54"></a>
+    <a class="ph-badge" href="https://www.producthunt.com/products/vessel-class-finder?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-vessel-class-finder" target="_blank" rel="noopener noreferrer" onclick="window.vcfTrack('producthunt_badge_clicked', { where: 'hero' })"><img alt="Vessel Class Finder - Check any ship's class status by IMO, via API or in Claude | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1268772&amp;theme=light&amp;t=1791272293168"></a>
 
     <form class="demo" onsubmit="runDemo(event)">
       <div class="demo-label">Try it now, no signup: enter any 7-digit IMO number</div>
@@ -1270,7 +1270,7 @@ handleCheckoutReturn();
 <footer>
   <div class="container">
     <p><a href="/class-societies/">Classification societies</a> &middot; <a href="/iacs-class-status-codes.html">IACS status codes</a> &middot; <a href="/use-cases/sanctions-kyc-screening.html">Sanctions &amp; KYC</a> &middot; <a href="/use-cases/charter-vetting.html">Charter vetting</a> &middot; <a href="/use-cases/marine-insurance.html">Marine insurance</a></p>
-    <p><a href="https://www.producthunt.com/posts/vessel-class-finder?utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-vessel-class-finder" target="_blank" rel="noopener" onclick="window.vcfTrack('producthunt_badge_clicked', { where: 'footer' })">Vessel Class Finder on Product Hunt</a></p>
+    <p><a href="https://www.producthunt.com/products/vessel-class-finder?utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-vessel-class-finder" target="_blank" rel="noopener" onclick="window.vcfTrack('producthunt_badge_clicked', { where: 'footer' })">Vessel Class Finder on Product Hunt</a></p>
     <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/terms.html">Terms & Privacy</a></p>
   </div>
 </footer>

@@ -136,7 +136,7 @@ const faqLd = (faq) => ({
 const cta = `
   <div class="cta-box">
     <h3>Check a whole fleet at once</h3>
-    <p>Free API key: 100 lookups a month, up to 100 IMO numbers per request. Paid plans from $49/month.</p>
+    <p>Free API key: 100 lookups a month, up to 100 IMO numbers per request. Paid plans from €49/month.</p>
     <a href="/#signup" class="btn">Get a free API key</a>
   </div>`;
 

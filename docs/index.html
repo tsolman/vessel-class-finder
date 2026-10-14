@@ -37,9 +37,9 @@
         "provider": { "@id": "https://wearefabbrik.com/#org" },
         "keywords": "IACS, vessel classification, class status, IMO number, classification society, ship survey dates, maritime API",
         "offers": [
-          { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "USD", "description": "100 lookups per month" },
-          { "@type": "Offer", "name": "Starter", "price": "49", "priceCurrency": "USD", "description": "5,000 lookups per month" },
-          { "@type": "Offer", "name": "Pro", "price": "199", "priceCurrency": "USD", "description": "50,000 lookups per month" }
+          { "@type": "Offer", "name": "Free", "price": "0", "priceCurrency": "EUR", "description": "100 lookups per month" },
+          { "@type": "Offer", "name": "Starter", "price": "49", "priceCurrency": "EUR", "description": "5,000 lookups per month" },
+          { "@type": "Offer", "name": "Pro", "price": "199", "priceCurrency": "EUR", "description": "50,000 lookups per month" }
         ]
       },
       {
@@ -69,7 +69,7 @@
           {
             "@type": "Question",
             "name": "How much does the vessel classification API cost?",
-            "acceptedAnswer": { "@type": "Answer", "text": "The free tier includes 100 lookups per month with no credit card. Starter is $49/month for 5,000 lookups, Pro is $199/month for 50,000 lookups, and Enterprise is custom. Paid plans are billed monthly by card through Stripe and can be upgraded or cancelled anytime; for Enterprise contact info@wearefabbrik.com." }
+            "acceptedAnswer": { "@type": "Answer", "text": "The free tier includes 100 lookups per month with no credit card. Starter is €49/month for 5,000 lookups, Pro is €199/month for 50,000 lookups, and Enterprise is custom. Paid plans are billed monthly by card through Stripe and can be upgraded or cancelled anytime; for Enterprise contact info@wearefabbrik.com." }
           }
         ]
       }
@@ -720,7 +720,7 @@
     <div class="pricing-grid">
       <div class="price-card">
         <h3>Free</h3>
-        <div class="price">$0</div>
+        <div class="price">€0</div>
         <div class="limit">100 lookups / month</div>
         <ul>
           <li>Full API access</li>
@@ -731,7 +731,7 @@
       </div>
       <div class="price-card featured">
         <h3>Starter</h3>
-        <div class="price">$49<span> /mo</span></div>
+        <div class="price">€49<span> /mo</span></div>
         <div class="limit">5,000 lookups / month</div>
         <ul>
           <li>Everything in Free</li>
@@ -742,7 +742,7 @@
       </div>
       <div class="price-card">
         <h3>Pro</h3>
-        <div class="price">$199<span> /mo</span></div>
+        <div class="price">€199<span> /mo</span></div>
         <div class="limit">50,000 lookups / month</div>
         <ul>
           <li>Everything in Starter</li>
@@ -789,7 +789,7 @@
       </details>
       <details>
         <summary>How much does the vessel classification API cost?</summary>
-        <p>The free tier includes 100 lookups per month with no credit card. Starter is $49/month for 5,000 lookups, Pro is $199/month for 50,000 lookups, and Enterprise is custom. Paid plans are billed monthly by card through Stripe and can be upgraded or cancelled anytime from your account; for Enterprise contact <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a>.</p>
+        <p>The free tier includes 100 lookups per month with no credit card. Starter is €49/month for 5,000 lookups, Pro is €199/month for 50,000 lookups, and Enterprise is custom. Paid plans are billed monthly by card through Stripe and can be upgraded or cancelled anytime from your account; for Enterprise contact <a href="mailto:info@wearefabbrik.com">info@wearefabbrik.com</a>.</p>
       </details>
     </div>
   </div>
@@ -1024,7 +1024,7 @@ function renderPlanActions(plan) {
     '<button type="button" class="btn ' + (primary ? "btn-primary" : "btn-secondary") + '" onclick="' + onclick + '">' + label + "</button>";
   const enterprise = '<a class="btn btn-secondary" href="mailto:info@wearefabbrik.com?subject=Vessel%20Class%20Finder%20-%20Enterprise">Talk to us about Enterprise</a>';
   if (plan === "free") {
-    el.innerHTML = btn("Upgrade to Starter &middot; $49/mo", "startCheckout('starter')", true) + btn("Upgrade to Pro &middot; $199/mo", "startCheckout('pro')");
+    el.innerHTML = btn("Upgrade to Starter &middot; €49/mo", "startCheckout('starter')", true) + btn("Upgrade to Pro &middot; €199/mo", "startCheckout('pro')");
   } else if (plan === "starter") {
     el.innerHTML = btn("Upgrade to Pro", "openPortal()", true) + btn("Manage billing", "openPortal()");
   } else if (plan === "pro") {

@@ -547,8 +547,8 @@ const UPGRADE_URL = `${SITE_URL}/#pricing`;
 
 // Suggested next step up from each plan, used in usage-alert emails.
 const NEXT_PLAN = {
-    free: "Starter ($49/mo, 5,000 lookups)",
-    starter: "Pro ($199/mo, 50,000 lookups)",
+    free: "Starter (€49/mo, 5,000 lookups)",
+    starter: "Pro (€199/mo, 50,000 lookups)",
     pro: "Enterprise (unlimited lookups)",
 };
 

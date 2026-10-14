@@ -58,8 +58,8 @@ TELEGRAM_CHAT_ID=...
 # Stripe billing (checkout/portal return 503 if unset)
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...       # from the webhook endpoint for /billing/webhook
-STRIPE_PRICE_STARTER=price_...        # monthly $49 price
-STRIPE_PRICE_PRO=price_...            # monthly $199 price
+STRIPE_PRICE_STARTER=price_...        # monthly €49 price
+STRIPE_PRICE_PRO=price_...            # monthly €199 price
 STRIPE_PORTAL_CONFIG=bpc_...          # optional: portal configuration for this product (else the account default)
 
 # Product analytics (server-side events skipped if unset)
@@ -287,8 +287,8 @@ Response: `{ "month": "2026-03", "used": 47, "limit": 100, "plan": "free" }`
 | Plan | Lookups/month | How to get |
 |------|--------------|------------|
 | Free | 100 | Register an account |
-| Starter | 5,000 | Upgrade on the website (Stripe, $49/mo) |
-| Pro | 50,000 | Upgrade on the website (Stripe, $199/mo) |
+| Starter | 5,000 | Upgrade on the website (Stripe, €49/mo) |
+| Pro | 50,000 | Upgrade on the website (Stripe, €199/mo) |
 | Enterprise | Unlimited | Contact info@wearefabbrik.com |
 
 Each unique IMO in a `/vessels` request counts as one lookup. If a request would take you over your monthly limit, `/vessels` returns `429` with `usage`, `requested`, `limit`, `plan` and `upgrade_url`, and nothing is charged. Users get one email when they reach 80% of their monthly limit and one at 100% (requires `RESEND_API_KEY`).

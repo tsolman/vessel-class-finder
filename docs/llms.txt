@@ -49,9 +49,9 @@ Errors are JSON `{"error": "..."}`. Status codes: 400 invalid input (non-numeric
 
 ## Plans
 
-- Free: 100 lookups/month, $0
-- Starter: 5,000 lookups/month, $49/mo
-- Pro: 50,000 lookups/month, $199/mo
+- Free: 100 lookups/month, €0
+- Starter: 5,000 lookups/month, €49/mo
+- Pro: 50,000 lookups/month, €199/mo
 - Enterprise: unlimited, custom pricing
 
 Upgrade by card at https://vesselclassfinder.com/#pricing (log in, choose a plan, pay through Stripe; the new limit applies within a minute). A 429 response includes an `upgrade_url`. For Enterprise, email info@wearefabbrik.com.

@@ -12,7 +12,7 @@ IACS publishes its *Vessels in Class* dataset only as a ZIP/CSV download. This p
 ```bash
 curl -X POST https://vessel-class-finder-production.up.railway.app/vessels \
   -H "x-api-key: YOUR_API_KEY" -H "Content-Type: application/json" \
-  -d '{"imos": [9200079]}'
+  -d '{"imos": [9811000]}'
 ```
 
 ## MCP server
@@ -182,7 +182,7 @@ POST /vessels
 x-api-key: your-api-key
 Content-Type: application/json
 
-{ "imos": [9200079, 9300123] }
+{ "imos": [9811000, 9321483] }
 ```
 
 - Up to **100 IMO numbers** per request (duplicates are removed first).
@@ -194,13 +194,13 @@ Response:
 ```json
 [
   {
-    "imo": 9200079,
-    "vessel_name": "EXAMPLE VESSEL",
+    "imo": 9811000,
+    "vessel_name": "EVER GIVEN",
     "update_date": "01/03/26",
-    "class": "LRS",
-    "date_of_survey": "15/06/2025",
-    "date_of_next_survey": "15/06/2028",
-    "date_of_latest_status": "01/01/2024",
+    "class": "ABS",
+    "date_of_survey": "12/07/2023",
+    "date_of_next_survey": "24/09/2028",
+    "date_of_latest_status": "25/10/2018",
     "status": "Delivered",
     "reason_for_status": ""
   }

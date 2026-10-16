@@ -54,7 +54,7 @@
           {
             "@type": "Question",
             "name": "How do I check a ship's class status by IMO number?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Register for a free API key, then send POST /vessels with body {\"imos\": [9200079]}. The response includes the classification society (for example NV for DNV, LRS for Lloyd's Register, NKK for ClassNK, BV, ABS), the class status (Delivered, Reinstated or Reassigned when in class; Suspended; Withdrawn), the last and next survey dates, and the reason for the latest status change." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Register for a free API key, then send POST /vessels with body {\"imos\": [9811000]}. The response includes the classification society (for example NV for DNV, LRS for Lloyd's Register, NKK for ClassNK, BV, ABS), the class status (Delivered, Reinstated or Reassigned when in class; Suspended; Withdrawn), the last and next survey dates, and the reason for the latest status change." }
           },
           {
             "@type": "Question",
@@ -440,6 +440,8 @@
       margin: 36px auto 0;
       text-align: left;
     }
+    .demo-examples { font-size: 13px; color: var(--text-muted); margin-top: 8px; text-align: center; }
+    .demo-examples button { background: none; border: 0; padding: 0 4px; color: var(--accent); font: inherit; cursor: pointer; text-decoration: underline; }
     .demo-label { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; text-align: center; }
     .demo-row { display: flex; gap: 8px; }
     .demo-row input {
@@ -552,20 +554,22 @@
     <div class="badge">IACS Classification Data</div>
     <h1>Vessel classification data<br>as a clean REST API</h1>
     <p>Query IACS class status, survey dates, and compliance info by IMO number. Stop maintaining scrapers &mdash; start shipping.</p>
-    <div class="cta-group">
-      <a href="#signup" class="btn btn-primary">Get Free API Key</a>
-      <a href="#api" class="btn btn-secondary">View Docs</a>
-    </div>
-    <a class="ph-badge" href="https://www.producthunt.com/products/vessel-class-finder?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-vessel-class-finder" target="_blank" rel="noopener noreferrer" onclick="window.vcfTrack('producthunt_badge_clicked', { where: 'hero' })"><img alt="Vessel Class Finder - Check any ship's class status by IMO, via API or in Claude | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1268772&amp;theme=light&amp;t=1791272293168"></a>
-
     <form class="demo" onsubmit="runDemo(event)">
       <div class="demo-label">Try it now, no signup: enter any 7-digit IMO number</div>
       <div class="demo-row">
         <input id="demo-imo" inputmode="numeric" pattern="[0-9]{7}" maxlength="7" placeholder="e.g. 9321483" aria-label="IMO number" required>
         <button class="btn btn-primary" id="demo-btn" type="submit">Look up</button>
       </div>
+      <div class="demo-examples">Or try: <button type="button" onclick="demoExample('9811000')">Ever Given</button> <button type="button" onclick="demoExample('9321483')">Emma Maersk</button> <button type="button" onclick="demoExample('9703291')">MSC Oscar</button></div>
       <div class="demo-result" id="demo-result" hidden aria-live="polite"></div>
     </form>
+
+    <div class="cta-group">
+      <a href="#signup" class="btn btn-primary">Get Free API Key</a>
+      <a href="#api" class="btn btn-secondary">View Docs</a>
+    </div>
+    <a class="ph-badge" href="https://www.producthunt.com/products/vessel-class-finder?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-vessel-class-finder" target="_blank" rel="noopener noreferrer" onclick="window.vcfTrack('producthunt_badge_clicked', { where: 'hero' })"><img alt="Vessel Class Finder - Check any ship's class status by IMO, via API or in Claude | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1268772&amp;theme=light&amp;t=1791272293168"></a>
+
 
     <div class="code-block">
       <div class="code-header">
@@ -578,17 +582,17 @@
 <span class="kw">curl</span> -X POST https://vessel-class-finder-production.up.railway.app/vessels \
   -H <span class="str">"x-api-key: YOUR_API_KEY"</span> \
   -H <span class="str">"Content-Type: application/json"</span> \
-  -d <span class="str">'{"imos": [9200079]}'</span>
+  -d <span class="str">'{"imos": [9811000]}'</span>
 
 <span class="cm"># Response</span>
 [{
-  <span class="key">"imo"</span>: <span class="num">9200079</span>,
-  <span class="key">"vessel_name"</span>: <span class="str">"NORDIC AURORA"</span>,
-  <span class="key">"class"</span>: <span class="str">"NV"</span>,
+  <span class="key">"imo"</span>: <span class="num">9811000</span>,
+  <span class="key">"vessel_name"</span>: <span class="str">"EVER GIVEN"</span>,
+  <span class="key">"class"</span>: <span class="str">"ABS"</span>,
   <span class="key">"status"</span>: <span class="str">"Delivered"</span>,
-  <span class="key">"date_of_survey"</span>: <span class="str">"15/06/2025"</span>,
-  <span class="key">"date_of_next_survey"</span>: <span class="str">"15/06/2028"</span>,
-  <span class="key">"date_of_latest_status"</span>: <span class="str">"01/01/2024"</span>,
+  <span class="key">"date_of_survey"</span>: <span class="str">"12/07/2023"</span>,
+  <span class="key">"date_of_next_survey"</span>: <span class="str">"24/09/2028"</span>,
+  <span class="key">"date_of_latest_status"</span>: <span class="str">"25/10/2018"</span>,
   <span class="key">"reason_for_status"</span>: <span class="str">""</span>
 }]</pre>
     </div>
@@ -777,7 +781,7 @@
       </details>
       <details>
         <summary>How do I check a ship's class status by IMO number?</summary>
-        <p>Register for a free API key, then send <code>POST /vessels</code> with body <code>{"imos": [9200079]}</code>. The response includes the classification society (for example NV for DNV, LRS for Lloyd's Register, NKK for ClassNK, BV, ABS), the class status (Delivered, Reinstated or Reassigned when in class; Suspended; Withdrawn), the last and next survey dates, and the reason for the latest status change.</p>
+        <p>Register for a free API key, then send <code>POST /vessels</code> with body <code>{"imos": [9811000]}</code>. The response includes the classification society (for example NV for DNV, LRS for Lloyd's Register, NKK for ClassNK, BV, ABS), the class status (Delivered, Reinstated or Reassigned when in class; Suspended; Withdrawn), the last and next survey dates, and the reason for the latest status change.</p>
       </details>
       <details>
         <summary>Which classification societies are covered?</summary>
@@ -866,13 +870,13 @@ const SNIPPETS = {
   "curl": (key) => `curl -X POST ${API}/vessels \\
   -H "x-api-key: ${key}" \\
   -H "Content-Type: application/json" \\
-  -d '{"imos": [9200079, 9321483]}'`,
+  -d '{"imos": [9811000, 9321483]}'`,
   "Python": (key) => `import requests
 
 resp = requests.post(
     "${API}/vessels",
     headers={"x-api-key": "${key}"},
-    json={"imos": [9200079, 9321483]},
+    json={"imos": [9811000, 9321483]},
 )
 resp.raise_for_status()
 for vessel in resp.json():
@@ -880,7 +884,7 @@ for vessel in resp.json():
   "JavaScript": (key) => `const res = await fetch("${API}/vessels", {
   method: "POST",
   headers: { "x-api-key": "${key}", "Content-Type": "application/json" },
-  body: JSON.stringify({ imos: [9200079, 9321483] }),
+  body: JSON.stringify({ imos: [9811000, 9321483] }),
 });
 const vessels = await res.json();
 console.table(vessels);`,
@@ -928,8 +932,17 @@ function renderSnippets() {
 }
 
 // ---------- Live demo ----------
+let demoSource = "typed";
+function demoExample(imo) {
+  document.getElementById("demo-imo").value = imo;
+  demoSource = "example";
+  document.querySelector("form.demo").requestSubmit();
+}
+
 async function runDemo(e) {
   e.preventDefault();
+  const source = demoSource;
+  demoSource = "typed";
   const imo = document.getElementById("demo-imo").value.trim();
   const out = document.getElementById("demo-result");
   const btn = document.getElementById("demo-btn");
@@ -941,9 +954,10 @@ async function runDemo(e) {
   try {
     const res = await fetch(API + "/demo/" + imo);
     const data = await res.json();
-    window.vcfTrack("demo_lookup", { result: res.ok ? "found" : res.status === 404 ? "not_found" : res.status === 429 ? "rate_limited" : "error" });
+    window.vcfTrack("demo_lookup", { result: res.ok ? "found" : res.status === 404 ? "not_found" : res.status === 429 ? "rate_limited" : "error", source });
     if (!res.ok) {
       out.innerHTML = '<p class="error">' + escapeHtml(data.error || "Lookup failed.") + "</p>" +
+        (res.status === 404 ? '<p class="note">We cover the 12 IACS societies\' public dataset. The ship may be classed by a non-IACS society, unclassed, or the IMO number may be wrong. Try <a href="#" onclick="demoExample(\'9811000\'); return false;">Ever Given (9811000)</a>.</p>' : "") +
         (res.status === 429 ? '<p class="note"><a href="#signup">Get a free API key</a> for 100 lookups a month.</p>' : "");
       return;
     }

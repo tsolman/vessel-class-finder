@@ -1,0 +1,71 @@
+{
+  "slug": "what-is-an-imo-number",
+  "date": "2026-10-19",
+  "title": "What Is an IMO Number? Format, Check Digit and Uses",
+  "meta_description": "What an IMO ship identification number is, how the 7-digit format and check digit work, who assigns it, and how it differs from MMSI, call sign and name.",
+  "h1": "What is an IMO number?",
+  "primary_keyword": "IMO number",
+  "summary": "The seven-digit IMO number identifies a ship for life. How the check digit works, who issues it, and why it beats name or MMSI for lookups.",
+  "answer": "An IMO number is a unique seven-digit identifier given to a ship under the IMO Ship Identification Number Scheme. It is written as IMO followed by the digits, for example IMO 9811000. The number stays with the hull for its whole life, through changes of name, flag and owner. The last digit is a check digit that catches most typing errors.",
+  "sections": [
+    {
+      "h2": "What the IMO number is for",
+      "html": "<p>The International Maritime Organization (IMO) introduced the ship identification number scheme in 1987 to improve maritime safety and reduce fraud. It was later made mandatory under SOLAS, the main international convention on ship safety, for ships on international voyages. Under SOLAS, the requirement generally covers passenger ships of 100 gross tonnage and above and cargo ships of 300 gross tonnage and above, with some exceptions such as certain fishing vessels and warships.</p><p>The point is a single, permanent key for each ship. A vessel may sail under five names and three flags over 25 years. Its IMO number does not change. That is why class societies, flag registries, port state control, insurers and sanctions lists all use it.</p><p>The number is normally shown on the ship's certificates and, for most ships covered by SOLAS, marked permanently on the hull or superstructure.</p>"
+    },
+    {
+      "h2": "The format: seven digits with a check digit",
+      "html": "<p>An IMO number has seven digits and is usually written with the prefix <code>IMO</code>, as in <code>IMO 9321483</code>. The first six digits identify the ship. The seventh is a check digit calculated from the first six.</p><p>To calculate the check digit:</p><ol><li>Multiply the first six digits by 7, 6, 5, 4, 3 and 2, in that order.</li><li>Add the six results together.</li><li>Take the last digit of the total (the remainder after dividing by 10). That is the check digit.</li></ol><p>If the seventh digit of the number does not match, the number is invalid. Most single-digit typos and many swapped pairs of digits will fail the check.</p>"
+    },
+    {
+      "h2": "Worked examples: 9811000 and 9321483",
+      "html": "<p><strong>IMO 9811000</strong> (EVER GIVEN). First six digits: 9, 8, 1, 1, 0, 0.</p><table><thead><tr><th>Digit</th><th>9</th><th>8</th><th>1</th><th>1</th><th>0</th><th>0</th></tr></thead><tbody><tr><td>Weight</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td></tr><tr><td>Product</td><td>63</td><td>48</td><td>5</td><td>4</td><td>0</td><td>0</td></tr></tbody></table><p>63 + 48 + 5 + 4 + 0 + 0 = 120. The last digit of 120 is <strong>0</strong>, which matches the seventh digit. The number is valid.</p><p><strong>IMO 9321483</strong> (EMMA MAERSK). First six digits: 9, 3, 2, 1, 4, 8.</p><table><thead><tr><th>Digit</th><th>9</th><th>3</th><th>2</th><th>1</th><th>4</th><th>8</th></tr></thead><tbody><tr><td>Weight</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td></tr><tr><td>Product</td><td>63</td><td>18</td><td>10</td><td>4</td><td>12</td><td>16</td></tr></tbody></table><p>63 + 18 + 10 + 4 + 12 + 16 = 123. The last digit is <strong>3</strong>, which matches. Valid.</p><p>Now change one digit, say 9321<strong>5</strong>83. The fifth product becomes 15 instead of 12, the total is 126, and the check digit should be 6, not 3. The check catches it. In code, the whole test is one line: the sum of each of the first six digits times (7 minus its position, counting from 0) modulo 10 must equal the seventh digit.</p>"
+    },
+    {
+      "h2": "Who assigns IMO numbers",
+      "html": "<p>The IMO does not issue the numbers itself. They are allocated on its behalf by the organisation that maintains the long-running world ship database, historically associated with Lloyd's Register of Shipping and its successors (Lloyd's Register-Fairplay, then IHS Markit, now S&amp;P Global). New numbers are usually assigned when a ship is ordered or under construction, so a newbuilding often has an IMO number before it is delivered.</p><p>A related scheme gives seven-digit IMO numbers to companies and registered owners. Those are a different series and identify the company, not a ship. Make sure you are not looking at a company number when you expect a ship.</p>"
+    },
+    {
+      "h2": "IMO number vs MMSI, call sign and name",
+      "html": "<table><thead><tr><th>Identifier</th><th>Format</th><th>Issued by</th><th>Changes when</th></tr></thead><tbody><tr><td>IMO number</td><td>7 digits with check digit</td><td>Allocated on behalf of the IMO</td><td>Never; stays with the hull</td></tr><tr><td>MMSI</td><td>9 digits; first 3 identify the flag country</td><td>The flag state's radio authority</td><td>Usually on change of flag</td></tr><tr><td>Call sign</td><td>Letters and digits; prefix tied to the flag country</td><td>The flag state</td><td>Usually on change of flag</td></tr><tr><td>Ship name</td><td>Free text</td><td>The owner, registered with the flag</td><td>On sale or rename, at any time</td></tr></tbody></table><p>The MMSI (Maritime Mobile Service Identity) is what AIS transponders broadcast and what radio equipment uses. It is useful for tracking, but it is tied to the flag and can be reused or spoofed. The call sign is the ship's radio identity. The name is the least reliable of all: many ships share common names, and names are often changed when a ship is sold.</p>"
+    },
+    {
+      "h2": "Common IMO number mistakes",
+      "html": "<p>Most failed ship lookups come down to a handful of errors:</p><ul><li><strong>Using the MMSI.</strong> If the number has nine digits, it is not an IMO number. AIS screens often show both side by side.</li><li><strong>Dropping or adding a digit.</strong> Copying from PDFs and spreadsheets can strip a leading character or merge two cells. Seven digits, every time.</li><li><strong>Storing it as text with the prefix.</strong> Keep <code>IMO 9811000</code> for display, but store and query the bare digits <code>9811000</code>.</li><li><strong>Confusing ship and company numbers.</strong> A registered owner or manager also has a seven-digit IMO company number. It will pass a length check but will not match any ship.</li><li><strong>Trusting an old document.</strong> The IMO number does not change, but everything else on an old fixture or certificate might. Take the IMO from the document, then look up the current name, flag and class.</li></ul>"
+    },
+    {
+      "h2": "Why lookups should use the IMO number, not the name",
+      "html": "<p>If you search by name you will get false matches and missed matches. A ship renamed last month will not appear under its old name, and a common name can return several unrelated ships. In compliance work this is a real risk: ships with a history of class or sanctions problems are sometimes renamed and reflagged, and only the IMO number connects the new identity to the old record.</p><p>Class data is keyed by IMO for this reason. The IACS Vessels in Class dataset, which covers 60,223 ships across the 12 IACS societies in the 30 September 2026 snapshot, lists each ship by IMO with its current name. On <a href='/'>Vessel Class Finder</a> you look up a ship by IMO only; for a worked example see <a href='https://vesselclassfinder.com/?imo=9811000'>the result for IMO 9811000</a>, and for the full process see <a href='/blog/how-to-check-vessel-class-status.html'>how to check a ship's class status</a>.</p><p>A practical habit: validate the check digit before running any lookup or screening. It costs nothing and stops a typo from producing a false \"not found\". If you work with lists of ships, the <a href='/blog/vessel-classification-api.html'>API guide</a> shows how to check up to 100 IMOs per request, and the <a href='/use-cases/sanctions-kyc-screening.html'>KYC screening page</a> covers how class status fits into due diligence.</p>"
+    }
+  ],
+  "faq": [
+    {
+      "q": "How many digits is an IMO number?",
+      "a": "Seven. The first six identify the ship and the seventh is a check digit. It is usually written with the prefix IMO, for example IMO 9811000."
+    },
+    {
+      "q": "Does a ship's IMO number change when it is sold or renamed?",
+      "a": "No. The IMO number stays with the hull for its whole life, through changes of name, owner, manager and flag."
+    },
+    {
+      "q": "What is the difference between an IMO number and an MMSI?",
+      "a": "The IMO number is a permanent seven-digit ship identifier. The MMSI is a nine-digit radio identifier used by AIS, tied to the flag state, and usually changes when the ship changes flag."
+    },
+    {
+      "q": "How do I check if an IMO number is valid?",
+      "a": "Multiply the first six digits by 7, 6, 5, 4, 3 and 2, add the results, and take the last digit of the total. It must equal the seventh digit."
+    },
+    {
+      "q": "Who issues IMO numbers?",
+      "a": "They are allocated on behalf of the International Maritime Organization by the organisation that maintains the world ship database, today S&P Global, usually when a ship is ordered or under construction."
+    },
+    {
+      "q": "Where can I find a ship's IMO number?",
+      "a": "On its certificates, charter party and Q88, on bills of lading, on public AIS sites, and for most ships it is also marked on the hull or superstructure."
+    }
+  ],
+  "related": [
+    "how-to-check-vessel-class-status",
+    "shadow-fleet-class-red-flags",
+    "/use-cases/sanctions-kyc-screening.html"
+  ]
+}

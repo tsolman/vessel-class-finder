@@ -84,3 +84,17 @@ Every vessel in the IACS Vessels in Class dataset, which covers ships classed by
 - [Class status for marine insurance underwriting](https://vesselclassfinder.com/use-cases/marine-insurance.html)
 - [Source code and full API reference](https://github.com/tsolman/vessel-class-finder)
 - [Terms of Service & Privacy Policy](https://vesselclassfinder.com/terms.html)
+
+## Guides
+
+- [All articles](https://vesselclassfinder.com/blog/)
+- [Why does marine insurance depend on a ship keeping its class?](https://vesselclassfinder.com/blog/class-and-marine-insurance.html): How class status ties into hull and machinery and P&I cover, what suspension or withdrawal can mean for a policy, and how to monitor a book of vessels.
+- [What is the difference between class suspended and class withdrawn?](https://vesselclassfinder.com/blog/class-suspended-vs-withdrawn.html): Suspended class is temporary and can be reinstated. Withdrawn means the society no longer classes the ship. Causes, consequences and the numbers.
+- [How to check a ship's class status by IMO number](https://vesselclassfinder.com/blog/how-to-check-vessel-class-status.html): Find the IMO number, look it up in the IACS Vessels in Class data, and read status, survey dates and reason fields correctly.
+- [What does it mean if a ship is classed by a non-IACS society?](https://vesselclassfinder.com/blog/non-iacs-classification-societies.html): Ships classed outside IACS: why it raises due-diligence questions, how 431 ships moved to non-IACS class, and what the IACS data can and cannot show.
+- [What class red flags are associated with the shadow fleet?](https://vesselclassfinder.com/blog/shadow-fleet-class-red-flags.html): Class withdrawals, overdue surveys and moves to non-IACS societies: which class signals matter in shadow fleet screening, and what they cannot prove.
+- [How does the ship survey cycle work?](https://vesselclassfinder.com/blog/ship-survey-cycle-explained.html): Annual, intermediate and special surveys, bottom surveys in dry dock, and how to read survey dates and Survey overdue in IACS class data.
+- [What is a transfer of class and why do ships change classification society?](https://vesselclassfinder.com/blog/transfer-of-class.html): Ships move between classification societies for ordinary commercial reasons, and sometimes to dodge scrutiny. How transfers work and what to check.
+- [What is a classification society?](https://vesselclassfinder.com/blog/what-is-a-classification-society.html): What ship classification societies do, how class differs from statutory certification, and why insurers, charterers, flags and lenders require it.
+- [What is an IMO number?](https://vesselclassfinder.com/blog/what-is-an-imo-number.html): The seven-digit IMO number identifies a ship for life. How the check digit works, who issues it, and why it beats name or MMSI for lookups.
+- [What is IACS?](https://vesselclassfinder.com/blog/what-is-iacs.html): IACS explained: the 12 member class societies and their ship counts, Unified Requirements and CSR, and what the Vessels in Class dataset can tell you.

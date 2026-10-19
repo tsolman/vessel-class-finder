@@ -1,0 +1,67 @@
+{
+  "slug": "what-is-iacs",
+  "date": "2026-10-19",
+  "title": "What Is IACS? The 12 Members and Vessels in Class Data",
+  "meta_description": "What IACS is, its 12 member classification societies with ship counts, what Unified Requirements and Common Structural Rules are, and the limits of its data.",
+  "h1": "What is IACS?",
+  "primary_keyword": "what is IACS",
+  "summary": "IACS explained: the 12 member class societies and their ship counts, Unified Requirements and CSR, and what the Vessels in Class dataset can tell you.",
+  "answer": "IACS, the International Association of Classification Societies, is the industry body of 12 leading ship classification societies, including ABS, Bureau Veritas, ClassNK, DNV and Lloyd's Register. It develops common technical requirements its members apply, works with the IMO on safety standards, and publishes the Vessels in Class dataset listing about 60,000 ships classed by its members.",
+  "sections": [
+    {
+      "h2": "IACS in one paragraph",
+      "html": "<p>The International Association of Classification Societies was formed in 1968 and has its secretariat in London. It is not a regulator and does not class ships itself. Its members do. What IACS does is agree minimum technical standards that all members apply, coordinate how members deal with each other (for example when a ship changes society), represent the class sector at the International Maritime Organization, where it has consultative status, and run a quality scheme that members must meet. For background on what each member does day to day, see <a href='/blog/what-is-a-classification-society.html'>what is a classification society</a>.</p>"
+    },
+    {
+      "h2": "The 12 IACS members",
+      "html": "<p>IACS has 12 members. The table shows each society, the code it appears under in IACS data, and the number of ships it has in the Vessels in Class dataset (snapshot 30 September 2026, all statuses).</p><table><thead><tr><th>Society</th><th>IACS code</th><th>Ships</th></tr></thead><tbody><tr><td><a href='/class-societies/classnk.html'>ClassNK</a></td><td><code>NKK</code></td><td>10,117</td></tr><tr><td><a href='/class-societies/bureau-veritas.html'>Bureau Veritas</a></td><td><code>BV</code></td><td>9,958</td></tr><tr><td><a href='/class-societies/abs.html'>ABS</a></td><td><code>ABS</code></td><td>8,787</td></tr><tr><td><a href='/class-societies/dnv.html'>DNV</a></td><td><code>NV</code></td><td>7,753</td></tr><tr><td><a href='/class-societies/lloyds-register.html'>Lloyd's Register</a></td><td><code>LRS</code></td><td>7,606</td></tr><tr><td><a href='/class-societies/rina.html'>RINA</a></td><td><code>RINA</code></td><td>5,842</td></tr><tr><td><a href='/class-societies/china-classification-society.html'>China Classification Society</a></td><td><code>CCS</code></td><td>4,376</td></tr><tr><td><a href='/class-societies/korean-register.html'>Korean Register</a></td><td><code>KR</code></td><td>2,559</td></tr><tr><td><a href='/class-societies/indian-register.html'>Indian Register of Shipping</a></td><td><code>IRS</code></td><td>1,639</td></tr><tr><td><a href='/class-societies/polish-register.html'>Polish Register of Shipping</a></td><td><code>PRS</code></td><td>608</td></tr><tr><td><a href='/class-societies/croatian-register.html'>Croatian Register of Shipping</a></td><td><code>CRS</code></td><td>494</td></tr><tr><td><a href='/class-societies/turk-loydu.html'>Türk Loydu</a></td><td><code>TLV</code></td><td>484</td></tr></tbody></table><p>Total: <strong>60,223 ships</strong>. Note the codes: DNV appears as <code>NV</code>, ClassNK as <code>NKK</code>, Lloyd's Register as <code>LRS</code> and Türk Loydu as <code>TLV</code>. If you match IACS data against your own records, map these first. Ship counts are not tonnage, so a society with fewer but larger ships can rank higher by gross tonnage. The <a href='/class-societies/'>class societies comparison</a> shows status breakdowns for each member.</p>"
+    },
+    {
+      "h2": "Unified Requirements and Common Structural Rules",
+      "html": "<p>Each society writes its own rules, but IACS members agree a common floor. The main instruments are:</p><ul><li><strong>Unified Requirements (URs).</strong> Minimum technical requirements on specific topics, such as materials, welding, machinery, electrical installations or particular ship types. Members are expected to build them into their own rules.</li><li><strong>Unified Interpretations (UIs).</strong> Agreed readings of IMO convention requirements, so that members apply the same statutory text in the same way when acting for flag states.</li><li><strong>Procedural Requirements.</strong> Agreed procedures for how members work, including how class is transferred between members so that overdue surveys and outstanding conditions follow the ship.</li><li><strong>Common Structural Rules (CSR).</strong> A harmonised set of structural rules for bulk carriers and oil tankers, applied by members to ships within its scope. The aim is that the structural standard does not depend on which IACS society the owner picks.</li></ul><p>IACS also publishes recommendations, which are guidance rather than mandatory. The exact list and current versions are on the IACS website. For this article the key point is that IACS membership signals a shared technical baseline and shared procedures, not identical rulebooks.</p>"
+    },
+    {
+      "h2": "How IACS works with the IMO and flag states",
+      "html": "<p>The IMO writes the international conventions, such as SOLAS, MARPOL and the Load Line Convention. Flag states apply them to their ships. Classification societies sit between the two: they class ships to their own rules and, as recognized organizations, often carry out statutory surveys for flags.</p><p>IACS contributes at the IMO as a non-governmental organisation with consultative status. In practice that means it brings technical input to IMO committees, and its Unified Interpretations help members apply new convention text consistently. Where a convention leaves technical detail open, IACS requirements often fill the gap for the ships its members class.</p><p>Membership also comes with obligations. Members must hold certification under the IACS quality scheme, which is audited, and follow the association's procedural requirements. A society can leave IACS or have its membership suspended, and the list of members has changed over the years, so check the current list on the IACS website before relying on it in a contract.</p>"
+    },
+    {
+      "h2": "Why IACS membership matters in practice",
+      "html": "<p>Many contracts and policies refer to IACS rather than to a named society. Charter parties often require the ship to be classed with an IACS member. Hull and machinery policies, P&amp;I club rules and loan agreements commonly use similar wording. Some flag registries and port state control regimes also treat IACS membership as one indicator when assessing recognized organizations.</p><p>That is why a move from an IACS member to a society outside IACS draws attention in vetting, insurance and KYC work. In the dataset, <strong>431 ships</strong> carry the reason <em>Transfer of class to a non-IACS society</em>, against 1,316 that moved to another IACS member. <a href='/blog/non-iacs-classification-societies.html'>Non-IACS classification societies</a> covers what that means for due diligence, and <a href='/use-cases/sanctions-kyc-screening.html'>class checks for sanctions and KYC</a> covers the screening workflow.</p>"
+    },
+    {
+      "h2": "The Vessels in Class dataset",
+      "html": "<p>IACS publishes a list of ships classed by its members, known as Vessels in Class. It is free and public, but it is published as a downloadable ZIP/CSV file rather than an API. Each record includes:</p><ul><li><code>imo</code> and <code>vessel_name</code></li><li><code>class</code>: the society code, such as <code>ABS</code> or <code>NV</code></li><li><code>status</code>: Delivered, Reinstated, Reassigned, Suspended or Withdrawn</li><li><code>date_of_survey</code> and <code>date_of_next_survey</code></li><li><code>date_of_latest_status</code> and <code>reason_for_status</code></li></ul><p>In the 30 September 2026 snapshot, 50,826 ships are in class (Delivered 46,063, Reinstated 3,381, Reassigned 1,382), 575 are Suspended, 4,848 are Withdrawn and 3,974 have no status recorded. The <a href='/iacs-class-status-codes.html'>status codes guide</a> explains each value.</p><p>Vessel Class Finder downloads this file every Sunday and serves it by IMO number, through a free web lookup and a JSON API. For example, <a href='https://vesselclassfinder.com/?imo=9811000'>IMO 9811000 (EVER GIVEN)</a> returns ABS, Delivered, last survey 12/07/2023, next survey 24/09/2028. The <a href='/blog/vessel-classification-api.html'>API guide</a> shows batch requests of up to 100 IMOs.</p>"
+    },
+    {
+      "h2": "What the dataset cannot tell you",
+      "html": "<p>The data is useful precisely because it is simple, but it has clear limits:</p><ul><li><strong>Only the 12 IACS members.</strong> Ships classed elsewhere are not in it. A missing IMO means no IACS record, not that the ship does not exist.</li><li><strong>Status, not condition.</strong> There are no class notations, no conditions of class, no open recommendations and no certificate details. Those come from the society's own records or the owner.</li><li><strong>No statutory certificates.</strong> The dataset says nothing about SOLAS, MARPOL or load line certificates issued for the flag.</li><li><strong>Not real time.</strong> IACS updates the file periodically and Vessel Class Finder refreshes weekly, so a change made yesterday may not show yet.</li><li><strong>Gaps in fields.</strong> 3,974 records have no status, and survey dates are sometimes blank.</li></ul><p>Use it as a fast first check across a fleet or a deal. When something looks wrong, ask the society or the owner for the class certificate and a survey status report.</p>"
+    }
+  ],
+  "faq": [
+    {
+      "q": "How many members does IACS have?",
+      "a": "IACS has 12 members: ABS, Bureau Veritas, China Classification Society, Croatian Register of Shipping, DNV, Indian Register of Shipping, Korean Register, Lloyd's Register, ClassNK, Polish Register of Shipping, RINA and Türk Loydu."
+    },
+    {
+      "q": "What does IACS stand for?",
+      "a": "IACS stands for the International Association of Classification Societies. It is the association of 12 major ship classification societies and is based in London."
+    },
+    {
+      "q": "Is IACS a regulator?",
+      "a": "No. IACS does not class ships or enforce law. Its members class ships, and IACS sets common minimum technical requirements and procedures that members agree to apply."
+    },
+    {
+      "q": "What are IACS Unified Requirements?",
+      "a": "Unified Requirements are minimum technical requirements agreed by IACS members on specific topics, which each member incorporates into its own class rules."
+    },
+    {
+      "q": "Where can I download the IACS Vessels in Class list?",
+      "a": "IACS publishes it as a ZIP/CSV download on its website. Vessel Class Finder serves the same data by IMO number through a free lookup and an API, refreshed every Sunday."
+    },
+    {
+      "q": "Why is DNV listed as NV in IACS data?",
+      "a": "The IACS dataset uses its own society codes. DNV appears as NV, ClassNK as NKK, Lloyd's Register as LRS and Türk Loydu as TLV."
+    }
+  ],
+  "related": ["what-is-a-classification-society", "non-iacs-classification-societies", "/class-societies/", "/iacs-class-status-codes.html"]
+}

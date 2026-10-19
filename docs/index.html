@@ -939,6 +939,15 @@ function demoExample(imo) {
   document.querySelector("form.demo").requestSubmit();
 }
 
+// Shareable lookup links: /?imo=9811000 runs the demo on load.
+function demoFromLink() {
+  const imo = new URLSearchParams(location.search).get("imo");
+  if (!imo || !/^\d{7}$/.test(imo)) return;
+  document.getElementById("demo-imo").value = imo;
+  demoSource = "link";
+  document.querySelector("form.demo").requestSubmit();
+}
+
 async function runDemo(e) {
   e.preventDefault();
   const source = demoSource;
@@ -1279,6 +1288,7 @@ async function handleResend(e) {
 renderSnippets();
 if (apiKey) showAccount();
 handleCheckoutReturn();
+demoFromLink();
 </script>
 
 <footer>

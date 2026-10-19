@@ -13,6 +13,11 @@ const read = (f) => JSON.parse(fs.readFileSync(new URL(f, import.meta.url), "utf
 const stats = read("./stats.json");
 const societies = read("./societies.json");
 const useCases = fs.existsSync(new URL("./use-cases.json", import.meta.url)) ? read("./use-cases.json") : [];
+// Blog articles: one JSON file each in ./blog/, newest first.
+const BLOG_DIR = new URL("./blog/", import.meta.url);
+const posts = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".json"))
+    .map((f) => read(`./blog/${f}`))
+    .sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug));
 
 // ---------- helpers ----------
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -43,7 +48,7 @@ const STATUSES = [
 ];
 
 // ---------- layout ----------
-function page({ urlPath, title, description, h1, breadcrumb, body, jsonld = [], wide = false }) {
+function page({ urlPath, title, description, h1, breadcrumb, body, jsonld = [], wide = false, meta, ogType = "article" }) {
     const url = SITE + urlPath;
     const crumbs = [{ name: "Home", path: "/" }, ...breadcrumb];
     const breadcrumbLd = {
@@ -60,7 +65,7 @@ function page({ urlPath, title, description, h1, breadcrumb, body, jsonld = [], 
   <meta name="description" content="${esc(description)}">
   <link rel="canonical" href="${url}">
   <link rel="icon" href="/logo.svg" type="image/svg+xml">
-  <meta property="og:type" content="article">
+  <meta property="og:type" content="${ogType}">
   <meta property="og:site_name" content="Vessel Class Finder">
   <meta property="og:title" content="${esc(title)}">
   <meta property="og:description" content="${esc(description)}">
@@ -78,6 +83,7 @@ ${ld}
     <ul>
       <li class="nav-secondary"><a href="/class-societies/">Class societies</a></li>
       <li class="nav-secondary"><a href="/iacs-class-status-codes.html">Status codes</a></li>
+      <li class="nav-secondary"><a href="/blog/">Blog</a></li>
       <li><a href="/#api">API</a></li>
       <li><a href="/#pricing">Pricing</a></li>
       <li><a href="/#signup" class="nav-account">Get API key</a></li>
@@ -91,13 +97,13 @@ ${ld}
   </div>
 
   <h1>${esc(h1)}</h1>
-  <div class="meta">Data from the IACS Vessels in Class dataset, as of ${asOfLong}. Refreshed weekly.</div>
+  <div class="meta">${meta ?? `Data from the IACS Vessels in Class dataset, as of ${asOfLong}. Refreshed weekly.`}</div>
 ${body}
 </article>
 
 <footer>
   <div>
-    <p><a href="/class-societies/">Classification societies</a> &middot; <a href="/iacs-class-status-codes.html">IACS status codes</a> &middot; ${useCases.map((u) => `<a href="/use-cases/${u.slug}.html">${esc(u.h1)}</a>`).join(" &middot; ")}</p>
+    <p><a href="/class-societies/">Classification societies</a> &middot; <a href="/iacs-class-status-codes.html">IACS status codes</a> &middot; <a href="/blog/">Blog</a> &middot; ${useCases.map((u) => `<a href="/use-cases/${u.slug}.html">${esc(u.h1)}</a>`).join(" &middot; ")}</p>
     <p>Built by <a href="https://wearefabbrik.com" target="_blank" rel="noopener">WeAreFabbrik</a> &middot; <a href="https://github.com/tsolman/vessel-class-finder" target="_blank">GitHub</a> &middot; <a href="/terms.html">Terms &amp; Privacy</a></p>
   </div>
 </footer>
@@ -380,6 +386,82 @@ ${useCases.filter((o) => o.slug !== u.slug).map((o) => `    <li><a href="/use-ca
     });
 }
 
+// ---------- blog ----------
+const longDate = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+// The hand-written API guide is listed on the index alongside the generated posts.
+const apiGuide = {
+    path: "/blog/vessel-classification-api.html", date: "2026-03-25",
+    h1: "IACS vessel classification data API: how to query class status by IMO number",
+    summary: "How to get class status, classification society and survey dates by IMO number from a REST API instead of the IACS ZIP/CSV download.",
+};
+const postPath = (p) => `/blog/${p.slug}.html`;
+const relatedLink = (r) => {
+    if (r.startsWith("/")) {
+        const u = useCases.find((o) => r === `/use-cases/${o.slug}.html`);
+        const known = { "/iacs-class-status-codes.html": "IACS class status codes explained", "/class-societies/": "IACS classification societies compared", "/mcp.html": "Ask Claude about a ship's class (MCP connector)", [apiGuide.path]: apiGuide.h1 };
+        const soc = societies.find((o) => r === `/class-societies/${o.slug}.html`);
+        return `<a href="${r}">${esc(u?.h1 || known[r] || (soc && soc.name) || r)}</a>`;
+    }
+    const p = posts.find((o) => o.slug === r);
+    if (!p) throw new Error(`Unknown related blog slug: ${r}`);
+    return `<a href="${postPath(p)}">${esc(p.h1)}</a>`;
+};
+
+function blogPostPage(p) {
+    const body = `
+  <div class="answer"><p>${esc(p.answer)}</p></div>
+${p.sections.map((s) => `\n  <h2>${esc(s.h2)}</h2>\n  ${s.html}`).join("\n")}
+${demoBox("Check a ship's class status by IMO number (free, no signup)")}
+${cta}
+${faqBlock(p.faq)}
+
+  <h2>Related</h2>
+  <ul>
+${(p.related || []).map((r) => `    <li>${relatedLink(r)}</li>`).join("\n")}
+    <li><a href="/blog/">All articles</a></li>
+  </ul>`;
+    return page({
+        urlPath: postPath(p),
+        title: p.title,
+        description: p.meta_description,
+        h1: p.h1,
+        breadcrumb: [{ name: "Blog", path: "/blog/" }, { name: p.h1 }],
+        body,
+        meta: `Published ${longDate(p.date)} by WeAreFabbrik. Figures from the IACS Vessels in Class dataset as of ${asOfLong}.`,
+        jsonld: [{
+            "@context": "https://schema.org", "@type": "BlogPosting",
+            headline: p.h1, description: p.meta_description, datePublished: p.date, dateModified: p.date,
+            mainEntityOfPage: SITE + postPath(p), keywords: p.primary_keyword,
+            author: { "@type": "Organization", name: "WeAreFabbrik", url: "https://wearefabbrik.com" },
+            publisher: { "@type": "Organization", name: "WeAreFabbrik", url: "https://wearefabbrik.com" },
+        }, faqLd(p.faq)],
+    });
+}
+
+function blogIndexPage() {
+    const items = [...posts.map((p) => ({ path: postPath(p), date: p.date, h1: p.h1, summary: p.summary })), apiGuide];
+    const body = `
+  <p>Guides to ship classification, IACS class status and how to check it, for chartering, vetting, insurance and compliance teams.</p>
+  <ul class="post-list">
+${items.map((i) => `    <li>\n      <a href="${i.path}">${esc(i.h1)}</a>\n      <p>${esc(i.summary)}</p>\n      <span class="post-date">${longDate(i.date)}</span>\n    </li>`).join("\n")}
+  </ul>
+${cta}`;
+    return page({
+        urlPath: "/blog/",
+        title: "Ship Classification Guides & IACS Class Status Articles",
+        description: "Plain guides to ship classification, IACS class status codes, surveys, class transfers and how to check any ship's class by IMO number.",
+        h1: "Ship classification guides",
+        breadcrumb: [{ name: "Blog" }],
+        body,
+        meta: `${items.length} articles. Figures from the IACS Vessels in Class dataset as of ${asOfLong}.`,
+        ogType: "website",
+        jsonld: [{
+            "@context": "https://schema.org", "@type": "Blog", name: "Vessel Class Finder blog", url: SITE + "/blog/",
+            blogPost: items.map((i) => ({ "@type": "BlogPosting", headline: i.h1, url: SITE + i.path, datePublished: i.date })),
+        }],
+    });
+}
+
 // ---------- MCP connector docs ----------
 function mcpPage() {
     const MCP_URL = `${API}/mcp`;
@@ -470,6 +552,8 @@ for (const soc of societies) write(`/class-societies/${soc.slug}.html`, societyP
 write("/iacs-class-status-codes.html", glossaryPage());
 write("/mcp.html", mcpPage());
 for (const u of useCases) write(`/use-cases/${u.slug}.html`, useCasePage(u));
+write("/blog/", blogIndexPage());
+for (const p of posts) write(postPath(p), blogPostPage(p));
 
 // Sitemap: hand-written pages plus everything generated above.
 const staticPages = [
@@ -479,7 +563,7 @@ const staticPages = [
 ];
 const entries = [
     ...staticPages.map((p) => ({ ...p, lastmod: stats.asOf })),
-    ...written.map((loc) => ({ loc, lastmod: stats.asOf, priority: loc === "/class-societies/" || loc.startsWith("/iacs") ? "0.8" : "0.7" })),
+    ...written.map((loc) => ({ loc, lastmod: posts.find((p) => postPath(p) === loc)?.date || stats.asOf, priority: loc === "/class-societies/" || loc.startsWith("/iacs") ? "0.8" : "0.7" })),
 ];
 fs.writeFileSync(path.join(DOCS, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

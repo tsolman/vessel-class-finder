@@ -205,3 +205,10 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   nav .nav-secondary { display: none; }
   .demo-row { flex-direction: column; }
 }
+
+/* Blog index */
+.post-list { list-style: none; padding: 0; margin: 24px 0; }
+.post-list li { padding: 18px 0; border-bottom: 1px solid var(--border); }
+.post-list a { font-size: 18px; font-weight: 600; }
+.post-list p { color: var(--text-muted); margin: 6px 0 4px; }
+.post-date { font-size: 13px; color: var(--text-muted); }

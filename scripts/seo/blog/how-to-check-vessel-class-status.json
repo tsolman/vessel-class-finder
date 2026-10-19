@@ -1,0 +1,72 @@
+{
+  "slug": "how-to-check-vessel-class-status",
+  "date": "2026-10-19",
+  "title": "Check a Ship's Class Status by IMO Number: Step by Step",
+  "meta_description": "How to check whether a ship is in class using its IMO number: find the IMO, run a free lookup, read each IACS field, and what to do if nothing comes back.",
+  "h1": "How to check a ship's class status by IMO number",
+  "primary_keyword": "check vessel class status",
+  "summary": "Find the IMO number, look it up in the IACS Vessels in Class data, and read status, survey dates and reason fields correctly.",
+  "answer": "To check a ship's class status, find its seven-digit IMO number and look it up in the IACS Vessels in Class dataset, either through a free lookup tool or the society's own register. Read the status first: Delivered, Reinstated or Reassigned mean in class; Suspended or Withdrawn mean not. Then check the survey dates and the reason recorded with the latest status change.",
+  "sections": [
+    {
+      "h2": "Step 1: Find the ship's IMO number",
+      "html": "<p>Start with the IMO number, not the name. Ship names change with sales and are often reused, so a name search can return the wrong ship or several ships. The IMO number is a seven-digit number that stays with the hull for its whole life. See <a href='/blog/what-is-an-imo-number.html'>what an IMO number is</a> for the details.</p><p>Common places to find it:</p><ul><li>The charter party, Q88 or vessel particulars questionnaire.</li><li>Class, statutory or P&amp;I certificates for the ship.</li><li>Bills of lading, fixture recaps and port documents, usually written as <code>IMO 9811000</code>.</li><li>Public AIS sites, which normally show the IMO alongside the MMSI.</li></ul><p>Check you have seven digits, not nine. A nine-digit number is almost always an MMSI, which is a radio identifier and will not match class records.</p>"
+    },
+    {
+      "h2": "Step 2: Run a free lookup",
+      "html": "<p>IACS, the International Association of Classification Societies, publishes a Vessels in Class dataset covering ships classed by its 12 members. It is released as a downloadable file rather than a search page, so most people use a tool that indexes it by IMO.</p><p>On <a href='/'>Vessel Class Finder</a> you can type one IMO into the lookup box with no signup. To see a worked example, open <a href='https://vesselclassfinder.com/?imo=9811000'>vesselclassfinder.com/?imo=9811000</a>. That link runs the lookup for EVER GIVEN, the container ship that grounded in the Suez Canal in 2021. The result in the 30 September 2026 snapshot:</p><table><thead><tr><th>Field</th><th>Value</th></tr></thead><tbody><tr><td>vessel_name</td><td>EVER GIVEN</td></tr><tr><td>class</td><td>ABS</td></tr><tr><td>status</td><td>Delivered</td></tr><tr><td>date_of_survey</td><td>12/07/2023</td></tr><tr><td>date_of_next_survey</td><td>24/09/2028</td></tr><tr><td>date_of_latest_status</td><td>25/10/2018</td></tr><tr><td>reason_for_status</td><td>(empty)</td></tr></tbody></table><p>In plain terms: ABS classes the ship, it has been in class since 2018 with no suspension or withdrawal recorded, and its next survey date falls in September 2028.</p>"
+    },
+    {
+      "h2": "Step 3: Read each field",
+      "html": "<ul><li><strong>class</strong>: the society's IACS code. Some codes are not obvious: DNV appears as <code>NV</code>, ClassNK as <code>NKK</code>, Lloyd's Register as <code>LRS</code> and Türk Loydu as <code>TLV</code>. The <a href='/class-societies/'>class societies page</a> lists all 12.</li><li><strong>status</strong>: the field that answers the question. <em>Delivered</em>, <em>Reinstated</em> and <em>Reassigned</em> are in class. <em>Suspended</em> means class is temporarily invalid. <em>Withdrawn</em> means the society no longer classes the ship. Some records have no status at all. The <a href='/iacs-class-status-codes.html'>status codes guide</a> explains each one.</li><li><strong>date_of_survey</strong>: the most recent survey date the society reported.</li><li><strong>date_of_next_survey</strong>: the next survey due date the society reported. A date in the past on a ship still shown in class is worth a question to the owner or society.</li><li><strong>date_of_latest_status</strong>: when the status last changed. For a Delivered ship this is often close to delivery or entry into that society's class.</li><li><strong>reason_for_status</strong>: the reason recorded with the latest status change, such as <em>Survey overdue</em> or <em>Transfer of class to a non-IACS society</em>.</li></ul><p>Read status first and reason second. The reason field can carry text even on an in-class ship. EMMA MAERSK (IMO 9321483), for example, shows status Delivered with the reason <em>by society for other reasons</em>. The status is what tells you whether the ship is currently in class. All dates are in DD/MM/YYYY format.</p>"
+    },
+    {
+      "h2": "Step 4: Decide what the result means",
+      "html": "<p>For most checks, a quick rule of thumb works:</p><ul><li><strong>In class, recent survey, next survey in the future</strong>: no class concern from this data.</li><li><strong>Reinstated or Reassigned</strong>: in class, but there is history. Look at the date and reason of the latest status change.</li><li><strong>Suspended</strong>: treat the ship as not in class until it is reinstated. This usually matters for insurance cover, charter parties and port state control.</li><li><strong>Withdrawn</strong>: read the reason. <em>Transfer of class to another IACS member</em> or <em>Sold for recycling (scrap)</em> are routine. <em>Survey overdue</em>, <em>Non-compliance with conditions of class / recommendations</em> or <em>Transfer of class to a non-IACS society</em> deserve a closer look. See <a href='/blog/class-suspended-vs-withdrawn.html'>class suspended vs withdrawn</a>.</li></ul><p>For scale, the 30 September 2026 snapshot holds 60,223 ships. 50,826 are in class, 575 are suspended and 4,848 are withdrawn. <em>Survey overdue</em> is recorded as the reason for 1,589 ships, and <em>Transfer of class to a non-IACS society</em> for 431.</p>"
+    },
+    {
+      "h2": "What to do if the IMO is not found",
+      "html": "<p>No result does not mean the ship does not exist. It means the IMO is not in the IACS dataset. Work through the likely causes:</p><ol><li><strong>Typo or wrong number.</strong> Check the IMO check digit (explained in <a href='/blog/what-is-an-imo-number.html'>our IMO number guide</a>) and make sure it is not an MMSI.</li><li><strong>Non-IACS class.</strong> The ship may be classed by a society outside IACS. The dataset covers only the 12 members. See <a href='/blog/non-iacs-classification-societies.html'>non-IACS classification societies</a>.</li><li><strong>Not classed at all.</strong> Some small or domestic vessels have no class.</li><li><strong>Very recent change.</strong> The data is refreshed weekly, every Sunday, so a newbuilding delivered this week or a change made yesterday may not show yet.</li></ol><p>If an internationally trading ship has no IACS record, ask the owner or manager for the current class certificate and the name of the society. For compliance work, the absence of an IACS record is commonly treated as a reason for enhanced due diligence, not as a finding on its own.</p>"
+    },
+    {
+      "h2": "Check many ships at once with the API",
+      "html": "<p>If you vet a fleet, a portfolio or a list of nominations, one-at-a-time lookups get slow. The Vessel Class Finder API takes up to 100 IMO numbers per request and returns the same fields for each:</p><blockquote><code>POST https://vessel-class-finder-production.up.railway.app/vessels</code><br>Header: <code>x-api-key: YOUR_KEY</code><br>Body: <code>{\"imos\": [9811000, 9321483]}</code></blockquote><p>Each IMO counts as one lookup. The free plan includes 100 lookups a month with no card; you can <a href='/#signup'>get a free API key</a> on the homepage. The <a href='/blog/vessel-classification-api.html'>API guide</a> covers request and response details, and the <a href='/mcp.html'>Claude connector</a> lets you ask about ships in plain language.</p><p>A common pattern is a weekly job that re-checks every ship you care about and flags any change in status or reason since the last run.</p>"
+    },
+    {
+      "h2": "Limits to keep in mind",
+      "html": "<p>The IACS dataset is a useful first check, but it is not a class certificate. It does not show conditions of class, memoranda, class notations or survey reports. For a fixture, a loan or an insurance placement, ask the society or the owner for the certificate and survey status report. Use the public data to decide which ships need that extra step, and to spot changes between formal reviews.</p>"
+    }
+  ],
+  "faq": [
+    {
+      "q": "How do I know if a ship is in class?",
+      "a": "Look up its IMO number in the IACS Vessels in Class data. A status of Delivered, Reinstated or Reassigned means the ship is in class with that society; Suspended or Withdrawn means it is not."
+    },
+    {
+      "q": "Can I check class status by ship name?",
+      "a": "You can try, but it is unreliable. Names change and are reused across ships. Use the seven-digit IMO number, which stays with the hull for life."
+    },
+    {
+      "q": "Is there a free way to check a vessel's class?",
+      "a": "Yes. The lookup box on vesselclassfinder.com checks one IMO at a time with no signup, using IACS data refreshed weekly. The free API plan adds 100 lookups a month."
+    },
+    {
+      "q": "Why does my ship not appear in the IACS list?",
+      "a": "It may be classed by a non-IACS society, not classed at all, or the IMO may be mistyped. Very recent changes can also take up to a week to appear."
+    },
+    {
+      "q": "What does Survey overdue mean as a reason?",
+      "a": "It means the society recorded an overdue survey as the reason for the latest status change, usually a suspension or withdrawal. It appears for 1,589 ships in the 30 September 2026 snapshot."
+    },
+    {
+      "q": "Is the IACS dataset the same as a class certificate?",
+      "a": "No. It is a public summary of status and survey dates. For contractual or insurance purposes, get the certificate or a survey status report from the society."
+    }
+  ],
+  "related": [
+    "what-is-an-imo-number",
+    "class-suspended-vs-withdrawn",
+    "/iacs-class-status-codes.html",
+    "/blog/vessel-classification-api.html"
+  ]
+}

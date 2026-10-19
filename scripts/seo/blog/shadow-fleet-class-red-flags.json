@@ -1,0 +1,64 @@
+{
+  "slug": "shadow-fleet-class-red-flags",
+  "date": "2026-10-19",
+  "title": "Shadow Fleet Red Flags: What Class Data Shows",
+  "meta_description": "Class signals linked to shadow fleet risk: withdrawal, overdue surveys, moves to non-IACS societies. What class data can and cannot prove, and what to check.",
+  "h1": "What class red flags are associated with the shadow fleet?",
+  "primary_keyword": "shadow fleet class red flags",
+  "summary": "Class withdrawals, overdue surveys and moves to non-IACS societies: which class signals matter in shadow fleet screening, and what they cannot prove.",
+  "answer": "Class signals often associated with shadow or dark fleet risk are: class withdrawn or suspended, especially for an overdue survey; a transfer to a non-IACS society; no IACS class record for a ship trading internationally; and a recent status change on older tonnage. Each one is an indicator, not proof. Combine it with sanctions screening, AIS history, ownership research and P&I checks before drawing conclusions.",
+  "sections": [
+    {
+      "h2": "Why class comes up in shadow fleet screening",
+      "html": "<p>'Shadow fleet' and 'dark fleet' are informal labels. They usually describe ships, often older tankers, that trade outside the mainstream system of Western-linked insurance, finance and services, sometimes to move sanctioned cargo. There is no official list and no single definition. In December 2023 the IMO Assembly adopted a resolution urging states and the industry to act against illegal operations by the 'dark fleet', which shows the issue is taken seriously, but it did not create a register of ships.</p><p>Classification matters because mainstream insurers, banks, charterers and port authorities typically expect a ship to hold class with a recognised society, usually one of the 12 members of <a href='/blog/what-is-iacs.html'>IACS</a>. A ship that leaves that system loses one of the routine, independent checks on its condition. That makes class status one of the few public, structured data points a compliance team can check by IMO number in seconds.</p>"
+    },
+    {
+      "h2": "The class signals worth a closer look",
+      "html": "<p>The IACS Vessels in Class dataset records a status and, for many ships, a reason for the latest status change. In the snapshot of 30 September 2026, covering 60,223 ships, these are the patterns most relevant to screening:</p><ul><li><strong>Withdrawn for 'Survey overdue'</strong>: 1,589 ships carry this reason. The owner did not complete a required survey on time and the society ended class.</li><li><strong>'Transfer of class to a non-IACS society'</strong>: 431 ships. The ship moved out of IACS class. See <a href='/blog/non-iacs-classification-societies.html'>non-IACS classification societies</a> for why that matters.</li><li><strong>Withdrawn 'by society for other reasons'</strong>: 3,645 ships. This is a broad category with many routine causes, so it needs reading in context.</li><li><strong>'Non-compliance with conditions of class / recommendations'</strong>: 178 ships. The society required repairs or actions that were not carried out.</li><li><strong>Suspended</strong>: 575 ships currently suspended. Class is not in force until the issue is resolved.</li><li><strong>No IACS record at all</strong> for an ocean-going ship. It may be classed by a non-IACS society, or have no class.</li><li><strong>A next survey date in the past</strong> on a ship that is still trading.</li><li><strong>A recent status change on an older ship</strong>, particularly a tanker. Shadow fleet reporting commonly describes ships of 15 to 20 years or more.</li></ul><p>A single signal is a reason to ask questions. Two or three together, on the same ship, deserve enhanced due diligence. The <a href='/iacs-class-status-codes.html'>IACS class status codes</a> page explains each status in detail.</p>"
+    },
+    {
+      "h2": "Every signal has ordinary explanations",
+      "html": "<p>Most ships with these flags are not part of any shadow fleet. Treat class data as a filter that tells you where to look, never as a finding.</p><table><thead><tr><th>Signal</th><th>Common innocent explanation</th><th>What to ask</th></tr></thead><tbody><tr><td>Withdrawn, survey overdue</td><td>Ship laid up, sold for demolition, or owner in financial difficulty</td><td>Is the ship trading? Has it been reclassed elsewhere?</td></tr><tr><td>Transfer to non-IACS society</td><td>Domestic or regional trade where a national or smaller society is normal and accepted</td><td>Which society now? Is it recognised by the flag state? Where does the ship trade?</td></tr><tr><td>Suspended</td><td>A survey window missed by days, often fixed quickly</td><td>When was it suspended, and has it been reinstated since?</td></tr><tr><td>No IACS record</td><td>Small, domestic or newly delivered ship, or a typing error in the IMO number</td><td>Check the IMO number, then ask for the class certificate</td></tr><tr><td>Withdrawn, other reasons</td><td>Sale, scrapping, change of manager or flag paperwork</td><td>What happened next? Any new class?</td></tr></tbody></table><p>The data itself shows how common routine causes are: 1,316 ships carry 'Transfer of class to another IACS member' and 266 'Sold for recycling (scrap)'. Moving between IACS societies is normal commercial behaviour. Our guide to <a href='/blog/transfer-of-class.html'>transfer of class</a> covers how those moves usually work.</p>"
+    },
+    {
+      "h2": "What class data can and cannot tell you",
+      "html": "<p><strong>It can tell you:</strong></p><ul><li>Which IACS society holds the record, and the current status.</li><li>The reason recorded for the latest status change.</li><li>The date of the last survey, the next survey due and when the current status took effect.</li><li>Whether the IMO number appears in the IACS dataset at all.</li></ul><p><strong>It cannot tell you:</strong></p><ul><li>Who owns, manages or controls the ship. Class data has no ownership fields.</li><li>Whether the ship, owner or cargo is sanctioned.</li><li>Where the ship has been, or whether its AIS transponder went dark.</li><li>Who insures it, or whether that insurance is genuine.</li><li>The ship's age, flag or type. Those come from registry data.</li><li>Anything about ships classed only by non-IACS societies. They are simply absent.</li></ul><p>It is also a snapshot. The public IACS dataset is published as a periodic download, and Vessel Class Finder refreshes it weekly, every Sunday. A change made by a society yesterday may not show yet. For a decision, the society's own records and the class certificate remain the authority.</p>"
+    },
+    {
+      "h2": "How to combine class with other checks",
+      "html": "<p>Class is one independent layer. A reasonable screening file on a ship typically brings together five:</p><ol><li><strong>Sanctions screening.</strong> Match the IMO number, ship name, registered owner, manager and related companies against the sanctions lists that apply to you. Class data does none of this.</li><li><strong>Class status.</strong> Check status, reason and survey dates by IMO. Note anything from the list above.</li><li><strong>AIS and voyage history.</strong> Look for transponder gaps, unexplained loitering, ship-to-ship transfers in open water, and port calls that do not match the stated trade.</li><li><strong>Ownership and management.</strong> Look for recent changes of owner, single-ship companies, frequent changes of name or flag, and registered addresses that reveal little.</li><li><strong>P&amp;I and hull insurance.</strong> Ask who provides P&amp;I cover. Cover from a member of the International Group of P&amp;I Clubs is easy to verify. Cover from an unfamiliar provider needs more work.</li></ol><p>The value is in the overlaps. A ship that left IACS class, changed owner and flag in the same few months, and has gaps in its AIS track tells a different story from a ship with only one of those features. Our <a href='/use-cases/sanctions-kyc-screening.html'>sanctions and KYC screening</a> page sets out a step-by-step workflow for the class part.</p>"
+    },
+    {
+      "h2": "Building class checks into a routine",
+      "html": "<p>One-off checks miss changes. Ships lose class between deals. A practical routine looks like this:</p><ul><li><strong>Check at onboarding.</strong> Record the class society, status and date of latest status in the case file, with the date you checked.</li><li><strong>Re-check before each transaction</strong> such as a charter, cargo purchase, loan drawdown or port call.</li><li><strong>Monitor portfolios weekly.</strong> Compare this week's results with last week's and flag any change of status, any change of society, and any next survey date that has passed.</li><li><strong>Escalate by combination, not by single flag.</strong> Send ships with two or more signals to enhanced due diligence.</li><li><strong>Ask for documents.</strong> When a flag appears, ask the owner or manager for the current class certificate and survey status report from the society.</li></ul><p>You can try one ship with the free lookup, for example <a href='https://vesselclassfinder.com/?imo=9811000'>EVER GIVEN (IMO 9811000)</a>, which shows ABS as society, status Delivered and a next survey due 24/09/2028. For lists of ships, the <a href='/blog/vessel-classification-api.html'>vessel classification API</a> takes up to 100 IMO numbers per request.</p>"
+    }
+  ],
+  "faq": [
+    {
+      "q": "What is the shadow fleet in shipping?",
+      "a": "It is an informal term for ships, often older tankers, that operate outside mainstream insurance, finance and classification, sometimes to carry sanctioned cargo. There is no official list or single definition."
+    },
+    {
+      "q": "Is losing class a sign that a ship is in the shadow fleet?",
+      "a": "Not on its own. Class is lost for many routine reasons, such as lay-up, sale or scrapping. It is an indicator that justifies more checks, especially when combined with ownership changes, AIS gaps or unclear insurance."
+    },
+    {
+      "q": "Why does a transfer to a non-IACS society matter?",
+      "a": "IACS members work to common technical requirements and procedures. A move outside IACS means mainstream insurers, charterers and banks may have less assurance about the ship's condition. Many such transfers are legitimate, for example for domestic trade."
+    },
+    {
+      "q": "Can class data show who owns a vessel or whether it is sanctioned?",
+      "a": "No. The IACS dataset has no ownership or sanctions fields. Use a sanctions screening tool and ownership research alongside class data."
+    },
+    {
+      "q": "What does it mean if a ship is not in the IACS dataset?",
+      "a": "It is not classed by one of the 12 IACS members. It may be classed by a non-IACS society, have no class, or the IMO number may be wrong. Check the number first, then ask for the class certificate."
+    }
+  ],
+  "related": [
+    "non-iacs-classification-societies",
+    "class-suspended-vs-withdrawn",
+    "/use-cases/sanctions-kyc-screening.html",
+    "/iacs-class-status-codes.html"
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "slug": "what-is-a-classification-society",
+  "date": "2026-10-19",
+  "title": "What Is a Classification Society? Ship Class Explained",
+  "meta_description": "What classification societies do: rules, plan approval, surveys, class vs statutory certificates, and why insurers, charterers, flags and banks require class.",
+  "h1": "What is a classification society?",
+  "primary_keyword": "what is a classification society",
+  "summary": "What ship classification societies do, how class differs from statutory certification, and why insurers, charterers, flags and lenders require it.",
+  "answer": "A classification society is an independent organisation that sets technical rules for the design, construction and maintenance of ships, checks ships against those rules through plan approval and surveys, and records the result as the ship's class. Many also issue statutory certificates on behalf of flag states. Insurers, charterers, lenders and flags usually require a ship to stay in class.",
+  "sections": [
+    {
+      "h2": "What a classification society actually does",
+      "html": "<p>A classification society does four connected jobs. It writes rules, it checks designs against those rules, it surveys the ship while it is built and throughout its life, and it keeps a register of which ships are in class.</p><ul><li><strong>Rules.</strong> Each society publishes technical rules covering hull structure, machinery, electrical systems, stability-related arrangements and much more. The rules are updated regularly as experience and technology change.</li><li><strong>Plan approval.</strong> Before a ship is built, the shipyard and designer submit drawings and calculations. The society reviews them and approves the design, usually with comments that must be addressed.</li><li><strong>Construction survey.</strong> Surveyors attend the yard to check that the ship is built to the approved plans, that materials and welding meet the rules, and that equipment is tested. When the ship is delivered, it is assigned a class.</li><li><strong>Surveys in service.</strong> The ship is then surveyed at set intervals for as long as it stays with that society. Typically this means annual surveys, an intermediate survey, and a renewal (special) survey on a roughly five-year cycle, plus bottom surveys and occasional surveys after damage or repairs.</li></ul><p>The class itself is recorded as a set of notations describing the ship type and any special features. If the ship falls behind on surveys or has a serious unresolved defect, the society can suspend or withdraw class.</p>"
+    },
+    {
+      "h2": "Class certificates vs statutory certificates",
+      "html": "<p>A ship carries two quite different kinds of paperwork, and classification societies are often involved in both.</p><p>The <strong>class certificate</strong> confirms that the ship complies with the society's own rules. It is a private, contractual matter between the owner and the society. No international convention requires a ship to be classed as such.</p><p><strong>Statutory certificates</strong> confirm compliance with international conventions and the flag state's laws: for example the safety certificates under SOLAS, pollution prevention certificates under MARPOL, and the load line certificate. These are the flag state's responsibility. Many flag states do not survey every ship themselves. Instead they authorise classification societies to carry out the surveys and issue the certificates on their behalf. In that role the society acts as a <strong>recognized organization (RO)</strong> for that flag, under an agreement with the flag administration and the framework set out by the IMO.</p><p>So the same surveyor may, on the same visit, check items for class and items for the flag. The two outcomes are still separate. A ship can, in principle, have valid statutory certificates and a class problem, or the reverse, although in practice many flags expect their ships to be classed with a recognized organization.</p>"
+    },
+    {
+      "h2": "Why ships need class",
+      "html": "<p>Class is voluntary in law but close to mandatory in commerce. Four groups usually insist on it.</p><ul><li><strong>Insurers.</strong> Hull and machinery policies commonly include a classification clause that makes maintaining class a condition of cover. P&amp;I clubs usually require class too. Losing class can put cover at risk. See <a href='/use-cases/marine-insurance.html'>class checks for marine insurance</a>.</li><li><strong>Charterers.</strong> Charter parties typically require the owner to keep the ship in class, often with a society that is a member of IACS, for the whole charter period. Vetting teams check class before fixing. See <a href='/use-cases/charter-vetting.html'>class checks for charter vetting</a>.</li><li><strong>Flag states.</strong> Many registries require a ship to be classed by a recognized organization before it can be registered, and they rely on class societies for statutory surveys.</li><li><strong>Lenders.</strong> Ship mortgages and loan agreements usually contain a covenant that the ship stays in class with an acceptable society, free of overdue recommendations. A class withdrawal can be an event of default.</li></ul><p>Port state control inspectors and cargo interests also look at class. A ship out of class tends to attract more attention at every step.</p>"
+    },
+    {
+      "h2": "Who pays for classification?",
+      "html": "<p>The shipowner, or the shipyard during construction, pays the classification society. Fees cover plan approval, surveyor attendance, certificates and ongoing class maintenance. Statutory work done on behalf of a flag is also usually invoiced to the owner.</p><p>This is a known tension in the system: the society is paid by the party whose ship it is judging. The industry's answers include published rules, quality systems audited by outside bodies, flag state oversight of recognized organizations, and port state control regimes that track how ships classed by each society perform in inspections. Owners can change society, but transfers between IACS members follow agreed procedures so that outstanding surveys and conditions of class are passed on rather than lost. See <a href='/blog/transfer-of-class.html'>transfer of class explained</a>.</p>"
+    },
+    {
+      "h2": "How many ships are classed, and by whom",
+      "html": "<p>There are many classification societies worldwide, but most large ocean-going tonnage is classed by the 12 members of the International Association of Classification Societies (IACS). In the IACS Vessels in Class dataset (snapshot 30 September 2026) there are <strong>60,223 ships</strong> across those 12 societies.</p><table><thead><tr><th>Status</th><th>Ships</th></tr></thead><tbody><tr><td>In class (Delivered, Reinstated, Reassigned)</td><td>50,826</td></tr><tr><td>Suspended</td><td>575</td></tr><tr><td>Withdrawn</td><td>4,848</td></tr><tr><td>No status recorded</td><td>3,974</td></tr></tbody></table><p>The largest by ship count are <a href='/class-societies/classnk.html'>ClassNK</a> (10,117), <a href='/class-societies/bureau-veritas.html'>Bureau Veritas</a> (9,958) and <a href='/class-societies/abs.html'>ABS</a> (8,787). Ship count is not the same as tonnage, so rankings by gross tonnage can look different. You can compare all 12 on the <a href='/class-societies/'>class societies page</a>, and read more about the association itself in <a href='/blog/what-is-iacs.html'>what is IACS</a>.</p>"
+    },
+    {
+      "h2": "What class status tells you, and what it does not",
+      "html": "<p>A ship's class status is a short summary of its relationship with its society. In the IACS data the main values are <em>Delivered</em> (in class), <em>Reinstated</em>, <em>Reassigned</em>, <em>Suspended</em> and <em>Withdrawn</em>, often with a reason such as <em>Survey overdue</em> (1,589 ships) or <em>Transfer of class to another IACS member</em> (1,316 ships). The <a href='/iacs-class-status-codes.html'>status codes guide</a> explains each one, and <a href='/blog/class-suspended-vs-withdrawn.html'>suspended vs withdrawn</a> covers the difference that matters most.</p><p>Status does not tell you the condition of a particular tank, which recommendations are open, or whether statutory certificates are valid. For that you need the class survey status report and certificates from the society or the owner. Treat public status data as a first check that tells you where to look next.</p>"
+    },
+    {
+      "h2": "How to check a ship's class",
+      "html": "<p>You need the ship's IMO number, which stays with the hull for life even when the name or flag changes (see <a href='/blog/what-is-an-imo-number.html'>what is an IMO number</a>). With it you can:</p><ol><li>Search the society's own register, if you already know which society classes the ship.</li><li>Check the IACS Vessels in Class dataset, which covers all 12 IACS members in one place.</li><li>Ask the owner or manager for the class certificate and a recent survey status report.</li></ol><p>For example, <a href='https://vesselclassfinder.com/?imo=9811000'>EVER GIVEN (IMO 9811000)</a> shows ABS, status Delivered, last survey 12/07/2023 and next survey 24/09/2028. If an IMO returns no IACS record at all, the ship is not classed by an IACS member, which is a question in itself; see <a href='/blog/non-iacs-classification-societies.html'>non-IACS classification societies</a>. A step-by-step version is in <a href='/blog/how-to-check-vessel-class-status.html'>how to check vessel class status</a>.</p>"
+    }
+  ],
+  "faq": [
+    {
+      "q": "Is classification mandatory for ships?",
+      "a": "No international convention requires class as such, but in practice most commercial ships need it. Insurers, charterers, lenders and many flag registries make class a condition of doing business."
+    },
+    {
+      "q": "What is the difference between class and flag?",
+      "a": "The flag state is the country whose laws the ship sails under and which is responsible for statutory certification. The classification society checks the ship against its own technical rules and often carries out statutory surveys for the flag as a recognized organization."
+    },
+    {
+      "q": "What is a recognized organization (RO)?",
+      "a": "A recognized organization is a body, usually a classification society, that a flag state has authorised to carry out statutory surveys and issue certificates on its behalf. The authorisation is set out in an agreement between the flag and the society."
+    },
+    {
+      "q": "Who pays the classification society?",
+      "a": "The shipowner pays, or the shipyard during construction. Fees cover plan approval, surveys, certificates and ongoing class maintenance."
+    },
+    {
+      "q": "How often is a ship surveyed by class?",
+      "a": "Under most class rules a ship has annual surveys, an intermediate survey, and a renewal survey roughly every five years, plus bottom surveys and occasional surveys after damage or repairs. Exact intervals depend on the society, ship type and age."
+    },
+    {
+      "q": "What happens if a ship loses class?",
+      "a": "Class can be suspended or withdrawn, for example for overdue surveys or unresolved defects. Insurance cover, charter contracts, loan covenants and flag registration can all be affected, so a loss of class usually triggers questions from every counterparty."
+    }
+  ],
+  "related": ["what-is-iacs", "ship-survey-cycle-explained", "class-and-marine-insurance", "/iacs-class-status-codes.html"]
+}

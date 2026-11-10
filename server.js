@@ -932,6 +932,14 @@ async function handleStripeWebhook(req, res) {
     }
 }
 
+// 📌 OpenAI plugin directory domain verification: serve the portal's challenge token
+// as plain text. Set OPENAI_APPS_CHALLENGE on Railway to the token the portal shows.
+app.get("/.well-known/openai-apps-challenge", (req, res) => {
+    const token = process.env.OPENAI_APPS_CHALLENGE;
+    if (!token) return res.status(404).type("text/plain").send("Not found");
+    res.type("text/plain").send(token.trim());
+});
+
 // 📌 Public demo lookup for the homepage: one IMO at a time, tightly rate-limited
 // per IP so it can't be used to scrape the dataset.
 const demoLimiter = rateLimit({

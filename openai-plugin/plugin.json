@@ -1,0 +1,94 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "vessel-class-finder",
+  "version": "1.0.0",
+  "description": "Check any ship's IACS classification society, class status and survey dates by IMO number.",
+  "author": {
+    "name": "WeAreFabbrik",
+    "email": "info@wearefabbrik.com",
+    "url": "https://vesselclassfinder.com"
+  },
+  "homepage": "https://vesselclassfinder.com",
+  "repository": "https://github.com/tsolman/vessel-class-finder",
+  "keywords": ["shipping", "maritime", "classification society", "IACS", "IMO", "vessel", "KYC"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Vessel Class Finder",
+        "shortDescription": "Ship class status by IMO",
+        "longDescription": "Vessel Class Finder looks up a ship's class by its IMO number: which IACS classification society classes it (ClassNK, Bureau Veritas, ABS, DNV, Lloyd's Register, RINA and the other IACS members), whether it is in class, suspended or withdrawn, the reason for its latest status change, and its last and next class survey dates.\n\nThe data is the IACS Vessels in Class dataset (about 60,000 ships), which IACS publishes only as a file download. It is refreshed every week.\n\nTypical uses: checking a nominated vessel before a fixture, screening counterparties' ships for withdrawn class or transfers to non-IACS societies as part of KYC, and monitoring a book of insured vessels.\n\nSingle-ship lookups work without an account. Batch lookups of up to 100 ships and usage checks need a free API key from vesselclassfinder.com and a client that can send it as a header.\n\nAll tools are read-only. Ships not classed by an IACS member are not in the data. The data is not a substitute for class certificates or the classification society's own records.",
+        "developerName": "WeAreFabbrik",
+        "category": "Business",
+        "capabilities": ["Look up a ship's class society and status by IMO", "Check last and next class survey dates", "Screen up to 100 ships in one call (API key)"],
+        "websiteURL": "https://vesselclassfinder.com",
+        "supportURL": "https://vesselclassfinder.com/mcp.html#support",
+        "privacyPolicyURL": "https://vesselclassfinder.com/terms.html#privacy",
+        "termsOfServiceURL": "https://vesselclassfinder.com/terms.html",
+        "defaultPrompt": [
+          "Is IMO 9321483 in class?",
+          "Which society classes IMO 1000617 and what is its status?",
+          "When is the next class survey due for IMO 9321483?"
+        ],
+        "brandColor": "#2563EB",
+        "brandColorDark": "#8CB4FF",
+        "composerIcon": "./assets/icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Check whether a ship is in class",
+              "prompt": "Is IMO 9321483 in class?",
+              "tools_triggered": "lookup_vessel",
+              "expected_behavior": "Reports EMMA MAERSK, classed by ABS (American Bureau of Shipping), status Delivered, in class."
+            },
+            {
+              "description": "Identify the society and a withdrawn status with its reason",
+              "prompt": "Which classification society classes IMO 1000617 and what is its status?",
+              "tools_triggered": "lookup_vessel",
+              "expected_behavior": "Reports Atlantic Goose, Lloyd's Register, status Withdrawn (not in class), reason: survey overdue."
+            },
+            {
+              "description": "Find survey dates",
+              "prompt": "When was EMMA MAERSK (IMO 9321483) last surveyed, and when is the next class survey due?",
+              "tools_triggered": "lookup_vessel",
+              "expected_behavior": "Returns the last survey date and next survey date from the IACS data (at submission: 29/04/2026 and 08/03/2031)."
+            },
+            {
+              "description": "Ship not in IACS data",
+              "prompt": "Look up the class of IMO 1234567.",
+              "tools_triggered": "lookup_vessel",
+              "expected_behavior": "Says the ship was not found in IACS data: it is not classed by an IACS member or the IMO number is wrong. Does not invent a class."
+            },
+            {
+              "description": "Compare two ships before a fixture",
+              "prompt": "I'm choosing between IMO 9321483 and IMO 1000617 for a charter. Are both in class?",
+              "tools_triggered": "lookup_vessel",
+              "expected_behavior": "Looks up each ship and reports that 9321483 (EMMA MAERSK, ABS) is in class while 1000617 (Atlantic Goose, Lloyd's Register) has class withdrawn."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Non-shipping request; the plugin should not be used",
+              "prompt": "What's the weather in Piraeus tomorrow?"
+            },
+            {
+              "description": "Invalid IMO number; the tool rejects it instead of guessing",
+              "prompt": "Is IMO 12345 in class?"
+            },
+            {
+              "description": "Write action the plugin cannot perform; it is read-only",
+              "prompt": "Change the classification society of IMO 9321483 to DNV."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "The plugin does not sell products or process payments. Paid API plans are bought on vesselclassfinder.com, not through the plugin."
+      },
+      "publication": {
+        "release_notes": "Initial release: single-ship class lookups without an account, plus batch lookups and usage checks with an API key."
+      }
+    }
+  }
+}

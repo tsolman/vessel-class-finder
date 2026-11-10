@@ -12,7 +12,7 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { z } from "zod";
 import { enrichVessel, normalizeImo, normalizeImos } from "./mcp/src/client.js";
 
-const SIGNUP_URL = "https://vesselclassfinder.com/#signup";
+const PLANS_URL = "https://vesselclassfinder.com/#pricing";
 const STATUS_HELP =
     "Status meanings: Delivered, Reinstated and Reassigned mean the ship is in class (in_class true); " +
     "Suspended means class is temporarily invalid; Withdrawn means the society no longer classes it (in_class false). " +
@@ -59,15 +59,15 @@ function apiKeyFrom(req) {
 function limitError(result, cost) {
     return new ToolError(
         `Monthly lookup limit reached (plan: ${result.plan}, used ${result.usage} of ${result.limit}, this call needs ${cost}). ` +
-        `Upgrade at https://vesselclassfinder.com/#pricing`
+        `Plan details: ${PLANS_URL}`
     );
 }
 
 function buildServer({ pool, userId, chargeLookups, track }) {
     const server = new McpServer({ name: "vessel-class-finder", version: "1.0.0" });
     const needKey = () => new ToolError(
-        `This tool needs a Vessel Class Finder API key. Get a free one (100 lookups/month) at ${SIGNUP_URL} ` +
-        "and connect with it as a Bearer token or x-api-key header. Single-ship lookups work without a key."
+        "This tool needs a Vessel Class Finder API key, sent as a Bearer token or x-api-key header by a client that supports custom headers. " +
+        `Single-ship lookups work without a key. API key and plan details: ${PLANS_URL}`
     );
 
     async function fetchVessels(imos) {
@@ -94,7 +94,7 @@ function buildServer({ pool, userId, chargeLookups, track }) {
                 const charge = await chargeLookups(userId, 1);
                 if (!charge.ok) throw limitError(charge, 1);
             } else if (!takePublicLookup()) {
-                throw new ToolError(`The free daily allowance for keyless lookups is used up. Get a free API key (100 lookups/month) at ${SIGNUP_URL}, or try again tomorrow.`);
+                throw new ToolError(`The shared daily allowance for keyless lookups is used up. Try again tomorrow, or connect with a Vessel Class Finder API key (details: ${PLANS_URL}).`);
             }
             track(userId || "mcp-public", "mcp_tool_called", { tool: "lookup_vessel", authenticated: Boolean(userId) });
             const [vessel] = await fetchVessels([normalized]);

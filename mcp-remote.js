@@ -86,7 +86,7 @@ function buildServer({ pool, userId, chargeLookups, track }) {
                 STATUS_HELP + " If found is false, the ship is not classed by an IACS member or the IMO is wrong. " +
                 "Works without an API key (shared daily allowance).",
             inputSchema: { imo: z.union([z.string(), z.number()]).describe('A 7-digit IMO number, e.g. "9321483".') },
-            annotations: { title: "Look up a ship's class status", readOnlyHint: true, openWorldHint: false },
+            annotations: { title: "Look up a ship's class status", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
         },
         wrap(async ({ imo }) => {
             const normalized = normalizeImo(imo);
@@ -115,7 +115,7 @@ function buildServer({ pool, userId, chargeLookups, track }) {
             inputSchema: {
                 imos: z.array(z.union([z.string(), z.number()])).min(1).max(100).describe('IMO numbers, 1-100 items, e.g. ["9321483", "9074729"].'),
             },
-            annotations: { title: "Look up class status for many ships", readOnlyHint: true, openWorldHint: false },
+            annotations: { title: "Look up class status for many ships", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
         },
         wrap(async ({ imos }) => {
             if (!userId) throw needKey();
@@ -136,7 +136,7 @@ function buildServer({ pool, userId, chargeLookups, track }) {
             title: "Check API usage",
             description: "Show the connected account's plan and how many lookups are used and remaining this month. Requires the user's API key.",
             inputSchema: {},
-            annotations: { title: "Check API usage", readOnlyHint: true, openWorldHint: false },
+            annotations: { title: "Check API usage", readOnlyHint: true, destructiveHint: false, openWorldHint: false },
         },
         wrap(async () => {
             if (!userId) throw needKey();

@@ -1157,3 +1157,20 @@ describe("POST /mcp (remote MCP)", () => {
     expect(res.status).toBe(405);
   });
 });
+
+describe("GET /.well-known/openai-apps-challenge", () => {
+  afterEach(() => { delete process.env.OPENAI_APPS_CHALLENGE; });
+
+  it("returns 404 when no challenge token is configured", async () => {
+    const res = await request(app).get("/.well-known/openai-apps-challenge");
+    expect(res.status).toBe(404);
+  });
+
+  it("returns the exact token as plain text", async () => {
+    process.env.OPENAI_APPS_CHALLENGE = " tok_abc123\n";
+    const res = await request(app).get("/.well-known/openai-apps-challenge");
+    expect(res.status).toBe(200);
+    expect(res.headers["content-type"]).toMatch(/^text\/plain/);
+    expect(res.text).toBe("tok_abc123");
+  });
+});
